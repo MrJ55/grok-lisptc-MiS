@@ -1,0 +1,16 @@
+;; MiS helpers — load after the image or include in the image itself.
+;; These are intentionally simple so they survive the transcript model.
+
+(defun mis-version ()
+  "Return a version string for the mind helpers."
+  "mis-helpers-0.1")
+
+(defun mis-ping ()
+  "Health check for the restored mind."
+  'pong)
+
+;; Placeholder for a richer dump once we add environment reflection.
+;; For now the host simply appends the evaluated forms to the transcript.
+(defun mis-note (msg)
+  "Record a free-form note (currently just returns it)."
+  msg)

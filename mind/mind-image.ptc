@@ -1,0 +1,14 @@
+;; --- MiS mind image (transcript style) ---
+(defun square (x) (* x x))
+
+(defun mis-version ()
+  "Return a version string for the mind helpers."
+  "mis-helpers-0.1")
+
+(defun mis-ping ()
+  "Health check for the restored mind."
+  'pong)
+
+(defun mis-note (msg)
+  "Record a free-form note (currently just returns it)."
+  msg)
