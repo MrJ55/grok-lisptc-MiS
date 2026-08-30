@@ -1,0 +1,8 @@
+node_modules/
+/tmp/
+*.log
+.env
+.env.*
+.DS_Store
+/tmp/mis/
+/tmp/mis-node/
