@@ -2,6 +2,15 @@
 
 Append durable observations here. Newest first.
 
+## 2026-08-31 — review-by-all synthesis
+
+- Ingested Pi-Lisptc `review-by-all` (5 reviews). Mapped to MiS in `docs/review-by-all-synthesis.md`.
+- **Keep:** validate-before-eval, no reset on ordinary errors, save-only-on-success, cabinet vs cortex, replace-not-accumulate for turn recall, exit criteria + smoke tests.
+- **Drop / defer for MiS:** Pi prompt-cache layers, Fireworks grammar, tool-call provider modes, INTERPRETER_SOURCE-as-system-prompt correctness, dual Pi/lisptc authority.
+- **P0 gap:** bridge still accepts any string and can `--save` after failure paths; bootstrap does not guarantee `lisp.ts` on GitHub clone.
+- **Terra anti-pattern applies later:** never `eval` raw memory text; data-only literals for vestiges.
+- **Luna state classes** adapted: chat transcript / working REPL / mind-image.ptc / future vestiges / prefs / audit log.
+
 ## 2026-08-30 — v0 mind loop
 
 - **RAM**: Full lisptc monorepo install is heavy on ~1.2 GB sandboxes. Stripped MemoryRepl + only `zod` works.
