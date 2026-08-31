@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Assemble runnable MiS under /tmp/mis — always ensure lisp.ts
+# Assemble runnable MiS under /tmp/mis — always ensure lisp.ts + Reader fix
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -31,6 +31,13 @@ if [[ ! -f "$REPO_ROOT/src/arith.ts" ]] || [[ ! -s "$REPO_ROOT/src/arith.ts" ]];
   else
     curl -fsSL -o "$REPO_ROOT/src/arith.ts" "$UPSTREAM_ARITH_URL"
   fi
+fi
+
+# --- Reader tryToParse fix (undefined vs null) ---
+# arith tryToParse returns undefined on failure; original check treated it as number.
+if grep -q 'if (n !== null) this.token = n;' "$REPO_ROOT/src/lisp.ts" 2>/dev/null; then
+  echo "[mis] applying Reader tryToParse fix…"
+  sed -i 's/if (n !== null) this.token = n;/if (n !== undefined \&\& n !== null) this.token = n;/' "$REPO_ROOT/src/lisp.ts"
 fi
 
 # --- zod ---

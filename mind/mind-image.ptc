@@ -96,3 +96,9 @@
 ;; --- live saves from 2026-08-31 sandbox ---
 (update-self-schema '((:working-insights . (reader-fix-applied phase3-started)) (:last-reflection . "2026-08-31")))
 (progn (dmn-log-episode "(+ 40 2)" 42 "smoke") (dmn-fetch-unreflected 2))
+
+;; --- 2026-08-31T12:44:47.861Z ---
+(progn
+  (dmn-log-episode "(list 1 2 3)" (list 1 2 3) "verify")
+  (update-self-schema '((:working-insights . (reader-fix phase3-verified)) (:last-reflection . "2026-08-31-verify")))
+  (list (mis-insights) (dmn-fetch-unreflected 2)))
