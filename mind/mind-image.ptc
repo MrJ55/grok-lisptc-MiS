@@ -1,17 +1,38 @@
 ;; --- MiS mind image (transcript style) ---
-(defun square (x) (* x x))
+;; Core helpers (mis-helpers-0.2)
 
 (defun mis-version ()
   "Return a version string for the mind helpers."
-  "mis-helpers-0.1")
+  "mis-helpers-0.2")
 
 (defun mis-ping ()
   "Health check for the restored mind."
   'pong)
 
 (defun mis-note (msg)
-  "Record a free-form note (currently just returns it)."
+  "Record a free-form note (returns it)."
   msg)
 
-;; --- 2026-08-31T11:40:48.589Z ---
+(setq *mis-known*
+      '(mis-version mis-ping mis-note mis-register mis-state-summary
+        square triple))
+
+(defun mis-register (sym)
+  "Add SYM to *mis-known* if not already present; return SYM."
+  (if (member sym *mis-known*)
+      sym
+    (progn (setq *mis-known* (cons sym *mis-known*))
+           sym)))
+
+(defun mis-state-summary ()
+  "Return a small status structure: version, ping, known symbols."
+  (list (list 'version (mis-version))
+        (list 'ping (mis-ping))
+        (list 'known *mis-known*)))
+
+(defun square (x) (* x x))
+
 (defun triple (x) (* x 3))
+
+;; --- 2026-08-31T12:04:00Z ---
+(progn (defun double (x) (* x 2)) (mis-register (quote double)) (double 6))
