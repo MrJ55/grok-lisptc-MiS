@@ -1,15 +1,17 @@
 /**
- * MiS eval bridge — P0 hardened (validate + save-only-on-success).
+ * MiS eval bridge — P0+P2 (validate, save-on-success, --scratch/--image).
  *
  *   node --experimental-transform-types --no-warnings bridge/eval.ts '(+ 1 2)'
- *   node ... bridge/eval.ts --save '(defun foo () 1)'
  *
  * Options:
  *   --load <path>   load mind image first (default: mind/mind-image.ptc)
- *   --save          append forms to image ONLY after successful eval
+ *   --image <path>  alias for --load; also the save target
+ *   --scratch       use mind/mind-scratch.ptc (experiments)
+ *   --save          append forms ONLY after successful eval
  *   --reset         ignore existing image
- *   --checkpoint    copy image to mind-image.prev.ptc before save
+ *   --checkpoint    copy image to <stem>.prev.ptc before save
  *
+ * Env: MIS_IMAGE overrides default path; MIS_SAVE=1 enables save.
  * Exit codes: 0 success, 1 usage/empty, 2 validation or eval failure
  */
 
@@ -30,10 +32,12 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIND_DIR = resolve(__dirname, "../mind");
-const DEFAULT_IMAGE = join(MIND_DIR, "mind-image.ptc");
+const DEFAULT_IMAGE = process.env.MIS_IMAGE
+  ? resolve(process.env.MIS_IMAGE)
+  : join(MIND_DIR, "mind-image.ptc");
+const SCRATCH_IMAGE = join(MIND_DIR, "mind-scratch.ptc");
 const FAILURES_LOG = join(MIND_DIR, "mind-failures.log");
 
-/** Strip markdown fences and leading/trailing prose noise; keep inner Lisp. */
 function stripFences(raw: string): string {
   let s = raw.trim();
   const fenced = s.match(/^```(?:lisp|scheme|lisptc)?\s*\n?([\s\S]*?)\n?```$/i);
@@ -41,7 +45,6 @@ function stripFences(raw: string): string {
   return s;
 }
 
-/** Cheap structural checks before calling the interpreter. */
 function prevalidate(code: string): string | null {
   if (!code.trim()) return "empty input";
   const trimmed = code.trim();
@@ -86,7 +89,6 @@ class MemoryRepl {
     run(interp, prelude);
     return interp;
   }
-  /** Evaluate; never resets on EvalException. Returns ok + captured output. */
   eval(code: string): { ok: boolean; output: string } {
     let out = "";
     const prev = setWriter((s: string) => {
@@ -158,7 +160,6 @@ function checkpointImage(path: string) {
   console.error(`[mis] checkpoint → ${prevPath}`);
 }
 
-// --- CLI ---
 const args = process.argv.slice(2);
 let loadPath = DEFAULT_IMAGE;
 let doSave = process.env.MIS_SAVE === "1";
@@ -168,7 +169,8 @@ let code: string | null = null;
 
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
-  if (a === "--load" && args[i + 1]) loadPath = resolve(args[++i]);
+  if ((a === "--load" || a === "--image") && args[i + 1]) loadPath = resolve(args[++i]);
+  else if (a === "--scratch") loadPath = SCRATCH_IMAGE;
   else if (a === "--save") doSave = true;
   else if (a === "--reset") doReset = true;
   else if (a === "--checkpoint") doCheckpoint = true;
@@ -184,7 +186,7 @@ if (!code) {
 }
 
 if (!code || !code.trim()) {
-  console.error("usage: eval.ts [--load path] [--save] [--reset] [--checkpoint] '<lisp forms>'");
+  console.error("usage: eval.ts [--load|--image path] [--scratch] [--save] [--reset] [--checkpoint] '<lisp forms>'");
   process.exit(1);
 }
 
