@@ -1,28 +1,15 @@
-# Mind API (helpers)
-
-Helpers live in `mind/mind-image.ptc` (and `mind/helpers.ptc` as source of truth for the helper block).
+# Mind API
 
 | Form | Purpose |
 |------|---------|
-| `(mis-version)` | Helper version string (`"mis-helpers-0.2"`) |
-| `(mis-ping)` | Health → `pong` |
-| `(mis-note msg)` | Echo / placeholder note |
-| `(mis-register 'sym)` | Add symbol to `*mis-known*` |
-| `(mis-state-summary)` | `( (version …) (ping …) (known …) )` |
+| `(mis-version)` | `"mis-helpers-0.2"` |
+| `(mis-ping)` | `pong` |
+| `(mis-note msg)` | echo |
+| `(mis-register 'sym)` | track in `*mis-known*` |
+| `(mis-state-summary)` | version, ping, known |
 
-**Convention:** after `(defun foo …)`, call `(mis-register 'foo)` before `--save` so the summary stays accurate.
+Sample defs in image: `square` `triple` `double` `quadruple` `half`.
 
-## Images
+`--scratch` → `mind-scratch.ptc`. `--image` / `MIS_IMAGE` for alternate paths.
 
-| Image | Flag / env | Role |
-|-------|------------|------|
-| `mind/mind-image.ptc` | default, `--load` / `--image` | Permanent mind |
-| `mind/mind-scratch.ptc` | `--scratch` | Experiments; not permanent |
-
-## Push
-
-```bash
-bash scripts/push-mind-image.sh
-```
-
-Scratch should NOT be pushed as the permanent mind.
+Push: `scripts/push-mind-image.sh` or Grok GitHub tool. Do not push scratch as main.

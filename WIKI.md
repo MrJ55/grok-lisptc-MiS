@@ -1,47 +1,53 @@
-# grok-lisptc-MiS — Session Wiki (start here)
+# grok-lisptc-MiS — Wiki
 
-Live system: **Grok drives a permanent lisptc Mind-in-Sandbox (MiS)**.
+**Mind-in-Sandbox for Grok** using a stripped [lisptc](https://github.com/1hachem/lisptc) `MemoryRepl`.  
+Repo: https://github.com/MrJ55/grok-lisptc-MiS
 
-## Status (2026-08-30)
+**Status (2026-08-31):** v0 + **P0 + P1 + P2 complete and verified.** See [docs/VERIFICATION.md](./docs/VERIFICATION.md).
 
-- **v0 mind loop working**: MemoryRepl (no MCP), transcript image, save/load across process death.
-- Upstream: [1hachem/lisptc](https://github.com/1hachem/lisptc) (`@repo/interpreter` + `@repo/repl`).
-- Runtime dep: only `zod`. Full monorepo install avoided (RAM ~1.2 GB sandbox).
+## What this is
 
-## Read order (new / blank session)
+- **Host:** Grok — decides Lisp forms, talks to the user in plain language.
+- **Mind:** lisptc REPL state as transcript image (`mind/mind-image.ptc`).
+- **Bridge:** `bridge/eval.ts` — validate → eval → optional save (never on failure).
+- **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (dep: `zod` only).
 
-1. **This file**
-2. [docs/CUSTOM_INSTRUCTIONS.md](./docs/CUSTOM_INSTRUCTIONS.md) — paste into Grok project
-3. [docs/session-handoff.md](./docs/session-handoff.md) — cold-start checklist
-4. [docs/bootstrap.md](./docs/bootstrap.md) — exact install & restore steps
-5. [docs/permanence.md](./docs/permanence.md) — how state survives
-6. [docs/learnings-log.md](./docs/learnings-log.md)
-7. [docs/architecture.md](./docs/architecture.md)
+No Fireworks GBNF in this chat path; safety is validation + save-only-on-success.
 
-## Index
+## Read order (blank session)
 
-| Doc | Purpose |
-|-----|---------|
-| [docs/CUSTOM_INSTRUCTIONS.md](./docs/CUSTOM_INSTRUCTIONS.md) | Paste into Grok custom instructions |
-| [docs/session-handoff.md](./docs/session-handoff.md) | What the next Grok instance must do first |
-| [docs/bootstrap.md](./docs/bootstrap.md) | Clone → zod → assemble /tmp/mis → eval |
-| [docs/permanence.md](./docs/permanence.md) | mind-image.ptc, GitHub mirror, vestiges |
-| [docs/architecture.md](./docs/architecture.md) | Components & turn protocol |
-| [docs/learnings-log.md](./docs/learnings-log.md) | Hard-won constraints (RAM, I/O, Node) |
-| [docs/decisions-index.md](./docs/decisions-index.md) | ADR index |
-| [docs/ops-playbook.md](./docs/ops-playbook.md) | Daily ops checklist |
-| [docs/user-prompt-reseed.md](./docs/user-prompt-reseed.md) | One-shot user message to reseed a blank chat |
-| [adr/](./adr/) | Individual ADRs |
-| [mind/mind-image.ptc](./mind/mind-image.ptc) | Current permanent Lisp image |
-| [skills/](./skills/) | Optional Grok skills |
+1. This file
+2. [docs/CUSTOM_INSTRUCTIONS.md](./docs/CUSTOM_INSTRUCTIONS.md)
+3. [docs/session-handoff.md](./docs/session-handoff.md)
+4. [docs/bootstrap.md](./docs/bootstrap.md)
+5. [docs/permanence.md](./docs/permanence.md)
+6. [plan/README.md](./plan/README.md)
+7. [docs/VERIFICATION.md](./docs/VERIFICATION.md)
+8. [docs/mind-api.md](./docs/mind-api.md)
+9. [docs/UPSTREAM.md](./docs/UPSTREAM.md)
+10. [docs/learnings-log.md](./docs/learnings-log.md)
 
-## Sibling projects
-
-- [grok-zero-anneal](https://github.com/MrJ55/grok-zero-anneal) — Grok-as-manager + pure workers (orthogonal; no workers needed for MiS mind path)
-- [pi-zero-shot](https://github.com/MrJ55/pi-zero-shot) — Pi adaptation layer (this repo replaces Pi with Grok as host)
-
-## One-line restore
+## Quick start
 
 ```bash
-bash scripts/bootstrap.sh && cd /tmp/mis && node --experimental-transform-types --no-warnings bridge/eval.ts '(list (mis-version) (mis-ping))'
+bash scripts/bootstrap.sh
+cd /tmp/mis
+node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
+node --experimental-transform-types --no-warnings bridge/eval.ts \
+  '(list (square 2) (triple 3) (double 4) (quadruple 5) (half 8))'
 ```
+
+## Mind API
+
+`(mis-version)` `(mis-ping)` `(mis-note msg)` `(mis-register 'sym)` `(mis-state-summary)`  
+Sample defs: `square` `triple` `double` `quadruple` `half`
+
+## Safety / UX / Ops
+
+P0: validate, save-on-success, no reset, checkpoint, failures log.  
+P1: English-first; UPSTREAM pins; string-trim caveat.  
+P2: summary/register; `--scratch`; push script.
+
+## Next
+
+Optional **P3** vector cabinet.
