@@ -1,9 +1,9 @@
 ;; --- MiS mind image (transcript style) ---
-;; Core helpers (mis-helpers-0.2)
+;; Core helpers (mis-helpers-0.3) + Phase 3 self-schema
 
 (defun mis-version ()
   "Return a version string for the mind helpers."
-  "mis-helpers-0.2")
+  "mis-helpers-0.3")
 
 (defun mis-ping ()
   "Health check for the restored mind."
@@ -15,7 +15,9 @@
 
 (setq *mis-known*
       '(mis-version mis-ping mis-note mis-register mis-state-summary
-        square triple))
+        mis-schema mis-insights update-self-schema
+        dmn-log-episode dmn-fetch-unreflected
+        square triple double quadruple half))
 
 (defun mis-register (sym)
   "Add SYM to *mis-known* if not already present; return SYM."
@@ -25,20 +27,72 @@
            sym)))
 
 (defun mis-state-summary ()
-  "Return a small status structure: version, ping, known symbols."
+  "Return version, ping, known symbols, and current schema."
   (list (list 'version (mis-version))
         (list 'ping (mis-ping))
-        (list 'known *mis-known*)))
+        (list 'known *mis-known*)
+        (list 'schema *self-schema*)))
+
+(setq *self-schema*
+      '((:core-values . (curious precise persistent))
+        (:active-goals . (maintain-coherent-self support-user-goals))
+        (:working-insights . ())
+        (:episodic-summary . "MiS mind restored; self-schema initialized.")
+        (:last-reflection . nil)))
+
+(defun mis-schema ()
+  "Return the current *self-schema*."
+  *self-schema*)
+
+(defun mis-insights ()
+  "Return the :working-insights value from *self-schema*."
+  (let ((pair (assoc :working-insights *self-schema*)))
+    (if pair (cdr pair) nil)))
+
+(defun update-self-schema (new-map)
+  "Merge NEW-MAP alist into *self-schema*; return updated schema."
+  (let ((old *self-schema*) (acc new-map))
+    (while old
+      (let ((k (car (car old))))
+        (unless (assoc k new-map)
+          (setq acc (cons (car old) acc))))
+      (setq old (cdr old)))
+    (setq *self-schema* (nreverse acc))
+    *self-schema*))
+
+(setq *episodic-buffer* nil)
+(setq *episodic-max* 40)
+
+(defun dmn-log-episode (input result meta)
+  "Push episode (input result meta) newest-first; trim to max; return record. Pass nil for meta if unused."
+  (let ((rec (list input result meta)))
+    (setq *episodic-buffer* (cons rec *episodic-buffer*))
+    (when (> (length *episodic-buffer*) *episodic-max*)
+      (let ((acc nil) (i 0) (xs *episodic-buffer*))
+        (while (and xs (< i *episodic-max*))
+          (setq acc (cons (car xs) acc))
+          (setq xs (cdr xs))
+          (setq i (+ i 1)))
+        (setq *episodic-buffer* (nreverse acc))))
+    rec))
+
+(defun dmn-fetch-unreflected (n)
+  "Return up to N most recent episodes (newest first). Nil/<=0 => all."
+  (if (or (null n) (<= n 0))
+      *episodic-buffer*
+    (let ((acc nil) (i 0) (xs *episodic-buffer*))
+      (while (and xs (< i n))
+        (setq acc (cons (car xs) acc))
+        (setq xs (cdr xs))
+        (setq i (+ i 1)))
+      (nreverse acc))))
 
 (defun square (x) (* x x))
-
 (defun triple (x) (* x 3))
+(defun double (x) (* x 2))
+(defun quadruple (x) (* x 4))
+(defun half (x) (/ x 2))
 
-;; --- 2026-08-31T12:04:21.239Z ---
-(progn (defun double (x) (* x 2)) (mis-register (quote double)) (double 6))
-
-;; --- 2026-08-31T12:12:20.177Z ---
-(progn (defun quadruple (x) (* x 4)) (mis-register (quote quadruple)) (quadruple 3))
-
-;; --- 2026-08-31T12:12:21.906Z ---
-(progn (defun half (x) (/ x 2)) (mis-register (quote half)) (half 10))
+;; --- live saves from 2026-08-31 sandbox ---
+(update-self-schema '((:working-insights . (reader-fix-applied phase3-started)) (:last-reflection . "2026-08-31")))
+(progn (dmn-log-episode "(+ 40 2)" 42 "smoke") (dmn-fetch-unreflected 2))
