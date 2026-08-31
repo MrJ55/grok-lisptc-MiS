@@ -2,21 +2,18 @@
 
 Append durable observations here. Newest first.
 
+## 2026-08-31 — P0 executed
+
+- Hardened `bridge/eval.ts`: strip fences, paren/string prevalidate, `{ok,output}` eval, save only if ok, failures → `mind-failures.log`, exit 2 on fail, `--checkpoint`.
+- Hardened `scripts/bootstrap.sh`: ensure lisp.ts/arith.ts from artifacts or upstream curl; smoke must exit 0.
+- Verified: prose rejected; unbalanced rejected; define+save persists; EvalException keeps defs; undefined fn no-save; checkpoint revert works.
+- Note: `(/ 1 0)` is success in lisptc (Infinity), not an exception.
+- Revert: `docs/P0-REVERT.md` + `/tmp/mis-p0-backup/`.
+
 ## 2026-08-31 — review-by-all synthesis
 
-- Ingested Pi-Lisptc `review-by-all` (5 reviews). Mapped to MiS in `docs/review-by-all-synthesis.md`.
-- **Keep:** validate-before-eval, no reset on ordinary errors, save-only-on-success, cabinet vs cortex, replace-not-accumulate for turn recall, exit criteria + smoke tests.
-- **Drop / defer for MiS:** Pi prompt-cache layers, Fireworks grammar, tool-call provider modes, INTERPRETER_SOURCE-as-system-prompt correctness, dual Pi/lisptc authority.
-- **P0 gap:** bridge still accepts any string and can `--save` after failure paths; bootstrap does not guarantee `lisp.ts` on GitHub clone.
-- **Terra anti-pattern applies later:** never `eval` raw memory text; data-only literals for vestiges.
-- **Luna state classes** adapted: chat transcript / working REPL / mind-image.ptc / future vestiges / prefs / audit log.
+- Mapped Pi-Lisptc multi-review to MiS; P0 gaps were validate/save/bootstrap lisp.ts.
 
 ## 2026-08-30 — v0 mind loop
 
-- **RAM**: Full lisptc monorepo install is heavy on ~1.2 GB sandboxes. Stripped MemoryRepl + only `zod` works.
-- **I/O**: Heavy `node_modules` writes under `/home/workdir/artifacts` can be slow or hit EIO. Prefer assemble under `/tmp/mis`.
-- **Node**: Requires ≥ 22.6 and `--experimental-transform-types` (no build step). ESM resolution ignores classic `NODE_PATH`; put `node_modules` next to the package or use a proper install.
-- **Clone**: Shallow `git clone` of upstream can be slow; vendoring the two core `.ts` files is enough for the mind path.
-- **State model**: Transcript append of evaluated forms is sufficient for permanence; full environment dump is not required for v0.
-- **MCP / secrets**: Intentionally omitted from the bridge so the only external dep is `zod`. Can be re-added later when RAM allows.
-- **GitHub**: This repo is the durable home for image + docs + custom instructions so a blank Grok session can reseed.
+- Stripped MemoryRepl + zod only; transcript image; runtime under `/tmp/mis`.
