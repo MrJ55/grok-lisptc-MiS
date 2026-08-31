@@ -2,22 +2,28 @@
 
 Newest first.
 
+## 2026-08-31 — DMN roadmap P7–P10 synced
+
+- Five subsystems mapped: Narrative (P7), Episodic/scenes (P8), Prospection/imagination (P9), Wander (P10), Consolidation (P4 done).
+- Imagination treated as constructive simulation (fMRI-backed DMN literature), not mere next-token prediction.
+- Session survival: git image + proposal files + APIs; no sandbox daemon.
+- P5 prefers managed vector API (e.g. Pinecone Starter) over local sqlite-vec in this environment.
+- ADR 0005 accepted; creative mechanisms documented in plan/CREATIVE-MECHANISMS.md.
+
 ## 2026-08-31 — P4 reflection protocol
 
 - Added `dmn-reflect-pack` and `dmn-apply-reflection`; two live turns persisted.
 - Insights after turn2: reader-fix phase3-verified reflection-helpers-live avoid-undefined-fn-without-guard.
-- Plan folder segmented into P00–P6 for blank-session continuity.
+- Plan folder segmented into phase files for blank-session continuity.
 
 ## 2026-08-31 — P3 self-schema started + Reader fix
 
-- **Critical bug**: vendored/upstream `lisp.ts` Reader treated `tryToParse` returning `undefined` as a successful number (`if (n !== null)`). Fixed to `if (n !== undefined && n !== null)`. Without this, all list forms evaluated to undefined.
-- Multi-line docstrings break the Reader (bad string at line N). Keep docstrings single-line in the image.
-- `&optional` in defun can produce arity surprises with the current lambda/closure representation; prefer fixed arity + explicit `nil` for optional meta.
-- Phase 3 primitives land cleanly in the transcript image: `*self-schema*`, `update-self-schema`, `dmn-log-episode`, `dmn-fetch-unreflected`, `mis-schema`, `mis-insights`.
-- Schema and episodes persist across process death via `--save` + image reload.
+- **Critical bug**: Reader treated `tryToParse` returning `undefined` as a successful number (`if (n !== null)`). Fixed to `if (n !== undefined && n !== null)`. Without this, all list forms evaluated to undefined.
+- Multi-line docstrings break the Reader. Keep docstrings single-line in the image.
+- Prefer fixed arity + explicit `nil` for optional meta.
+- Phase 3 primitives: `*self-schema*`, `update-self-schema`, `dmn-log-episode`, `dmn-fetch-unreflected`, `mis-schema`, `mis-insights`.
 
 ## 2026-08-31 — full P0–P2 verification
 
-- 22 scenarios in /tmp/mis; report in docs/VERIFICATION.md.
-- All helpers and defs OK; errors never bricked the mind.
-- Image grew only on successful saves; failures → mind-failures.log.
+- 22 scenarios; report in docs/VERIFICATION.md.
+- Errors never bricked the mind; image grew only on successful saves.

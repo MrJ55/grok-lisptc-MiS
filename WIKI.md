@@ -1,16 +1,18 @@
 # grok-lisptc-MiS — Wiki
 
-**Mind-in-Sandbox for Grok** using a stripped [lisptc](https://github.com/1hachem/lisptc) `MemoryRepl`.  
+**Mind-in-Sandbox for Grok** using a stripped [lisptc](https://github.com/1hachem/lisptc) `MemoryRepl`, extended toward a **Default Mode Network–style** symbolic self.
+
 Repo: https://github.com/MrJ55/grok-lisptc-MiS
 
-**Status (2026-08-31):** P0–P2 verified. **P3 self-schema / DMN started** (helpers 0.3). See [docs/VERIFICATION.md](./docs/VERIFICATION.md) and [plan/README.md](./plan/README.md).
+**Status (2026-08-31):** P0–P4 done. **Next: P7 Narrative Self.** Full DMN path: P7→P10 (+ optional P5 cabinet, P6 eval). See [plan/README.md](./plan/README.md).
 
 ## What this is
 
 - **Host:** Grok — decides Lisp forms, talks to the user in plain language.
 - **Mind:** lisptc REPL state as transcript image (`mind/mind-image.ptc`).
 - **Bridge:** `bridge/eval.ts` — validate → eval → optional save (never on failure).
-- **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (dep: `zod` only).
+- **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (dep: `zod` only; auto Reader fix).
+- **DMN goal:** continuous narrative identity, replay, constructive simulation (imagination), spontaneous candidates, consolidation — without an always-on sandbox daemon.
 
 ## Quick start
 
@@ -18,25 +20,38 @@ Repo: https://github.com/MrJ55/grok-lisptc-MiS
 bash scripts/bootstrap.sh
 cd /tmp/mis
 node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
-node --experimental-transform-types --no-warnings bridge/eval.ts \
-  '(list (square 2) (triple 3) (double 4) (quadruple 5) (half 8))'
+node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
 ```
 
-## Mind API (v0.3)
+Reflection: [docs/reflection-protocol.md](./docs/reflection-protocol.md)  
+Cold start: [plan/P00-cold-start.md](./plan/P00-cold-start.md)
 
-`(mis-version)` `(mis-ping)` `(mis-note msg)` `(mis-register 'sym)` `(mis-state-summary)`  
-`(mis-schema)` `(mis-insights)` `(update-self-schema alist)`  
-`(dmn-log-episode input result meta)` `(dmn-fetch-unreflected n)`  
-Sample: `square` `triple` `double` `quadruple` `half`
+## Mind API (summary)
 
-## Safety / UX / Ops
+Core: `(mis-version)` `(mis-ping)` `(mis-note)` `(mis-register)` `(mis-state-summary)`  
+Schema: `(mis-schema)` `(mis-insights)` `(update-self-schema alist)`  
+Episodes: `(dmn-log-episode input result meta)` `(dmn-fetch-unreflected n)`  
+Reflection: `(dmn-reflect-pack n)` `(dmn-apply-reflection insights summary label)`  
+Planned P7+: autobiography / arc / replay / simulate / wander — see [docs/mind-api.md](./docs/mind-api.md)
 
-P0: validate, save-on-success, no reset, checkpoint, failures log.  
-P1: English-first; UPSTREAM pins.  
-P2: summary/register; `--scratch`; push script.  
-P3: self-schema + episodic buffer (in progress).
+## DMN subsystems
 
-## Next
+| Subsystem | Plan | Status |
+|-----------|------|--------|
+| Consolidation | P4 | done |
+| Narrative Self | P7 | next |
+| Episodic replay & scenes | P8 | planned |
+| Prospection (imagination) | P9 | planned |
+| Spontaneous wander | P10 | planned |
+| Vector cabinet | P5 | optional (prefer managed API) |
 
-- Drive reflection turns that call `update-self-schema` + `--save`.
-- Optional P5 vector cabinet.
+Creative mechanisms: [plan/CREATIVE-MECHANISMS.md](./plan/CREATIVE-MECHANISMS.md)  
+Architecture: [docs/architecture.md](./docs/architecture.md) · ADR 0005
+
+## Permanence
+
+GitHub repo is the durable store for the mind image and docs. Session process RAM does not survive. Optional wander **proposals** are files for the next session — never auto-applied.
+
+## Safety
+
+Validate before eval; save only on success; no reset on ordinary errors; single-line docstrings in image.

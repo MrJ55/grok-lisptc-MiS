@@ -41,3 +41,7 @@ node --experimental-transform-types --no-warnings bridge/eval.ts --save --checkp
 ## Example insights style
 Good: `(reader-fix avoid-undefined-fn-without-guard pack-works)`  
 Weak: `(be-better think-harder)`
+
+## Relation to full DMN
+
+Reflection is **consolidation**. Narrative chapters (P7), scenes (P8), simulations (P9), and wander proposals (P10) feed *into* later reflection turns. Prefer promoting dual-write narrative candidates and counterfactual insights through `dmn-apply-reflection` or explicit chapter-close forms rather than free prose in the image.

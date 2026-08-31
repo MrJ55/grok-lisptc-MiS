@@ -28,8 +28,10 @@ Restore a working MiS mind in under one minute and know exactly where you are in
 - [ ] `bash /tmp/grok-lisptc-MiS/scripts/bootstrap.sh` exits 0
 - [ ] `cd /tmp/mis && node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'` prints version/ping/known/schema
 - [ ] Read `plan/README.md` status table
-- [ ] Read current phase file (P3 or P4…) before writing code
+- [ ] Read current phase file (P7 Narrative Self unless README says otherwise) before writing code
 - [ ] Prefer `--save` only after successful eval; use `--checkpoint` before risky mutations
+- [ ] If `mind/wander-proposals.ptc` (or similar) exists, review candidates before applying (P10)
+- [ ] Active implementation focus: see plan/README.md (currently P7 Narrative Self)
 
 ## Key paths
 | Path | Role |
@@ -40,6 +42,7 @@ Restore a working MiS mind in under one minute and know exactly where you are in
 | `docs/mind-api.md` | Form reference |
 | `docs/VERIFICATION.md` | P0–P2 proof |
 | `plan/P0N-*.md` | Phase contracts |
+| `adr/0005-dmn-subsystems.md` | DMN architecture decision |
 
 ## Invariants (never violate)
 1. Never save on failed eval (bridge enforces).
