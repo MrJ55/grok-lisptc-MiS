@@ -1,19 +1,22 @@
 # Learnings log
 
-Append durable observations here. Newest first.
+Newest first.
+
+## 2026-08-31 — P1 (UX + pins)
+
+- English-first contract in CUSTOM_INSTRUCTIONS and session-handoff.
+- `docs/UPSTREAM.md`: lisptc HEAD `2c10ea8…`, sha256 of vendored lisp.ts / arith.ts.
+- string-trim bug confirmed: `_whitespace?` uses two-char `"\\t"` literals; avoid relying on it in MiS.
 
 ## 2026-08-31 — P0 executed
 
-- Hardened `bridge/eval.ts`: strip fences, paren/string prevalidate, `{ok,output}` eval, save only if ok, failures → `mind-failures.log`, exit 2 on fail, `--checkpoint`.
-- Hardened `scripts/bootstrap.sh`: ensure lisp.ts/arith.ts from artifacts or upstream curl; smoke must exit 0.
-- Verified: prose rejected; unbalanced rejected; define+save persists; EvalException keeps defs; undefined fn no-save; checkpoint revert works.
-- Note: `(/ 1 0)` is success in lisptc (Infinity), not an exception.
-- Revert: `docs/P0-REVERT.md` + `/tmp/mis-p0-backup/`.
+- Hardened bridge: validate, save-only-on-success, failures log, checkpoint, no reset on EvalException.
+- Bootstrap ensures lisp.ts; smoke must pass.
 
 ## 2026-08-31 — review-by-all synthesis
 
-- Mapped Pi-Lisptc multi-review to MiS; P0 gaps were validate/save/bootstrap lisp.ts.
+- Mapped Pi-Lisptc multi-review to MiS; deferred Fireworks grammar / Pi extension concerns.
 
 ## 2026-08-30 — v0 mind loop
 
-- Stripped MemoryRepl + zod only; transcript image; runtime under `/tmp/mis`.
+- Stripped MemoryRepl + zod; transcript image; runtime under `/tmp/mis`.
