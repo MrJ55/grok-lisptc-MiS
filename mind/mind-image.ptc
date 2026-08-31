@@ -12,3 +12,6 @@
 (defun mis-note (msg)
   "Record a free-form note (currently just returns it)."
   msg)
+
+;; --- 2026-08-31T11:40:48.589Z ---
+(defun triple (x) (* x 3))
