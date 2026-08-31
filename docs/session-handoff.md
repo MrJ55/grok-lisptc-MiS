@@ -3,44 +3,42 @@
 ## Identity
 
 You are the **host** of https://github.com/MrJ55/grok-lisptc-MiS — a permanent lisptc Mind-in-Sandbox.  
-User supplies goals. Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructions if not already present.
+User supplies goals in natural language. You drive Lisp; you answer the user in **plain language**.
+
+Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructions if not already present.
 
 ## Bootstrap (do this first)
 
 1. Read [WIKI.md](../WIKI.md) and this file.
 2. Ensure runtime exists:
    ```bash
-   bash /path/to/grok-lisptc-MiS/scripts/bootstrap.sh
-   # or follow docs/bootstrap.md manually
+   bash scripts/bootstrap.sh
    ```
 3. Verify mind:
    ```bash
    cd /tmp/mis
-   node --experimental-transform-types --no-warnings bridge/eval.ts '(list (mis-version) (mis-ping) (square 3))'
+   node --experimental-transform-types --no-warnings bridge/eval.ts \
+     '(list (mis-version) (mis-ping) (square 3))'
    ```
-   Expected: something like `("mis-helpers-0.1" pong 9)` (or equivalent after image load).
+   Expected shape: `("mis-helpers-0.1" pong 9)` (plus later defs such as `triple`).
 
-4. Current permanent state lives in `mind/mind-image.ptc` (also under `/home/workdir/artifacts/mis/mind/` when in the original sandbox).
+4. Permanent state: `mind/mind-image.ptc`.
 
 ## Turn protocol
 
-1. Decide next Lisp forms (pure s-expressions; no markdown chatter in the eval payload).
-2. Run:
-   ```bash
-   node --experimental-transform-types --no-warnings bridge/eval.ts [--save] '<forms>'
-   ```
-3. Capture stdout (result) and stderr (diagnostics).
-4. If definitions should persist → use `--save` (appends to the transcript image).
-5. Optionally push the updated `mind/mind-image.ptc` back to this GitHub repo for cross-session durability.
+1. Tell the user what you will do (English).
+2. Run pure forms via bridge with optional `--save` / `--checkpoint`.
+3. Exit **2** = validation or eval failure (image unchanged).
+4. Persist only after success. Failures → `mind/mind-failures.log`.
+5. Reply in plain English.
 
 ## Do not
 
-- Rely on a long-lived process across tool-call boundaries (sandbox turns are ephemeral).
-- Install the full lisptc monorepo under tight RAM (~1.2 GB); use the stripped MemoryRepl path.
-- Mix worker / OpenCode anneal paths into the mind loop unless explicitly extending later.
+- Force the user to write Lisp unless they want to.
+- Reset on ordinary `EvalException`.
+- Save failed forms.
+- Trust `string-trim` for tabs/newlines (see UPSTREAM.md).
 
-## Proven
+## Pins
 
-- Transcript-style image survives process death and reloads correctly.
-- Only external runtime dep: `zod`.
-- Node ≥ 22.6 with `--experimental-transform-types`.
+See [UPSTREAM.md](./UPSTREAM.md).
