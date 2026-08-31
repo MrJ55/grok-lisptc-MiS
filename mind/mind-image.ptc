@@ -1,5 +1,5 @@
 ;; --- MiS mind image (transcript style) ---
-;; Core helpers (mis-helpers-0.3) + Phase 3 self-schema
+;; Core helpers (mis-helpers-0.3) + Phase 3 self-schema + P4 reflection
 
 (defun mis-version ()
   "Return a version string for the mind helpers."
@@ -17,6 +17,7 @@
       '(mis-version mis-ping mis-note mis-register mis-state-summary
         mis-schema mis-insights update-self-schema
         dmn-log-episode dmn-fetch-unreflected
+        dmn-reflect-pack dmn-apply-reflection
         square triple double quadruple half))
 
 (defun mis-register (sym)
@@ -87,18 +88,29 @@
         (setq i (+ i 1)))
       (nreverse acc))))
 
+(defun dmn-reflect-pack (n)
+  "Return (list :schema schema :episodes last-n) for host reflection."
+  (list :schema (mis-schema) :episodes (dmn-fetch-unreflected n)))
+
+(defun dmn-apply-reflection (insights summary label)
+  "Merge insights summary label into *self-schema*; log reflection episode; return summary."
+  (update-self-schema (list
+    (cons :working-insights insights)
+    (cons :episodic-summary summary)
+    (cons :last-reflection label)))
+  (dmn-log-episode "dmn-apply-reflection" label "reflection")
+  (mis-state-summary))
+
 (defun square (x) (* x x))
 (defun triple (x) (* x 3))
 (defun double (x) (* x 2))
 (defun quadruple (x) (* x 4))
 (defun half (x) (/ x 2))
 
-;; --- live saves from 2026-08-31 sandbox ---
-(update-self-schema '((:working-insights . (reader-fix-applied phase3-started)) (:last-reflection . "2026-08-31")))
-(progn (dmn-log-episode "(+ 40 2)" 42 "smoke") (dmn-fetch-unreflected 2))
-
-;; --- 2026-08-31T12:44:47.861Z ---
-(progn
-  (dmn-log-episode "(list 1 2 3)" (list 1 2 3) "verify")
-  (update-self-schema '((:working-insights . (reader-fix phase3-verified)) (:last-reflection . "2026-08-31-verify")))
-  (list (mis-insights) (dmn-fetch-unreflected 2)))
+;; --- consolidated live history (P3/P4 sandbox) ---
+(update-self-schema '((:working-insights . (reader-fix phase3-verified reflection-helpers-live avoid-undefined-fn-without-guard)) (:last-reflection . "2026-08-31-p4-turn2") (:episodic-summary . "After simulated undefined-fn error; prefer guarded calls and mis-register new symbols.")))
+(dmn-log-episode "(+ 40 2)" 42 "smoke")
+(dmn-log-episode "(list 1 2 3)" (list 1 2 3) "verify")
+(dmn-log-episode "(undefined-fn 1)" "EvalException: undefined: undefined-fn" "error-sim")
+(dmn-log-episode "dmn-apply-reflection" "2026-08-31-p4-turn1" "reflection")
+(dmn-log-episode "dmn-apply-reflection" "2026-08-31-p4-turn2" "reflection")

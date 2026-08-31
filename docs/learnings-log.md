@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-08-31 — P4 reflection protocol
+
+- Added `dmn-reflect-pack` and `dmn-apply-reflection`; two live turns persisted.
+- Insights after turn2: reader-fix phase3-verified reflection-helpers-live avoid-undefined-fn-without-guard.
+- Plan folder segmented into P00–P6 for blank-session continuity.
+
 ## 2026-08-31 — P3 self-schema started + Reader fix
 
 - **Critical bug**: vendored/upstream `lisp.ts` Reader treated `tryToParse` returning `undefined` as a successful number (`if (n !== null)`). Fixed to `if (n !== undefined && n !== null)`. Without this, all list forms evaluated to undefined.
