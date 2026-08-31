@@ -34,5 +34,11 @@
 
 (defun triple (x) (* x 3))
 
-;; --- 2026-08-31T12:04:00Z ---
+;; --- 2026-08-31T12:04:21.239Z ---
 (progn (defun double (x) (* x 2)) (mis-register (quote double)) (double 6))
+
+;; --- 2026-08-31T12:12:20.177Z ---
+(progn (defun quadruple (x) (* x 4)) (mis-register (quote quadruple)) (quadruple 3))
+
+;; --- 2026-08-31T12:12:21.906Z ---
+(progn (defun half (x) (/ x 2)) (mis-register (quote half)) (half 10))

@@ -1,22 +1,12 @@
 # Learnings log
 
-Newest first.
+## 2026-08-31 — full P0–P2 verification
 
-## 2026-08-31 — P1 (UX + pins)
+- 22 scenarios in /tmp/mis; report in docs/VERIFICATION.md.
+- All helpers and defs OK; errors never bricked the mind.
+- Image grew only on successful saves; failures → mind-failures.log.
+- Current defs: mis-* helpers, square, triple, double, quadruple, half.
 
-- English-first contract in CUSTOM_INSTRUCTIONS and session-handoff.
-- `docs/UPSTREAM.md`: lisptc HEAD `2c10ea8…`, sha256 of vendored lisp.ts / arith.ts.
-- string-trim bug confirmed: `_whitespace?` uses two-char `"\\t"` literals; avoid relying on it in MiS.
+## 2026-08-31 — P2 / P1 / P0 / review-by-all / v0
 
-## 2026-08-31 — P0 executed
-
-- Hardened bridge: validate, save-only-on-success, failures log, checkpoint, no reset on EvalException.
-- Bootstrap ensures lisp.ts; smoke must pass.
-
-## 2026-08-31 — review-by-all synthesis
-
-- Mapped Pi-Lisptc multi-review to MiS; deferred Fireworks grammar / Pi extension concerns.
-
-## 2026-08-30 — v0 mind loop
-
-- Stripped MemoryRepl + zod; transcript image; runtime under `/tmp/mis`.
+See prior entries in git history and plan/README.md.
