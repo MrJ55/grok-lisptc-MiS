@@ -10,12 +10,12 @@
 | P1 | [P1-ux-pins.md](./P1-ux-pins.md) | done | English-first, upstream pins |
 | P2 | [P2-helpers-scratch-push.md](./P2-helpers-scratch-push.md) | done | Mind API, scratch, push |
 | P3 | [P3-self-schema.md](./P3-self-schema.md) | mostly done | Self-schema + episodic buffer |
-| **P4** | [P4-reflection-protocol.md](./P4-reflection-protocol.md) | **active** | Grok-driven reflection turns |
+| P4 | [P4-reflection-protocol.md](./P4-reflection-protocol.md) | done | Grok-driven reflection turns |
 | P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional | External vestige store |
 | P6 | [P6-evaluation.md](./P6-evaluation.md) | planned | Metrics & hardening |
 
 ## Current focus
-**P4 — Reflection protocol.** Implement helpers + docs + ≥2 live reflection turns. See [P4-reflection-protocol.md](./P4-reflection-protocol.md).
+**P4 done.** Next optional: P5 vector cabinet or P6 evaluation metrics.
 
 ## Architecture (stable)
 - **Host:** Grok (emits Lisp, owns permanence).
@@ -23,8 +23,8 @@
 - **Bridge:** `bridge/eval.ts` — validate → eval → save only on success.
 - **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (auto Reader fix).
 
-## Mind API (v0.3 → v0.4 during P4)
-See [docs/mind-api.md](../docs/mind-api.md). P4 adds `dmn-reflect-pack` and `dmn-apply-reflection`.
+## Mind API
+See [docs/mind-api.md](../docs/mind-api.md). P4 added `dmn-reflect-pack` and `dmn-apply-reflection`.
 
 ## Critical historical fix
 Reader `tryToParse`: use `n !== undefined && n !== null` (bootstrap applies automatically). Details: [src/READER-FIX.md](../src/READER-FIX.md).

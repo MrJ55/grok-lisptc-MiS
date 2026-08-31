@@ -1,6 +1,6 @@
 # P4 — Reflection Protocol (Grok-driven DMN cycle)
 
-**Status:** active / implement now  
+**Status:** done (2026-08-31)  
 **Depends on:** P0–P3 complete
 
 ## Goal
@@ -33,35 +33,22 @@ Sandbox tool-call processes are ephemeral. A Grok-driven turn is reliable, inspe
 ```
 
 ### B. Lisp helpers (mind side)
-Add thin wrappers (keep single-line docs):
-
-- `(dmn-reflect-pack n)` → `(list :schema <schema> :episodes <last-n>)` for host consumption  
-- `(dmn-apply-reflection insights summary label)` → builds the update-self-schema call internally  
-
-Prefer pure data out; Grok still decides the *content* of insights.
+- `(dmn-reflect-pack n)` → `(list :schema <schema> :episodes <last-n>)`
+- `(dmn-apply-reflection insights summary label)` → updates schema + logs reflection episode
 
 ### C. Ops artifacts
-- `docs/reflection-protocol.md` — copy-pasteable for Grok
-- Optional skill `skills/mis-reflect/SKILL.md`
-- Log each reflection as an episode with meta `"reflection"`
+- `docs/reflection-protocol.md`
+- `skills/mis-reflect/SKILL.md`
 
 ## Checklist
-- [ ] Add `(dmn-reflect-pack n)` to image
-- [ ] Add `(dmn-apply-reflection insights summary label)` (insights = list of symbols or short strings)
-- [ ] Write `docs/reflection-protocol.md`
-- [ ] Run ≥2 full reflection turns in sandbox; confirm schema + image growth
-- [ ] Register new symbols via `mis-register`
-- [ ] Update `docs/mind-api.md` and `plan/README.md` status → P4 done or in progress
-- [ ] Optional: `skills/mis-reflect/SKILL.md`
+- [x] Add `(dmn-reflect-pack n)` to image
+- [x] Add `(dmn-apply-reflection insights summary label)` (insights = list of symbols or short strings)
+- [x] Write `docs/reflection-protocol.md`
+- [x] Run ≥2 full reflection turns in sandbox; confirm schema + image growth
+- [x] Register new symbols via `mis-register`
+- [x] Update `docs/mind-api.md` and `plan/README.md` status → P4 done or in progress
+- [x] Optional: `skills/mis-reflect/SKILL.md`
 - [ ] Optional: auto-push note after reflection
-
-## Task breakdown (execute in order)
-1. Bootstrap current image.
-2. Define and `--save` the two helpers.
-3. Execute reflection turn #1 (synthesize from existing episodes/smoke data).
-4. Execute reflection turn #2 after logging a deliberate “error-like” episode.
-5. Write docs/reflection-protocol.md.
-6. Push mind-image + docs + plan status.
 
 ## Exit criteria
 - From cold start, Grok can run a reflection using only plan + mind-api + reflection-protocol docs.
