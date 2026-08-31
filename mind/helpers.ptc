@@ -1,16 +1,31 @@
-;; MiS helpers — load after the image or include in the image itself.
-;; These are intentionally simple so they survive the transcript model.
+;; MiS helpers v0.2 — transcript-safe mind API
 
 (defun mis-version ()
   "Return a version string for the mind helpers."
-  "mis-helpers-0.1")
+  "mis-helpers-0.2")
 
 (defun mis-ping ()
   "Health check for the restored mind."
   'pong)
 
-;; Placeholder for a richer dump once we add environment reflection.
-;; For now the host simply appends the evaluated forms to the transcript.
 (defun mis-note (msg)
-  "Record a free-form note (currently just returns it)."
+  "Record a free-form note (returns it)."
   msg)
+
+;; Registry of symbols the host/mind tracks (manual; no full env dump in v0).
+(setq *mis-known*
+      '(mis-version mis-ping mis-note mis-register mis-state-summary
+        square triple))
+
+(defun mis-register (sym)
+  "Add SYM to *mis-known* if not already present; return SYM."
+  (if (member sym *mis-known*)
+      sym
+    (progn (setq *mis-known* (cons sym *mis-known*))
+           sym)))
+
+(defun mis-state-summary ()
+  "Return a small status structure: version, ping, known symbols."
+  (list (list 'version (mis-version))
+        (list 'ping (mis-ping))
+        (list 'known *mis-known*)))

@@ -1,0 +1,14 @@
+;; --- MiS scratch image (experiments; do not treat as permanent) ---
+(defun mis-version ()
+  "scratch-helpers-0.2")
+
+(defun mis-ping ()
+  'scratch-pong)
+
+(setq *mis-known* '(mis-version mis-ping))
+
+(defun mis-state-summary ()
+  (list (list 'version (mis-version))
+        (list 'ping (mis-ping))
+        (list 'known *mis-known*)
+        (list 'image 'scratch)))
