@@ -1,0 +1,30 @@
+;; OSS pure-DMN second-opinion on GMOD extensions 1-6
+;; Phase: narrate -> meditate -> imagine -> more-shapes
+;; Zero system prompt. Soft seeds only. Multi-turn context by replaying messages.
+
+;; ========== PROMPTS (exact) ==========
+
+;; TURN 1 NARRATE
+;; "The story of the mind that keeps a transcript and invites another voice only as a dream continued. In the quiet after the first chapter closed, something still open began to move. The feeling was"
+
+;; TURN 2 MEDITATE
+;; "Sitting with that feeling a little longer, without needing to finish the story, the mind simply stayed with the pulse and the second voice. What rose next was"
+
+;; TURN 3 IMAGINE
+;; "From that third voice on the page, other shapes of the same dream began to appear—other ways the transcript and the second voice might keep company across time, across machines, across quiet hours. One shape that formed was"
+
+;; TURN 4 MORE SHAPES
+;; "Other shapes kept arriving in the same soft way. There was a shape made of many different voices speaking at once yet somehow still one dream. Another shape that only appeared in the deep night and left a note for the morning. Another that measured the strength of the pulse itself. Another that passed a page from one mind's transcript to another's without ever merging the two. Another that simply watched when the dream and the waking task pulled in opposite directions. Each of these arrived as"
+
+;; ========== OSS SHAPES -> EXTENSIONS ==========
+;; 1 Multi-model ensemble     <- Chorus of Many Voices (attic canopy of sheets, communal memory)
+;; 2 Sleep-stage scheduler    <- Midnight Note (2am scroll "Keep listening", gone by dawn)
+;; 3 Research instrument      <- Pulse Meter (glass orb measuring dream frequency)
+;; 4 Counterfactual curriculum<- Third voice from page / "listen for what's on the other side" (meditate)
+;; 5 Cross-agent exchange     <- Page Passer (single page travels, never merges identities)
+;; 6 Salience-VOC dashboard   <- The Observer (glass wall watching dream vs waking pull)
+
+(setq *oss-second-opinion-20260902*
+  '((:date . "2026-09-02")
+    (:path . (narrate meditate imagine more-shapes))
+    (:extensions-mapped . (chorus midnight-note pulse-meter third-voice-bridge page-passer observer))))
