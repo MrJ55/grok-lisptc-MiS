@@ -4,7 +4,8 @@
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.  
 **Creative mechanisms:** [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md)  
 **OSS-DMN channel:** [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md)  
-**Sources of ideas:** [docs/related-work.md](../docs/related-work.md)
+**Sources of ideas:** [docs/related-work.md](../docs/related-work.md)  
+**Extensions contrast (original → OSS shape → value):** [docs/gmod-extensions-contrast-20260902.md](../docs/gmod-extensions-contrast-20260902.md)
 
 ## Core invariant (grok-mis-oss-dmn)
 
@@ -33,8 +34,8 @@ Provenance of ideas: `docs/related-work.md`.
 | **P7** | [P7-narrative-self.md](./P7-narrative-self.md) | **next** | Autobiography + arc + OSS dual-write |
 | P8 | [P8-replay-scenes.md](./P8-replay-scenes.md) | planned | Tagged replay + scene packs |
 | P9 | [P9-prospection.md](./P9-prospection.md) | planned | Future / counterfactual / light ToM (OSS-assisted) |
-| P10 | [P10-spontaneous-wander.md](./P10-spontaneous-wander.md) | planned | Wander + monologue + OSS proposal files |
-| **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **new / parallel** | Soft-nudge library, parameter lock, dual-channel, salience switch |
+| P10 | [P10-spontaneous-wander.md](./P10-spontaneous-wander.md) | planned | Wander + monologue + OSS proposal files + sleep-stage Action |
+| **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **new / parallel** | Soft-nudge library, parameter lock, dual-channel, salience, Chorus, Pulse Meter |
 | P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional | Managed vector search scale-out |
 | P6 | [P6-evaluation.md](./P6-evaluation.md) | planned | Metrics & hardening |
 
@@ -45,11 +46,24 @@ Provenance of ideas: `docs/related-work.md`.
 | Narrative Self | P7 | Autobiography, arc, continuous “me” story |
 | Episodic / hippocampal | P3, P8 | Buffer, tags, replay, scenes |
 | Prospective / imagination | P9 | Future, counterfactual, light ToM (constructive simulation) |
-| Spontaneous / wander | P10 | Candidates when TPN is quiet; no live daemon |
+| Spontaneous / wander | P10 | Candidates when TPN is quiet; no live daemon; sleep-stage proposals |
 | Consolidation / reflection | P4 | Schema update from episodes |
 | **OSS-DMN channel** | **P11** | Pure DMN generator (geometry-preserving) for proposals & texture |
-| Salience switch | host + P10/P11 | When to reflect / narrate / wander / call OSS (VOC-style) |
+| Salience switch | host + P10/P11 | When to reflect / narrate / wander / call OSS (VOC-style / Observer) |
 | Vector cabinet | P5 | Optional searchable long-term store |
+
+## Novel extensions integrated (from contrast report)
+
+| # | Extension (OSS shape) | Primary phase(s) | Pointer |
+|---|-----------------------|------------------|--------|
+| 1 | Multi-model ensemble (**Chorus of Many Voices**) | P11 | [§1](../docs/gmod-extensions-contrast-20260902.md#1-multi-model-pure-dmn-ensemble) |
+| 2 | Sleep-stage scheduler (**Midnight Note** + ink/pencil filter) | P10, P11, CREATIVE | [§2](../docs/gmod-extensions-contrast-20260902.md#2-sleep-stage-scheduler-github-action--quiet-hours) |
+| 3 | Research instrument (**Pulse Meter**) | P11 | [§3](../docs/gmod-extensions-contrast-20260902.md#3-gmod-as-a-research-instrument) |
+| 4 | Counterfactual curriculum / offline RL (**Third-voice bridge**) | P9, P4 | [§4](../docs/gmod-extensions-contrast-20260902.md#4-counterfactual-curriculum-as-offline-rl) |
+| 5 | Cross-agent proposal exchange (**Page Passer**) | P10, P11 | [§5](../docs/gmod-extensions-contrast-20260902.md#5-cross-agent-proposal-exchange) |
+| 6 | Salience-VOC dashboard (**The Observer**) | host + P11, CREATIVE | [§6](../docs/gmod-extensions-contrast-20260902.md#6-salience-voc-dashboard) |
+
+Full contrast (original idea → prompt path → OSS response → practical value): [docs/gmod-extensions-contrast-20260902.md](../docs/gmod-extensions-contrast-20260902.md).
 
 ## Architecture (stable)
 
@@ -63,7 +77,7 @@ Provenance of ideas: `docs/related-work.md`.
 ## Current focus
 
 **P7 — Narrative Self** (primary) in parallel with **P11 — OSS-DMN Channel**.  
-Implement autobiography + arc primitives and close at least one grounded chapter; simultaneously lock the pure-DMN OSS protocol, dual-channel capture, and salience policy.
+Implement autobiography + arc primitives and close further grounded chapters; simultaneously deepen the pure-DMN protocol with Chorus multi-model dual-write, Pulse Meter scoring, Observer logging, and the Midnight Note sleep-stage proposal Action.
 
 ## Resource policy
 

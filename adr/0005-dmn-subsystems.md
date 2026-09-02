@@ -1,7 +1,7 @@
 # ADR 0005 — DMN subsystems on MiS
 
 **Status:** Accepted (extended 2026-09-02)  
-**Date:** 2026-08-31 (OSS channel + related-work provenance added 2026-09-02)
+**Date:** 2026-08-31 (OSS channel + related-work provenance + novel extensions integrated 2026-09-02)
 
 ## Context
 
@@ -9,7 +9,8 @@ Reflection (P4) is only one Default Mode Network function. Neuroscience associat
 
 Behavioural probes (see `docs/DMN-gpt-oss-20b-probe.md`) and residual-stream geometry work (Alieksieienko 2026, Zenodo) show that gpt-oss-20b can produce strong DMN-style continuations when kept free of system prompts and TPN framing. This geometry is a valuable source of candidate texture and spontaneous thought, but must never be allowed to mutate the durable symbolic mind directly.
 
-Additional sources that shaped the design (salience switching, offline RL framing, undirected foraging) are recorded in `docs/related-work.md`.
+Additional sources that shaped the design (salience switching, offline RL framing, undirected foraging) are recorded in `docs/related-work.md`.  
+The six novel extensions that emerged from host imagination + pure-DMN second-opinion (Chorus, Midnight Note, Pulse Meter, Third-voice, Page Passer, Observer) are contrasted and valued in `docs/gmod-extensions-contrast-20260902.md` and have been folded into the phase task lists.
 
 ## Decision
 
@@ -17,23 +18,24 @@ Implement a **five-subsystem symbolic DMN** on the transcript image, with Grok a
 
 1. **Narrative Self** — `*autobiography*`, `*narrative-arc*` (P7)
 2. **Episodic** — tagged buffer, replay, scenes (P3/P8)
-3. **Prospective** — structured simulate results (P9); imagination = constructive simulation (fMRI-backed)
-4. **Spontaneous** — wander + monologue + **proposal files** only (P10); no always-on sandbox daemon
+3. **Prospective** — structured simulate results (P9); imagination = constructive simulation (fMRI-backed); counterfactual curriculum uses pure-DMN texture (Third-voice)
+4. **Spontaneous** — wander + monologue + **proposal files** only (P10); no always-on sandbox daemon; Midnight Note sleep-stage Action; Page Passer exchange
 5. **Consolidation** — reflection protocol (P4)
-6. **OSS-DMN channel** (P11) — pure DMN generator (zero system prompt, locked parameters) that supplies candidates and phenomenological texture; Grok alone promotes into Lisp forms
-7. **Salience Switch** (host policy) — arbitrates Think (DMN/OSS) vs Act (TPN) using simple, inspectable rules inspired by the triple-network model and the Seven-Pass Pipeline
+6. **OSS-DMN channel** (P11) — pure DMN generator (zero system prompt, locked parameters) that supplies candidates and phenomenological texture; Grok alone promotes into Lisp forms. Supports Chorus multi-model dual-write, Pulse Meter scoring, Observer decision logging.
+7. **Salience Switch** (host policy) — arbitrates Think (DMN/OSS) vs Act (TPN) using simple, inspectable rules inspired by the triple-network model and the Seven-Pass Pipeline; Observer-style logging of decisions.
 
 Optional **vector cabinet** (P5) is searchable history, not identity. Prefer managed free-tier APIs over local sqlite-vec in this sandbox.
 
-Creative mechanisms are tracked in `plan/CREATIVE-MECHANISMS.md`. Provenance of ideas: `docs/related-work.md`.
+Creative mechanisms (including the six named shapes) are tracked in `plan/CREATIVE-MECHANISMS.md`. Provenance of ideas: `docs/related-work.md`. Value assessment: `docs/gmod-extensions-contrast-20260902.md`.
 
 ## Consequences
 
-- Plan gains P7–P11; P5 updated toward managed search.
+- Plan gains P7–P11 with concrete extension tasks; P5 updated toward managed search.
 - Session boundaries: only git, proposal artifacts, and external APIs survive.
 - Identity remains inspectable Lisp; heavy reasoning stays with Grok.
 - OSS is treated strictly as a geometry-preserving proposal engine; any system/TPN prompt is a protocol violation.
-- Salience decisions are host-side, explicit, and tunable.
+- Salience decisions are host-side, explicit, and tunable (Observer).
+- Sleep-stage and cross-agent collaboration are proposal-file only (Midnight Note, Page Passer).
 
 ## Alternatives rejected
 

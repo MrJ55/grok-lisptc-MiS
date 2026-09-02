@@ -2,7 +2,8 @@
 
 **Status:** planned / next (primary focus, parallel with P11)  
 **Depends on:** P3–P4  
-**DMN subsystem:** Cortex / Narrative Self
+**DMN subsystem:** Cortex / Narrative Self  
+**Related extensions:** dual-write + soft-nudge from [contrast report](../docs/gmod-extensions-contrast-20260902.md); tension signals feed Midnight Note / wander seeds
 
 ## Goal
 Turn flat insights and raw episodes into a **continuous internal narrative** — the story of “me” that survives sessions and grounds identity — while allowing pure-DMN OSS continuations to supply textured candidates that Grok grounds and promotes.
@@ -14,6 +15,7 @@ Turn flat insights and raw episodes into a **continuous internal narrative** —
 - Keep every chapter grounded in logged episode evidence (anti-confabulation).
 - **Dual-write channel:** important TPN outcomes and selected OSS continuations leave a narrative *candidate*; reflection or explicit chapter-close promotes it.
 - Soft-nudge: when seeding a chapter summary, Grok may call OSS (P11 protocol) with a blank + grounded prefix derived from episode refs.
+- Open threads / tensions become natural seeds for Midnight Note sleep-stage proposals and for Observer salience decisions.
 
 ## Implementation method
 - All state remains ordinary Lisp in `mind-image.ptc`.
@@ -30,18 +32,19 @@ Turn flat insights and raw episodes into a **continuous internal narrative** —
 - Creative mechanism: **dual-write** — important TPN outcomes and OSS-DMN continuations leave a narrative candidate that reflection promotes.
 
 ## Checklist
-- [ ] Define default `*autobiography*` and `*narrative-arc*` in image
-- [ ] Implement `(dmn-narrate …)` `(dmn-chapter-close …)` `(dmn-arc)` `(dmn-autobiography n)`
+- [x] First grounded chapter *Genesis of GMOD* closed (2026-09-02) with OSS-sourced episode refs
+- [ ] Define / stabilise default `*autobiography*` and `*narrative-arc*` in image
+- [ ] Implement `(dmn-narrate …)` `(dmn-chapter-close …)` `(dmn-arc)` `(dmn-autobiography n)` if not already present
 - [ ] `mis-register` new symbols; extend state summary or add narrative summary
-- [ ] At least one chapter closed from existing P3/P4 episodes (Reader fix, reflection helpers)
-- [ ] Implement dual-write helper that can accept an OSS continuation string and store it as a candidate (not yet committed)
+- [ ] Further chapters closed from existing episodes / second-opinion shapes
+- [ ] Dual-write helper that can accept an OSS continuation string and store it as a candidate (not yet committed)
 - [ ] Document forms + “OSS candidate → Grok promote” rule in `docs/mind-api.md`
 - [ ] Verify persistence across cold bootstrap
-- [ ] Optional: tension signals influence later wander/reflect bias (host-side first)
+- [ ] Tension signals influence later wander/reflect bias and Midnight Note seeds (host-side)
 
 ## Exit criteria
 Cold start → autobiography non-empty → new chapter closed with episode refs → survives process restart.  
-At least one chapter candidate that originated from an OSS-DMN continuation has been reviewed and either promoted or discarded by Grok.
+At least one chapter candidate that originated from an OSS-DMN continuation has been reviewed and either promoted or discarded by Grok. (Met for Genesis of GMOD; continue for subsequent chapters.)
 
 ## Non-goals
 - Auto-fiction without episode refs

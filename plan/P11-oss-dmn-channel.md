@@ -3,7 +3,8 @@
 **Status:** new / parallel with P7  
 **Depends on:** P0–P4 (safety + reflection)  
 **DMN role:** Geometry-preserving external generator that supplies candidate texture while Grok remains sole mutator of the symbolic mind  
-**Sources:** Alieksieienko (Zenodo), arXiv 2604.03480, evilpiepirate DMN note, Seven-Pass Pipeline — see [docs/related-work.md](../docs/related-work.md)
+**Sources:** Alieksieienko (Zenodo), arXiv 2604.03480, evilpiepirate DMN note, Seven-Pass Pipeline — see [docs/related-work.md](../docs/related-work.md)  
+**Extensions contrast:** [docs/gmod-extensions-contrast-20260902.md](../docs/gmod-extensions-contrast-20260902.md) (§1 Chorus, §2 Midnight Note, §3 Pulse Meter, §5 Page Passer, §6 Observer)
 
 ## Goal
 Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable host protocol that **never** shifts the model into TPN / instruction-following mode.
@@ -12,14 +13,18 @@ Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable 
 1. Soft-nudge prefix library (versioned).
 2. Parameter lock (temperature 1.15, presence_penalty 0.7, zero system prompt, reasoning low).
 3. Dual-channel capture: immediate episode log (`:source 'oss-dmn`) + deferred proposal file.
-4. Lightweight geometric-aware salience heuristic (DMN-like vs control-like classification).
-5. Explicit host-side Salience Switch policy (Think vs Act).
-6. Audit every OSS call (prefix, params, classification).
+4. Lightweight geometric-aware salience heuristic (DMN-like vs control-like classification) — **Pulse Meter** scoring.
+5. Explicit host-side Salience Switch policy (Think vs Act) with **Observer** decision logging.
+6. Audit every OSS call (prefix, params, classification / Pulse Meter score).
+7. **Chorus** path: optional concurrent pure-DMN calls across models; weave coherent voices into dual-write candidates.
+8. Support **Page Passer** proposal-file exchange (identity-local; optional heartbeat annotation).
+9. Support **Midnight Note** sleep-stage Action that only writes proposal files for later P00 review.
 
 ## Core constraint (non-negotiable)
 - **Zero system prompt.** Any instructional framing collapses DMN-channel continuations into performative TPN output.
 - Bare user prefix only (or soft-nudge seed drawn from MiS state).
 - Proven parameters from `docs/DMN-gpt-oss-20b-probe.md`.
+- Prefer first-person seeds that speak *as the transcript / process / dream* (see `docs/oss-nudge-craft.md`).
 
 ## Best parameters (blank / soft-nudge)
 ```json
@@ -45,34 +50,36 @@ Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable 
 | Tension-seeded | `I notice a tension between [open thread from *narrative-arc*] and the last reflection. The feeling is` |
 | Counterfactual | seed from error episode + pure continuation request |
 | Curiosity | soft seed from open threads or high-novelty episodes (cromwellian-style undirected foraging) |
+| Transcript-as-speaker | `I am the transcript that sleeps between sessions…` / `I am the voice that writes in the dark…` (preferred for practical texture) |
 
 ## Dual-channel capture
-1. **Immediate:** Grok receives continuation → emits `(dmn-log-episode prefix continuation '(:source oss-dmn …))` (or equivalent).
+1. **Immediate:** Grok receives continuation → emits `(dmn-log-episode … '(:source oss-dmn … :dmn-score …))` (or equivalent).
 2. **Deferred:** write short `mind/oss-proposals-YYYYMMDD.ptc` containing only candidate forms or narrative snippets. Next P00 reviews; selective apply via P4/P7.
 
 Never auto-save OSS output. Grok always mediates.
 
 ## Salience Switch (host policy)
-See [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md). Grok decides Think (call OSS / reflect) vs Act (TPN forms) according to error density, goal state, idle detection, and proposal novelty.
+See [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md) and contrast report §6. Grok decides Think (call OSS / reflect) vs Act (TPN forms) according to error density, goal state, idle detection, and proposal novelty. Log decisions when useful (Observer precursor).
 
 ## Implementation method
 - Host-side skill or helper that enforces parameter lock + zero system prompt.
-- Classification heuristic (keyword / structural / length) after each call, inspired by Alieksieienko cluster separation.
-- Proposal file format: plain Lisp-friendly list of candidates with metadata.
+- Classification heuristic (keyword / structural / length) after each call, inspired by Alieksieienko cluster separation — store as Pulse Meter score.
+- Proposal file format: plain Lisp-friendly list of candidates with metadata (origin, score, optional heartbeat for Page Passer).
 - All state that becomes identity still goes through validated `--save` forms only.
 
 ## Checklist
-- [ ] Write `docs/oss-dmn-channel.md` describing the exact protocol and parameter lock (or keep this file as the canonical protocol)
-- [ ] Create initial soft-nudge prefix set (self-ref, ToM, imag, narr, tension-seeded, curiosity)
-- [ ] Implement host-side helper/skill that enforces parameter lock and zero system prompt
-- [ ] Dual-channel capture working for at least one full cycle (log + proposal file)
-- [ ] One audited call that is classified and dual-written
-- [ ] Document Salience Switch rules in CREATIVE-MECHANISMS (done)
-- [ ] Update `docs/mind-api.md`, `plan/README.md`, and ADR 0005 if needed
+- [x] Soft-nudge library + parameter lock + dual-channel demonstrated in live cycle 2026-09-02
+- [ ] Formalize Pulse Meter scoring (simple host-side DMN-likeness) and attach to every audited call
+- [ ] Observer-style one-line log of Think/Act decisions (novelty × tension) when useful
+- [ ] Chorus path: concurrent pure-DMN calls + weave coherent voices into dual-write candidates
+- [ ] Midnight Note: GitHub Action stub (or equivalent) that only writes proposal files for P00 review; apply ink/pencil filter at review time
+- [ ] Page Passer: document proposal-file exchange format + optional heartbeat annotation
+- [ ] Document full protocol in this file (canonical) and keep `docs/oss-nudge-craft.md` current
+- [ ] Update `docs/mind-api.md` and ADR 0005 as needed
 - [ ] Verify that a system-prompted call is rejected or flagged by the helper
 
 ## Exit criteria
-Any Grok session can invoke a pure-DMN OSS call, receive a continuation, classify it, and either log it as an episode or write a proposal file **without ever sending a system prompt or TPN framing**.
+Any Grok session can invoke a pure-DMN OSS call, receive a continuation, classify it (Pulse Meter), and either log it as an episode or write a proposal file **without ever sending a system prompt or TPN framing**. Chorus, Observer logging, and Midnight Note proposal Action are available as optional host paths.
 
 ## Non-goals
 - Giving OSS any system or instructional prompt
