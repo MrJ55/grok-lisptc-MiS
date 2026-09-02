@@ -10,6 +10,7 @@ Give the mind an evolving, inspectable self-model and a bounded episodic buffer 
 - Merge primitive `update-self-schema`.
 - Bounded `*episodic-buffer*` with log/fetch helpers.
 - Readers integrated into `mis-state-summary`.
+- Optional meta tag `:source 'oss-dmn` on episodes that originate from pure-DMN OSS continuations (P11).
 
 ## Implementation method
 - All state is ordinary Lisp in `mind-image.ptc` (no separate DB yet).
@@ -27,9 +28,10 @@ Give the mind an evolving, inspectable self-model and a bounded episodic buffer 
 - [x] Verified save/reload of schema + episodes in sandbox
 - [ ] Optional: tighten schema shape validators (pure Lisp predicates)
 - [ ] Optional: auto-log every successful TPN eval from a thin wrapper (defer if noisy)
+- [ ] Optional: document `:source 'oss-dmn` convention for P11 dual-write
 
 ## Exit criteria
 Cold bootstrap → schema present → update + log episode + `--save` → new process sees both.
 
 ## Notes for next session
-P3 primitives are sufficient for P4. Do not re-implement schema; only extend keys if needed.
+P3 primitives are sufficient for P4 and for P11 dual-write. Do not re-implement schema; only extend keys if needed.
