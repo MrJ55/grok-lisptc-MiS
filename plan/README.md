@@ -3,7 +3,8 @@
 **Last updated:** 2026-09-02  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.  
 **Creative mechanisms:** [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md)  
-**OSS-DMN channel:** [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md)
+**OSS-DMN channel:** [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md)  
+**Sources of ideas:** [docs/related-work.md](../docs/related-work.md)
 
 ## Core invariant (grok-mis-oss-dmn)
 
@@ -16,7 +17,8 @@ Grok is the sole host that may mutate the durable symbolic mind.
 - Grok decides what (if anything) is promoted into Lisp forms
 - No auto-save of OSS text; dual-write + proposal files are the only hand-off channels
 
-See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock.
+See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock.  
+Provenance of ideas: `docs/related-work.md`.
 
 ## Status table
 
@@ -32,7 +34,7 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 | P8 | [P8-replay-scenes.md](./P8-replay-scenes.md) | planned | Tagged replay + scene packs |
 | P9 | [P9-prospection.md](./P9-prospection.md) | planned | Future / counterfactual / light ToM (OSS-assisted) |
 | P10 | [P10-spontaneous-wander.md](./P10-spontaneous-wander.md) | planned | Wander + monologue + OSS proposal files |
-| **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **new / parallel** | Soft-nudge library, parameter lock, dual-channel capture |
+| **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **new / parallel** | Soft-nudge library, parameter lock, dual-channel, salience switch |
 | P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional | Managed vector search scale-out |
 | P6 | [P6-evaluation.md](./P6-evaluation.md) | planned | Metrics & hardening |
 
@@ -46,12 +48,12 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 | Spontaneous / wander | P10 | Candidates when TPN is quiet; no live daemon |
 | Consolidation / reflection | P4 | Schema update from episodes |
 | **OSS-DMN channel** | **P11** | Pure DMN generator (geometry-preserving) for proposals & texture |
-| Salience switch | host + P10/P11 | When to reflect / narrate / wander / call OSS |
+| Salience switch | host + P10/P11 | When to reflect / narrate / wander / call OSS (VOC-style) |
 | Vector cabinet | P5 | Optional searchable long-term store |
 
 ## Architecture (stable)
 
-- **Host:** Grok (emits Lisp, owns permanence, mediates all OSS calls).
+- **Host:** Grok (emits Lisp, owns permanence, mediates all OSS calls, owns salience switch).
 - **Mind:** transcript image `mind/mind-image.ptc`.
 - **Bridge:** validate → eval → save only on success.
 - **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (auto Reader fix).
@@ -61,7 +63,7 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 ## Current focus
 
 **P7 — Narrative Self** (primary) in parallel with **P11 — OSS-DMN Channel**.  
-Implement autobiography + arc primitives and close at least one grounded chapter; simultaneously lock the pure-DMN OSS protocol and dual-channel capture.
+Implement autobiography + arc primitives and close at least one grounded chapter; simultaneously lock the pure-DMN OSS protocol, dual-channel capture, and salience policy.
 
 ## Resource policy
 

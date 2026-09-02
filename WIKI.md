@@ -6,9 +6,11 @@ Repo: https://github.com/MrJ55/grok-lisptc-MiS
 
 **Status (2026-09-02):** P0–P4 done. **Next: P7 Narrative Self + P11 OSS-DMN Channel** (parallel). Full DMN path: P7→P10 + P11 (+ optional P5 cabinet, P6 eval). See [plan/README.md](./plan/README.md).
 
+**Sources of ideas:** [docs/related-work.md](./docs/related-work.md) (Alieksieienko geometry, brain-LLM creative alignment, evilpiepirate DMN note, Seven-Pass Pipeline, cromwellian auto-researcher).
+
 ## What this is
 
-- **Host:** Grok — decides Lisp forms, talks to the user in plain language, mediates all OSS calls.
+- **Host:** Grok — decides Lisp forms, talks to the user in plain language, mediates all OSS calls, owns the salience switch.
 - **Mind:** lisptc REPL state as transcript image (`mind/mind-image.ptc`).
 - **Bridge:** `bridge/eval.ts` — validate → eval → optional save (never on failure).
 - **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (dep: `zod` only; auto Reader fix).
@@ -26,7 +28,8 @@ node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-p
 
 Reflection: [docs/reflection-protocol.md](./docs/reflection-protocol.md)  
 Cold start: [plan/P00-cold-start.md](./plan/P00-cold-start.md)  
-OSS pure-DMN probe: [docs/DMN-gpt-oss-20b-probe.md](./docs/DMN-gpt-oss-20b-probe.md)
+OSS pure-DMN probe: [docs/DMN-gpt-oss-20b-probe.md](./docs/DMN-gpt-oss-20b-probe.md)  
+Related work & provenance: [docs/related-work.md](./docs/related-work.md)
 
 ## Mind API (summary)
 
@@ -46,6 +49,7 @@ Planned P7+: autobiography / arc / replay / simulate / wander — see [docs/mind
 | Prospection (imagination) | P9 | planned |
 | Spontaneous wander | P10 | planned |
 | **OSS-DMN channel** | **P11** | **new / parallel** |
+| Salience switch | host + P10/P11 | documented policy |
 | Vector cabinet | P5 | optional (prefer managed API) |
 
 Creative mechanisms: [plan/CREATIVE-MECHANISMS.md](./plan/CREATIVE-MECHANISMS.md)  

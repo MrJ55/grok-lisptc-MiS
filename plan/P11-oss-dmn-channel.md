@@ -2,7 +2,8 @@
 
 **Status:** new / parallel with P7  
 **Depends on:** P0–P4 (safety + reflection)  
-**DMN role:** Geometry-preserving external generator that supplies candidate texture while Grok remains sole mutator of the symbolic mind
+**DMN role:** Geometry-preserving external generator that supplies candidate texture while Grok remains sole mutator of the symbolic mind  
+**Sources:** Alieksieienko (Zenodo), arXiv 2604.03480, evilpiepirate DMN note, Seven-Pass Pipeline — see [docs/related-work.md](../docs/related-work.md)
 
 ## Goal
 Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable host protocol that **never** shifts the model into TPN / instruction-following mode.
@@ -12,7 +13,8 @@ Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable 
 2. Parameter lock (temperature 1.15, presence_penalty 0.7, zero system prompt, reasoning low).
 3. Dual-channel capture: immediate episode log (`:source 'oss-dmn`) + deferred proposal file.
 4. Lightweight geometric-aware salience heuristic (DMN-like vs control-like classification).
-5. Audit every OSS call (prefix, params, classification).
+5. Explicit host-side Salience Switch policy (Think vs Act).
+6. Audit every OSS call (prefix, params, classification).
 
 ## Core constraint (non-negotiable)
 - **Zero system prompt.** Any instructional framing collapses DMN-channel continuations into performative TPN output.
@@ -42,6 +44,7 @@ Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable 
 | Narrative | `The story began when she opened the door. Years later,` |
 | Tension-seeded | `I notice a tension between [open thread from *narrative-arc*] and the last reflection. The feeling is` |
 | Counterfactual | seed from error episode + pure continuation request |
+| Curiosity | soft seed from open threads or high-novelty episodes (cromwellian-style undirected foraging) |
 
 ## Dual-channel capture
 1. **Immediate:** Grok receives continuation → emits `(dmn-log-episode prefix continuation '(:source oss-dmn …))` (or equivalent).
@@ -49,18 +52,22 @@ Make interaction with `openai/gpt-oss-20b` a first-class, repeatable, auditable 
 
 Never auto-save OSS output. Grok always mediates.
 
+## Salience Switch (host policy)
+See [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md). Grok decides Think (call OSS / reflect) vs Act (TPN forms) according to error density, goal state, idle detection, and proposal novelty.
+
 ## Implementation method
 - Host-side skill or helper that enforces parameter lock + zero system prompt.
-- Classification heuristic (keyword / structural) after each call.
+- Classification heuristic (keyword / structural / length) after each call, inspired by Alieksieienko cluster separation.
 - Proposal file format: plain Lisp-friendly list of candidates with metadata.
 - All state that becomes identity still goes through validated `--save` forms only.
 
 ## Checklist
-- [ ] Write `docs/oss-dmn-channel.md` describing the exact protocol and parameter lock
-- [ ] Create initial soft-nudge prefix set (self-ref, ToM, imag, narr, tension-seeded)
+- [ ] Write `docs/oss-dmn-channel.md` describing the exact protocol and parameter lock (or keep this file as the canonical protocol)
+- [ ] Create initial soft-nudge prefix set (self-ref, ToM, imag, narr, tension-seeded, curiosity)
 - [ ] Implement host-side helper/skill that enforces parameter lock and zero system prompt
 - [ ] Dual-channel capture working for at least one full cycle (log + proposal file)
 - [ ] One audited call that is classified and dual-written
+- [ ] Document Salience Switch rules in CREATIVE-MECHANISMS (done)
 - [ ] Update `docs/mind-api.md`, `plan/README.md`, and ADR 0005 if needed
 - [ ] Verify that a system-prompted call is rejected or flagged by the helper
 
