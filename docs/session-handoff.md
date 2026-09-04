@@ -1,4 +1,4 @@
-# Session handoff (cold-start Grok)
+# Session handoff
 
 ## Identity
 
@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/wander-proposals.ptc` if present (do not auto-apply).
-5. Active phase: **P7 Narrative Self** unless plan/README says otherwise.
+5. Active phase: **P6 Evaluation** unless plan/README says otherwise.
 
 ## Turn protocol
 
