@@ -1,5 +1,6 @@
 /**
- * MiS eval bridge — P0+P2 + review-by-all Tier-1 (validate, save-on-success, atomic append, host globals).
+ * MiS eval bridge — P0+P2 + P0.1 trust base (validate, save-on-success, atomic append,
+ * host globals, last-known-good, light OSS-shape rejection).
  *
  *   node --experimental-transform-types --no-warnings bridge/eval.ts '(+ 1 2)'
  *
@@ -10,6 +11,7 @@
  *   --save          append forms ONLY after successful eval
  *   --reset         ignore existing image
  *   --checkpoint    copy image to <stem>.prev.ptc before save
+ *   --strict-load   treat image-load errors as fatal (exit 2)
  *
  * Env: MIS_IMAGE overrides default path; MIS_SAVE=1 enables save.
  * Exit codes: 0 success, 1 usage/empty, 2 validation or eval failure
@@ -18,6 +20,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, renameSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { randomUUID } from "node:crypto";
 
 import {
   Interp,
@@ -32,12 +35,30 @@ import {
 } from "./driver.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = resolve(__dirname, "..");
 const MIND_DIR = resolve(__dirname, "../mind");
+const STATE_DIR = resolve(__dirname, "../state");
+const CHECKPOINTS_DIR = join(STATE_DIR, "checkpoints");
+const AUDIT_DIR = join(STATE_DIR, "audit");
 const DEFAULT_IMAGE = process.env.MIS_IMAGE
   ? resolve(process.env.MIS_IMAGE)
   : join(MIND_DIR, "mind-image.ptc");
 const SCRATCH_IMAGE = join(MIND_DIR, "mind-scratch.ptc");
 const FAILURES_LOG = join(MIND_DIR, "mind-failures.log");
+const LKG_IMAGE = join(CHECKPOINTS_DIR, "last-known-good.ptc");
+const MUTATIONS_LOG = join(AUDIT_DIR, "mutations.jsonl");
+
+/** Common pure-DMN / nudge-craft openings that must never be eval'd as code. */
+const OSS_SHAPE_PREFIXES = [
+  "i am the transcript",
+  "i am the voice that writes",
+  "i notice my own processing",
+  "imagine a city where",
+  "the story began when",
+  "she believed that he did not know",
+  "after many nights of leaving notes",
+  "i wonder how a mind that only exists",
+];
 
 function stripFences(raw: string): string {
   let s = raw.trim();
@@ -46,8 +67,22 @@ function stripFences(raw: string): string {
   return s;
 }
 
+function looksLikeOssProse(code: string): boolean {
+  const lower = code.trim().toLowerCase();
+  if (lower.startsWith("(") || lower.startsWith("'(") || lower.startsWith("`(")) return false;
+  for (const p of OSS_SHAPE_PREFIXES) {
+    if (lower.startsWith(p) || lower.includes("\n" + p)) return true;
+  }
+  // Long prose without any open paren is almost never intentional Lisp.
+  if (!code.includes("(") && code.length > 80 && /\s/.test(code)) return true;
+  return false;
+}
+
 function prevalidate(code: string): string | null {
   if (!code.trim()) return "empty input";
+  if (looksLikeOssProse(code)) {
+    return "looks like untrusted OSS/prose (not a lisptc form); refuse to eval — store as candidate data only";
+  }
   const trimmed = code.trim();
   if (!trimmed.includes("(") && !/^-?\d+(\.\d+)?$/.test(trimmed) && !/^"[^"]*"$/.test(trimmed) && !/^[a-zA-Z_*?!+\-*/<>=][\w\-?!*]*$/.test(trimmed)) {
     if (/\s/.test(trimmed) && !trimmed.startsWith('"')) {
@@ -126,11 +161,14 @@ class MemoryRepl {
   }
 }
 
-function ensureMindDir() {
+function ensureDirs() {
   if (!existsSync(MIND_DIR)) mkdirSync(MIND_DIR, { recursive: true });
+  if (!existsSync(STATE_DIR)) mkdirSync(STATE_DIR, { recursive: true });
+  if (!existsSync(CHECKPOINTS_DIR)) mkdirSync(CHECKPOINTS_DIR, { recursive: true });
+  if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
 }
 
-function loadImage(repl: MemoryRepl, path: string) {
+function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   if (!existsSync(path)) {
     console.error(`[mis] no image at ${path} — starting fresh`);
     return;
@@ -142,12 +180,16 @@ function loadImage(repl: MemoryRepl, path: string) {
   if (output.trim()) console.error(output.trim());
   if (!ok) {
     console.error(`[mis] warning: image load reported errors (definitions may be partial)`);
+    if (strict) {
+      console.error(`[mis] --strict-load: treating image load failure as fatal`);
+      process.exit(2);
+    }
   }
 }
 
 /** Atomic append via temp file + rename (POSIX). */
 function appendTranscript(forms: string, path: string) {
-  ensureMindDir();
+  ensureDirs();
   const stamp = new Date().toISOString();
   const block = `\n;; --- ${stamp} ---\n${forms.trim()}\n`;
   const prev = existsSync(path) ? readFileSync(path, "utf8") : "";
@@ -157,8 +199,21 @@ function appendTranscript(forms: string, path: string) {
   console.error(`[mis] appended forms to ${path} (atomic)`);
 }
 
+function writeLastKnownGood(path: string) {
+  if (!existsSync(path)) return;
+  ensureDirs();
+  copyFileSync(path, LKG_IMAGE);
+  console.error(`[mis] last-known-good ← ${path}`);
+}
+
+function appendMutationRecord(record: Record<string, unknown>) {
+  ensureDirs();
+  const line = JSON.stringify(record) + "\n";
+  writeFileSync(MUTATIONS_LOG, (existsSync(MUTATIONS_LOG) ? readFileSync(MUTATIONS_LOG, "utf8") : "") + line);
+}
+
 function logFailure(forms: string, reason: string) {
-  ensureMindDir();
+  ensureDirs();
   const stamp = new Date().toISOString();
   const block = `\n;; --- ${stamp} FAIL: ${reason} ---\n${forms.trim()}\n`;
   writeFileSync(FAILURES_LOG, (existsSync(FAILURES_LOG) ? readFileSync(FAILURES_LOG, "utf8") : "") + block);
@@ -177,6 +232,7 @@ let loadPath = DEFAULT_IMAGE;
 let doSave = process.env.MIS_SAVE === "1";
 let doReset = false;
 let doCheckpoint = false;
+let strictLoad = false;
 let code: string | null = null;
 
 for (let i = 0; i < args.length; i++) {
@@ -186,6 +242,7 @@ for (let i = 0; i < args.length; i++) {
   else if (a === "--save") doSave = true;
   else if (a === "--reset") doReset = true;
   else if (a === "--checkpoint") doCheckpoint = true;
+  else if (a === "--strict-load") strictLoad = true;
   else if (a === "-") {
     /* stdin */
   } else if (!a.startsWith("-")) code = a;
@@ -198,7 +255,7 @@ if (!code) {
 }
 
 if (!code || !code.trim()) {
-  console.error("usage: eval.ts [--load|--image path] [--scratch] [--save] [--reset] [--checkpoint] '<lisp forms>'");
+  console.error("usage: eval.ts [--load|--image path] [--scratch] [--save] [--reset] [--checkpoint] [--strict-load] '<lisp forms>'");
   process.exit(1);
 }
 
@@ -211,9 +268,9 @@ if (preErr) {
   process.exit(2);
 }
 
-ensureMindDir();
+ensureDirs();
 const repl = new MemoryRepl();
-if (!doReset) loadImage(repl, loadPath);
+if (!doReset) loadImage(repl, loadPath, strictLoad);
 
 const { ok, output } = repl.eval(stripped);
 process.stdout.write(output);
@@ -225,8 +282,25 @@ if (!ok) {
 }
 
 if (doSave) {
+  const beforeHash = existsSync(loadPath)
+    ? (await import("node:crypto")).createHash("sha256").update(readFileSync(loadPath)).digest("hex").slice(0, 16)
+    : "none";
+  // Always refresh last-known-good before mutating the durable image.
+  writeLastKnownGood(loadPath);
   if (doCheckpoint) checkpointImage(loadPath);
   appendTranscript(stripped, loadPath);
+  const afterHash = (await import("node:crypto")).createHash("sha256").update(readFileSync(loadPath)).digest("hex").slice(0, 16);
+  appendMutationRecord({
+    mutation_id: `mut-${randomUUID()}`,
+    actor: process.env.MIS_SESSION_ID || "grok-session",
+    timestamp: new Date().toISOString(),
+    operation: "append-forms",
+    path: loadPath,
+    state_before_hash: beforeHash,
+    state_after_hash: afterHash,
+    validation_result: "success",
+    rollback_target: LKG_IMAGE,
+  });
 }
 
 process.exit(0);
