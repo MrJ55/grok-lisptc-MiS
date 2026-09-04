@@ -10,7 +10,7 @@ This is a defensible and interesting design. The three strongest choices:
 
 1. **Single-mutator discipline.** ADR 0001 makes Grok the sole host. This avoids the "multi-agent workers race on shared state" problem that plagues most agent-loop designs. Every state change has a single, attributable cause: a Grok-emitted Lisp form that passed validation and evaluated successfully.
 2. **Transcript-as-image.** ADR 0002 acknowledges the tradeoff ("failed forms can pollute the image") but chooses inspectability and git-friendliness over opaque binary snapshots. For a project of this size, this is correct.
-3. **Pure-DMN constraint on OSS.** ADR 0005 + `docs/DMN-gpt-oss-20b-probe.md` define a specific, falsifiable protocol (zero system prompt, locked parameters, dual-channel capture, no auto-promotion). Whether or not the underlying neuroscience claim holds, the *operational* discipline of "never instruct the second model" is a meaningful constraint that prevents the second model from drifting into a regular instruction-following assistant.
+3. **Pure-DMN constraint on OSS.** ADR 0005 + `docs/DMN-gpt-oss-20b-probe.md` define a specific, falsifiable protocol (zero system prompt, locked parameters, dual-channel capture, no auto-promotion). The *operational* discipline of "never instruct the second model" is a meaningful constraint that prevents the second model from drifting into a regular instruction-following assistant, and is well-motivated by Alieksieienko (2026)'s finding that instruction-tuning degrades DMN-like residual geometry (see §1.2.2 for the calibrated assessment).
 
 ## 1.2 Where the architecture overclaims
 
@@ -30,18 +30,31 @@ Of the five subsystems, only two (Narrative, Episodic) have any Lisp implementat
 
 This is fine as a roadmap. It is not fine when `WIKI.md` says "P0–P4 done. P7 first chapter *Genesis of GMOD* closed. P11 pure-DMN channel live" — that phrasing implies the architecture is operational. It is not. It is a plan with two stubs and one chapter that contains a single sentence.
 
-### 1.2.2 The "pure-DMN" claim is stronger than the evidence supports
+### 1.2.2 The "pure-DMN" claim — calibrated assessment
 
-The fork cites:
+The fork's "pure-DMN" framing combines **four distinct claims** that need to be evaluated separately against the evidence:
 
-- Alieksieienko (2026), Zenodo — residual-stream DMN geometry across 9 architectures
-- Ismayilzada et al. (2026), arXiv:2604.03480 — brain–LLM alignment during creative thinking
-- evilpiepirate DMN research notes — conceptual framing
-- Ghosh (2025), ResearchGate — Seven-Pass Pipeline + salience switching
+**Claim A — DMN-like geometry exists in LLM residual streams.**
+*Well-supported.* Alieksieienko (2026) tests 9 primary architectures (Llama-3.1-8B, Gemma-2-9B, Mistral-7B, Qwen2.5-7B, GPT-2-XL, OPT-1.3B, Pythia-1.4B, Bloom-1.7B, DeepSeek-1.5B) plus 9 control models (Mamba-2.8B SSM, DeepSeek-Math, BERT, RoBERTa, DeBERTa, ALBERT, CodeLlama, DNA transformer, GPT-2-117M). The SR/ToM/Imagination/Narrative cluster is significant in 7/8 models (mean Cohen's *d* = 1.03), with three convergent metrics (Verification Horizon 97.2%, ToM→SR dominance 93.5%, confound closed 8/8). Controls rule out "any high-dim space has clusters" (DNA model *d* = −0.12), "any transformer has clusters" (RoBERTa MLM-only *d* = −0.08), and "clusters require scale" (Pearson *r* = −0.163, n.s.). This is a substantial empirical study, not a single observation.
 
-Of these, only the Alieksieienko paper directly supports the "zero system prompt preserves DMN geometry" claim, and the fork's own probe (`docs/DMN-gpt-oss-20b-probe.md`) is a single n=1 behavioural demonstration on one model. The probe is well-designed (it has controls: factual and abstract-logic prefixes that produced short non-agentive continuations), but it is one observation. The architecture then generalizes this into a project-wide invariant repeated in 9+ documents.
+**Claim B — The geometry is pretraining-inherited, not eliminated by post-training.**
+*Well-supported.* GPT-2-XL (2019, pre-RLHF) shows the strongest cluster (*d* = 1.84); base models consistently outscore instruct versions. The paper's §5.4 explicitly states "post-training alignment cannot eliminate it."
 
-A more cautious framing would be: "we observe that gpt-oss-20b under blank-prefix, high-temperature conditions produces more situation-model/first-person/narrative continuations than under instructional framing. We use this as a *heuristic generator* of candidate texture. We do not claim the model has a DMN." The fork sometimes speaks this carefully (`docs/DMN-gpt-oss-20b-probe.md` is restrained) and sometimes does not (ADR 0005 talks about "geometry-preserving proposal engine" as if geometry preservation is verified).
+**Claim C — Inference-time system prompts collapse the geometry during generation.**
+*Not directly tested by the paper.* The paper compares base vs. instruct *models* (a training-time comparison), not inference-time system-prompt effects on a fixed model. The fork's actual evidence for Claim C is its own probe (`docs/DMN-gpt-oss-20b-probe.md`), which is genuinely n=1 — one model (gpt-oss-20b, not in the paper's model list), one prompt set, behavioural observation only (no residual-stream extraction). The paper's base-vs-instruct finding is *indirectly consistent* with Claim C but does not validate it.
+
+**Claim D — The fork's Lisp data structures implement a DMN.**
+*Not supported by the paper.* The paper is about residual-stream geometry in trained neural networks. The fork's `*self-schema*`, `*episodic-buffer*`, `*autobiography*` are Lisp alists with no residual stream. The "five-subsystem DMN" mapping in ADR 0005 is organizational metaphor, not a claim the paper supports.
+
+**Net assessment:** The fork's framing is **better-grounded than my earlier review indicated**. Claims A and B are well-supported by a substantial multi-model study. Claim C is the fork's own extension — indirectly motivated by the paper but not directly tested. Claim D is metaphor.
+
+The appropriate correction is not to "soften all DMN language to metaphor" but to:
+1. Cite the paper accurately (9+ architectures, rigorous controls — not "one preprint")
+2. Distinguish Claim C (inference-time preservation, untested) from Claims A and B (geometry exists and is pretraining-inherited, well-tested)
+3. Retain the metaphor caveat only for Claim D (Lisp data structures)
+4. Frame the zero-system-prompt protocol as *motivated by* the paper's base-vs-instruct finding, not as *validated by* the paper
+
+The overclaim to flag is narrower than I initially indicated: it's specifically ADR 0005's "geometry-preserving proposal engine" language, which implies the paper validates the fork's inference-time protocol. It doesn't. But the protocol is a reasonable operationalization of the paper's findings, not speculation.
 
 ### 1.2.3 The six "novel extensions" are unimplemented
 
@@ -127,7 +140,7 @@ These should not be changed even if the project pivots:
 
 3. **P0 invariants — validate before eval, save only on success, no reset on EvalException.** These are sound. The implementation has bugs (F8, F9) but the invariants themselves are right.
 
-4. **Grok-sole-mutator + OSS-never-gets-system-prompt.** The dual-channel capture (episode log + proposal file) and the "no auto-promotion" rule are the project's most distinctive contribution. They should be preserved even if the DMN framing is softened.
+4. **Grok-sole-mutator + OSS-never-gets-system-prompt.** The dual-channel capture (episode log + proposal file) and the "no auto-promotion" rule are the project's most distinctive contribution. The zero-system-prompt protocol is **well-motivated** by Alieksieienko (2026)'s finding that instruction-tuning degrades DMN-like residual geometry (base > instruct across 8 architectures; GPT-2-XL pre-RLHF shows strongest cluster *d* = 1.84). The specific inference-time preservation claim (system prompts collapse geometry during generation) is the fork's extension and is not directly tested by the paper, but the operational discipline is sound regardless.
 
 ## 1.5 Architectural decisions to revisit
 

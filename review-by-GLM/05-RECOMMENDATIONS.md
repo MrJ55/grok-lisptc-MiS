@@ -570,18 +570,45 @@ This makes P11's "zero system prompt" invariant **enforced by code**, not just d
 
 ---
 
-## R14 — Soften DMN neuroscience claims
+## R14 — Calibrate DMN claims to match paper's actual scope
 
-**Severity:** Low (academic honesty)
-**Effort:** 1 hour (doc edits)
+**Severity:** Low (precision)
+**Effort:** ~30 minutes (doc edits)
+**Revised:** 2026-09-04 — original R14 recommended "softening" all DMN language to "metaphor." Having read Alieksieienko (2026) in full, this was overcorrected. The paper is a substantial multi-model study (9 primary + 9 control architectures, 7 organizations, rigorous controls including DNA models, RoBERTa MLM-only, Mamba SSM, scaling regression). The DMN-like residual-stream geometry finding is well-established. What's untested is the fork's specific operational claim that inference-time system prompts collapse the geometry during generation. The revised R14 narrows the critique to this actual gap.
 
-In `adr/0005-dmn-subsystems.md`, `plan/CREATIVE-MECHANISMS.md`, and `docs/gmod-extensions-contrast-20260902.md`:
+The paper (Alieksieienko 2026) establishes:
+- DMN-like residual-stream geometry (SR + ToM + Imagination + Narrative cluster; Factual + Abstract Logic outside) across 9+ architectures (mean Cohen's *d* = 1.03; 7/8 significant at *p* < 0.01)
+- Geometry is **pretraining-inherited** — strongest in GPT-2-XL (2019, pre-RLHF, *d* = 1.84); base > instruct consistently
+- Geometry is **architecture-independent** (Transformer + SSM/Mamba + math/code models all converge)
+- Geometry is **content-dependent** (DNA models *d* = −0.12; RoBERTa MLM-only *d* = −0.08)
+- Geometry **does not scale with model size** (Pearson *r* = −0.163, *p* = 0.699)
 
-- Change "DMN subsystem" → "DMN-inspired subsystem" or "symbolic subsystem (DMN-mapped)"
-- Change "geometry-preserving proposal engine" → "candidate-texture generator (hypothesized to preserve DMN-like residual geometry)"
-- Add a "Caveat" section to ADR 0005: "The DMN framing is a metaphor inspired by neuroscience literature. The Lisp data structures do not implement a DMN; they implement a symbolic self-model whose organization is influenced by DMN concepts. The pure-DMN OSS channel is a heuristic generator, not a verified geometry preserver."
+The fork should cite the paper accurately and distinguish what it supports from what the fork extends.
 
-This protects the project's credibility if the underlying neuroscience claim (Alieksieienko 2026) is later weakened.
+**Specific edits:**
+
+1. **In `adr/0005-dmn-subsystems.md`:**
+   - Change "geometry-preserving proposal engine" → "candidate-texture generator whose zero-system-prompt protocol is motivated by Alieksieienko (2026)'s finding that instruction-tuning degrades DMN-like residual geometry (base > instruct across 8 architectures; GPT-2-XL pre-RLHF shows strongest cluster, *d* = 1.84). The specific inference-time preservation claim (system prompts collapse geometry during generation) is not directly tested by the paper and remains the fork's extension."
+   - Add: "The five-subsystem mapping (Narrative, Episodic, Prospective, Spontaneous, Consolidation) is organizational metaphor inspired by DMN neuroscience. The Lisp data structures do not implement a DMN; they implement a symbolic self-model whose organization is influenced by DMN concepts."
+
+2. **In `plan/CREATIVE-MECHANISMS.md`:**
+   - Replace the blanket "metaphor" caveat with a calibrated two-level statement: (1) the OSS channel protocol is well-motivated by the paper; (2) the five-subsystem Lisp mapping is organizational metaphor. See the corrected `plan-revised/CREATIVE-MECHANISMS.md` for the full text.
+
+3. **In `docs/gmod-extensions-contrast-20260902.md`:**
+   - No change needed — this doc is already restrained and doesn't overclaim.
+
+4. **In `docs/DMN-gpt-oss-20b-probe.md`:**
+   - Add a note: "This probe is n=1 (one model, gpt-oss-20b, not in Alieksieienko 2026's model list; one prompt set; behavioural observation only). It is consistent with the paper's base-vs-instruct finding but does not directly test residual-stream geometry. A residual-stream-level replication on gpt-oss-20b would strengthen the inference-time preservation claim."
+
+5. **In `docs/related-work.md`:**
+   - Update the Alieksieienko entry to reflect the paper's actual scope: "9 primary architectures + 9 controls, 7 organizations, 1.3B–9B params, 2019–2024, base and instruct; three convergent metrics; mechanistic causal hierarchy (GELU seed → situation model → NTP amplification); controls include DNA models, RoBERTa MLM-only, Mamba SSM, scaling regression."
+
+**What NOT to change:**
+- Do not soften "DMN-inspired subsystem" to vague language. The paper supports the DMN-like geometry finding; the fork's use of DMN labels for its subsystems is reasonable metaphor.
+- Do not remove the "zero system prompt" invariant. It's well-motivated by the paper's base-vs-instruct finding.
+- Do not treat the OSS channel as speculative. It's a reasonable operationalization of the paper's findings, with one specific extension (inference-time preservation) that's untested but indirectly supported.
+
+**Why this matters:** The original R14 would have made the fork's documentation sound less credible than the underlying science supports. The paper is strong evidence; the fork should lean on it appropriately while being honest about the one claim (inference-time preservation) that's the fork's own extension.
 
 ---
 
@@ -614,6 +641,6 @@ Option (a) is simpler and the log is small (append-only, a few KB per session).
 6. **R12** — modularize mind image. ~1 hour. Deferred until after above.
 7. **R11** — use `AgentRepl` + conversation vars. ~2 hours. Architectural improvement.
 8. **R13** — implement OSS helper. ~2 hours. Makes P11 actually live.
-9. **R14** — soften neuroscience claims. ~1 hour. Academic honesty.
+9. **R14** — calibrate DMN claims to match paper's actual scope. ~30 minutes. Precision/academic honesty.
 
 Total: ~9 hours of work to address all findings. Most of the impact comes from the first 4 hours (R1–R8).
