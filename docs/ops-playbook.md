@@ -23,7 +23,7 @@ It is **local/ephemeral**:
 - Never `--save` after a failed eval (bridge enforces).
 - Atomic append: temp file + `renameSync`.
 - Form-by-form image load; `--strict-load` makes any form failure fatal.
-- `--save` always refreshes `state/checkpoints/last-known-good.ptc` first.
+- `--save` always refreshes `state/checkpoints/last-known-good.ptc` first (and snapshots core mind modules beside it so modular imports resolve).
 - Prevalidate rejects multi-word prose and OSS-shaped openings; allows bare atoms (`:keyword`, `<=`, `string->symbol`).
 
 ## Tests

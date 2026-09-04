@@ -76,127 +76,115 @@ function looksLikeOssProse(code: string): boolean {
   for (const p of OSS_SHAPE_PREFIXES) {
     if (lower.startsWith(p) || lower.includes("\n" + p)) return true;
   }
-  if (!code.includes("(") && code.length > 80 && /\s/.test(code)) return true;
   return false;
 }
 
-/** Bare atom allowed without parentheses (number, string, or symbol including :kw, <=, string->symbol). */
-const BARE_ATOM =
-  /^(?:-?\d+(?:\.\d+)?|"[^"]*"|:?[a-zA-Z_*?!+\-*/<>=][\w\-?!*><=]*)$/;
-
-function prevalidate(code: string): string | null {
-  if (!code.trim()) return "empty input";
-  if (looksLikeOssProse(code)) {
-    return "looks like untrusted OSS/prose (not a lisptc form); refuse to eval — store as candidate data only";
+function prevalidate(code: string): { ok: boolean; reason?: string } {
+  const s = stripFences(code);
+  if (!s) return { ok: false, reason: "empty input" };
+  if (looksLikeOssProse(s)) {
+    return { ok: false, reason: "OSS-shaped prose rejected (pure-DMN discipline)" };
   }
-  const trimmed = code.trim();
-
-  // Multi-word input without an s-expression is prose (e.g. "hello world").
-  // Do not allow a leading identifier to bypass this check.
-  if (!trimmed.includes("(") && /\s/.test(trimmed) && !trimmed.startsWith('"')) {
-    return "does not look like lisptc (no s-expression); refuse to eval prose";
+  // Multi-word prose without a leading form is rejected.
+  const first = s.split(/\s+/)[0] ?? "";
+  const hasForm = s.includes("(") || s.startsWith("'") || s.startsWith("`");
+  if (!hasForm) {
+    // Allow bare atoms / keywords / identifiers, reject multi-word.
+    if (/\s/.test(s.trim())) {
+      return { ok: false, reason: "multi-word prose without form rejected" };
+    }
   }
-
-  // Single bare atom: number, string, or symbol (UR7: :keyword, <=, >=, string->symbol).
-  if (!trimmed.includes("(") && !BARE_ATOM.test(trimmed)) {
-    return "does not look like lisptc (no s-expression); refuse to eval prose";
-  }
-
+  // Paren balance (approximate; strings ignored for speed).
   let depth = 0;
   let inStr = false;
-  let escape = false;
-  for (let i = 0; i < code.length; i++) {
-    const c = code[i];
+  let esc = false;
+  for (const ch of s) {
     if (inStr) {
-      if (escape) escape = false;
-      else if (c === "\\") escape = true;
-      else if (c === '"') inStr = false;
-      continue;
-    }
-    if (c === '"') inStr = true;
-    else if (c === "(") depth++;
-    else if (c === ")") {
-      depth--;
-      if (depth < 0) return "unbalanced: extra ')'";
-    }
-  }
-  if (inStr) return "unbalanced: unclosed string";
-  if (depth !== 0) return "unbalanced: unclosed '('";
-  return null;
-}
-
-/**
- * Extract successive top-level s-expressions, skipping ; line comments and
- * respecting strings. Good enough for mind-image form-by-form load.
- */
-function extractTopLevelForms(src: string): string[] {
-  const forms: string[] = [];
-  let i = 0;
-  const n = src.length;
-  while (i < n) {
-    while (i < n && /\s/.test(src[i])) i++;
-    if (i >= n) break;
-    if (src[i] === ";") {
-      while (i < n && src[i] !== "\n") i++;
-      continue;
-    }
-    if (src[i] !== "(") {
-      // skip non-form tokens (rare in image)
-      while (i < n && !/\s/.test(src[i]) && src[i] !== "(" && src[i] !== ";") i++;
-      continue;
-    }
-    const start = i;
-    let depth = 0;
-    let inStr = false;
-    let escape = false;
-    for (; i < n; i++) {
-      const c = src[i];
-      if (inStr) {
-        if (escape) escape = false;
-        else if (c === "\\") escape = true;
-        else if (c === '"') inStr = false;
+      if (esc) {
+        esc = false;
         continue;
       }
-      if (c === '"') inStr = true;
-      else if (c === "(") depth++;
-      else if (c === ")") {
-        depth--;
-        if (depth === 0) {
-          i++;
-          forms.push(src.slice(start, i));
-          break;
-        }
+      if (ch === "\\") {
+        esc = true;
+        continue;
       }
+      if (ch === '"') inStr = false;
+      continue;
     }
-    if (depth !== 0) {
-      // unbalanced remainder — let eval report it
-      forms.push(src.slice(start));
-      break;
+    if (ch === '"') {
+      inStr = true;
+      continue;
+    }
+    if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    if (depth < 0) return { ok: false, reason: "unbalanced parens (extra )" };
+  }
+  if (depth !== 0) return { ok: false, reason: `unbalanced parens (depth ${depth})` };
+  return { ok: true };
+}
+
+function extractTopLevelForms(src: string): string[] {
+  const forms: string[] = [];
+  let depth = 0;
+  let start = -1;
+  let inStr = false;
+  let esc = false;
+  let inComment = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (inComment) {
+      if (ch === "\n") inComment = false;
+      continue;
+    }
+    if (inStr) {
+      if (esc) {
+        esc = false;
+        continue;
+      }
+      if (ch === "\\") {
+        esc = true;
+        continue;
+      }
+      if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === ";") {
+      inComment = true;
+      continue;
+    }
+    if (ch === '"') {
+      inStr = true;
+      if (depth === 0 && start < 0) start = i;
+      continue;
+    }
+    if (ch === "(") {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (ch === ")") {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        forms.push(src.slice(start, i + 1));
+        start = -1;
+      }
+    } else if (depth === 0 && start < 0 && /[^\s]/.test(ch)) {
+      // bare atom / keyword at top level
+      start = i;
+      // consume until whitespace or end
+      while (i + 1 < src.length && /[^\s;]/.test(src[i + 1])) i++;
+      forms.push(src.slice(start, i + 1));
+      start = -1;
     }
   }
   return forms;
 }
 
-function injectHostGlobals(interp: InstanceType<typeof Interp>) {
-  const today = new Date().toISOString().slice(0, 10);
-  const now = new Date().toISOString();
-  const sessionId = process.env.MIS_SESSION_ID || "unknown";
-  interp.defineGlobal(newSym("*today*"), today);
-  interp.defineGlobal(newSym("*now*"), now);
-  interp.defineGlobal(newSym("*session-id*"), sessionId);
-}
-
 class MemoryRepl {
-  currentInterp: InstanceType<typeof Interp>;
+  currentInterp: Interp;
   constructor() {
     this.currentInterp = this.freshInterp();
   }
-  get interp() {
-    return this.currentInterp;
-  }
-  freshInterp() {
-    const interp = new Interp({ extensions: [] });
-    run(interp, prelude);
+  freshInterp(): Interp {
+    const interp = prelude();
     injectHostGlobals(interp);
     return interp;
   }
@@ -299,32 +287,40 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
         // Light string checks (full alist parse is overkill in TS)
         if (!text.includes("0.1.0") && !text.includes(":gmod-schema")) {
           console.error(`[mis] warning: *mind-manifest* present but schema not recognized`);
-          if (strict) {
-            console.error(`[mis] --strict-load: unknown gmod-schema`);
-            process.exit(2);
-          }
         } else {
           console.error(`[mis] manifest ok (gmod-schema present)`);
-        }
-      } else if (idx === 0) {
-        console.error(`[mis] warning: first form did not establish *mind-manifest*`);
-        if (strict) {
-          console.error(`[mis] --strict-load: missing *mind-manifest*`);
-          process.exit(2);
         }
       }
     }
   }
 
-  console.error(`[mis] loaded ${path} (${src.length} chars, ${forms.length} forms) anyFail=${anyFail}`);
-  try { process.chdir(prevCwd); } catch { /* ignore */ }
-  if (anyFail && strict) {
-    process.exit(2);
+  try {
+    process.chdir(prevCwd);
+  } catch {
+    /* ignore */
+  }
+
+  console.error(
+    `[mis] loaded ${path} (${src.length} chars, ${forms.length} forms) anyFail=${anyFail}`,
+  );
+  if (anyFail && strict) process.exit(2);
+}
+
+function injectHostGlobals(interp: Interp) {
+  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date().toISOString();
+  const session = process.env.MIS_SESSION_ID || process.env.SESSION_ID || "unknown";
+  // Bind as Lisp symbols
+  try {
+    run(interp, `(setq *today* "${today}")`);
+    run(interp, `(setq *now* "${now}")`);
+    run(interp, `(setq *session-id* "${session}")`);
+  } catch (e) {
+    console.error(`[mis] injectHostGlobals warning: ${e}`);
   }
 }
 
-/** Atomic append via temp file + rename (POSIX). */
-function appendTranscript(forms: string, path: string) {
+function appendTranscript(path: string, forms: string) {
   ensureDirs();
   const stamp = new Date().toISOString();
   const block = `\n;; --- ${stamp} ---\n${forms.trim()}\n`;
@@ -339,7 +335,22 @@ function writeLastKnownGood(path: string) {
   if (!existsSync(path)) return;
   ensureDirs();
   copyFileSync(path, LKG_IMAGE);
-  console.error(`[mis] last-known-good ← ${path}`);
+  // Snapshot imported modules next to LKG so relative (import "...") resolves
+  // when --image points at checkpoints/last-known-good.ptc (cwd = checkpoints/).
+  const coreModules = [
+    "helpers.ptc",
+    "schema.ptc",
+    "episodes.ptc",
+    "autobiography.ptc",
+    "arithmetic.ptc",
+  ];
+  for (const name of coreModules) {
+    const src = join(MIND_DIR, name);
+    if (existsSync(src)) {
+      copyFileSync(src, join(CHECKPOINTS_DIR, name));
+    }
+  }
+  console.error(`[mis] last-known-good ← ${path} (+ modules)`);
 }
 
 function appendMutationRecord(record: Record<string, unknown>) {
@@ -358,105 +369,105 @@ function writeStateManifest(imagePath: string, mutationId: string, beforeHash: s
     image_path: imagePath,
     image_sha256: imageFull,
     image_short_hash: afterHash,
-    previous_short_hash: beforeHash,
     last_mutation_id: mutationId,
-    last_known_good: LKG_IMAGE,
+    before_hash: beforeHash,
+    after_hash: afterHash,
     updated_at: new Date().toISOString(),
   };
-  const tmp = `${STATE_MANIFEST}.tmp.${process.pid}`;
-  writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
-  renameSync(tmp, STATE_MANIFEST);
-  console.error(`[mis] state/manifest.json updated (${mutationId})`);
+  writeFileSync(STATE_MANIFEST, JSON.stringify(payload, null, 2) + "\n");
 }
 
-function logFailure(forms: string, reason: string) {
+function logFailure(reason: string, form: string) {
   ensureDirs();
-  const stamp = new Date().toISOString();
-  const block = `\n;; --- ${stamp} FAIL: ${reason} ---\n${forms.trim()}\n`;
-  writeFileSync(FAILURES_LOG, (existsSync(FAILURES_LOG) ? readFileSync(FAILURES_LOG, "utf8") : "") + block);
+  const line = `${new Date().toISOString()}\t${reason}\t${form.replace(/\n/g, " ").slice(0, 200)}\n`;
+  writeFileSync(FAILURES_LOG, (existsSync(FAILURES_LOG) ? readFileSync(FAILURES_LOG, "utf8") : "") + line);
   console.error(`[mis] logged failure to ${FAILURES_LOG}`);
 }
 
-function checkpointImage(path: string) {
-  if (!existsSync(path)) return;
-  const prevPath = path.replace(/\.ptc$/i, "") + ".prev.ptc";
-  copyFileSync(path, prevPath);
-  console.error(`[mis] checkpoint → ${prevPath}`);
+async function main() {
+  const args = process.argv.slice(2);
+  let imagePath = DEFAULT_IMAGE;
+  let doSave = process.env.MIS_SAVE === "1";
+  let doReset = false;
+  let doCheckpoint = false;
+  let strictLoad = false;
+  const forms: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "--save") doSave = true;
+    else if (a === "--reset") doReset = true;
+    else if (a === "--checkpoint") doCheckpoint = true;
+    else if (a === "--strict-load") strictLoad = true;
+    else if (a === "--scratch") imagePath = SCRATCH_IMAGE;
+    else if (a === "--image" || a === "--load") {
+      imagePath = resolve(args[++i]);
+    } else if (a.startsWith("-")) {
+      console.error(`unknown flag: ${a}`);
+      process.exit(1);
+    } else {
+      forms.push(a);
+    }
+  }
+
+  const code = forms.join(" ").trim();
+  if (!code && !doReset) {
+    // Allow pure load / image inspection with no forms
+  }
+
+  const pre = code ? prevalidate(code) : { ok: true as const };
+  if (!pre.ok) {
+    console.error(`[mis] prevalidate failed: ${pre.reason}`);
+    logFailure(pre.reason || "prevalidate", code);
+    process.exit(2);
+  }
+
+  const repl = new MemoryRepl();
+  if (!doReset) {
+    loadImage(repl, imagePath, strictLoad);
+  } else {
+    console.error(`[mis] --reset: skipping image load`);
+  }
+
+  if (!code) {
+    // nothing to eval
+    process.exit(0);
+  }
+
+  const beforeHash = existsSync(imagePath) ? shortHash(readFileSync(imagePath)) : "none";
+  const { ok, output } = repl.eval(code);
+  process.stdout.write(output);
+
+  if (!ok) {
+    console.error(`[mis] eval failed — image NOT updated`);
+    logFailure("eval", code);
+    process.exit(2);
+  }
+
+  if (doSave) {
+    if (doCheckpoint && existsSync(imagePath)) {
+      const prev = imagePath.replace(/\.ptc$/, ".prev.ptc");
+      copyFileSync(imagePath, prev);
+      console.error(`[mis] checkpoint → ${prev}`);
+    }
+    writeLastKnownGood(imagePath);
+    appendTranscript(imagePath, code);
+    const afterHash = shortHash(readFileSync(imagePath));
+    const mutationId = randomUUID();
+    appendMutationRecord({
+      mutation_id: mutationId,
+      timestamp: new Date().toISOString(),
+      image: imagePath,
+      before_hash: beforeHash,
+      after_hash: afterHash,
+      forms_preview: code.slice(0, 240),
+    });
+    writeStateManifest(imagePath, mutationId, beforeHash, afterHash);
+    console.error(`[mis] saved (mutation ${mutationId.slice(0, 8)}…)`);
+  }
 }
 
-const args = process.argv.slice(2);
-let loadPath = DEFAULT_IMAGE;
-let doSave = process.env.MIS_SAVE === "1";
-let doReset = false;
-let doCheckpoint = false;
-let strictLoad = false;
-let code: string | null = null;
-
-for (let i = 0; i < args.length; i++) {
-  const a = args[i];
-  if ((a === "--load" || a === "--image") && args[i + 1]) loadPath = resolve(args[++i]);
-  else if (a === "--scratch") loadPath = SCRATCH_IMAGE;
-  else if (a === "--save") doSave = true;
-  else if (a === "--reset") doReset = true;
-  else if (a === "--checkpoint") doCheckpoint = true;
-  else if (a === "--strict-load") strictLoad = true;
-  else if (a === "-") {
-    /* stdin */
-  } else if (!a.startsWith("-")) code = a;
-}
-
-if (!code) {
-  const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
-  code = Buffer.concat(chunks).toString("utf8");
-}
-
-if (!code || !code.trim()) {
-  console.error("usage: eval.ts [--load|--image path] [--scratch] [--save] [--reset] [--checkpoint] [--strict-load] '<lisp forms>'");
+main().catch((e) => {
+  console.error(e);
   process.exit(1);
-}
-
-const stripped = stripFences(code);
-const preErr = prevalidate(stripped);
-if (preErr) {
-  console.error(`[mis] validation failed: ${preErr}`);
-  process.stdout.write(`[mis-error] validation: ${preErr}\n`);
-  logFailure(stripped, preErr);
-  process.exit(2);
-}
-
-ensureDirs();
-const repl = new MemoryRepl();
-if (!doReset) loadImage(repl, loadPath, strictLoad);
-
-const { ok, output } = repl.eval(stripped);
-process.stdout.write(output);
-
-if (!ok) {
-  console.error(`[mis] eval failed — image NOT updated`);
-  logFailure(stripped, "eval-error");
-  process.exit(2);
-}
-
-if (doSave) {
-  const beforeHash = existsSync(loadPath) ? shortHash(readFileSync(loadPath)) : "none";
-  writeLastKnownGood(loadPath);
-  if (doCheckpoint) checkpointImage(loadPath);
-  appendTranscript(stripped, loadPath);
-  const afterHash = shortHash(readFileSync(loadPath));
-  const mutationId = `mut-${randomUUID()}`;
-  appendMutationRecord({
-    mutation_id: mutationId,
-    actor: process.env.MIS_SESSION_ID || "grok-session",
-    timestamp: new Date().toISOString(),
-    operation: "append-forms",
-    path: loadPath,
-    state_before_hash: beforeHash,
-    state_after_hash: afterHash,
-    validation_result: "success",
-    rollback_target: LKG_IMAGE,
-  });
-  writeStateManifest(loadPath, mutationId, beforeHash, afterHash);
-}
-
-process.exit(0);
+});

@@ -27,6 +27,7 @@ Give Grok a small, stable Mind API, safe experimentation paths, and a modular mi
 - [x] Loader uses `(import "...")` (bridge chdirs to image dir during load)
 - [x] Old monolithic body replaced by thin loader
 - [x] `*mis-known*` retained (dump optional later)
+- [x] LKG snapshot also copies core modules into `state/checkpoints/` so modular LKG remains bootable
 
 ### Scratch + push
 - [x] `--scratch` isolation
