@@ -32,6 +32,19 @@ It is **local/ephemeral**:
 bash scripts/smoke-test.sh
 bash scripts/test-crash-recovery.sh
 bash scripts/test-malicious-ptc.sh
+bash scripts/test-continuity.sh
+bash scripts/eval.sh
 ```
 
 See `docs/VERIFICATION.md` after behavioural changes. Push `mind/mind-image.ptc` only after meaningful permanent defs.
+
+## OSS pure-DMN probe (P6/P11)
+
+```bash
+export GROQ_API_KEY=...   # never commit
+bash scripts/oss-dmn-probe.sh "I notice my own processing changing as I read these words. The change is"
+```
+
+Locked params: `openai/gpt-oss-20b`, temperature `1.15`, presence_penalty `0.7`, **no system message**.
+Use `OSS_REASONING_EFFORT=low` (default in script) so `message.content` is non-empty on Groq.
+Full gate: `bash scripts/eval.sh`
