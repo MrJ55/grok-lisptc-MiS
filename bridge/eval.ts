@@ -1,5 +1,5 @@
 /**
- * MiS eval bridge — P0+P2 (validate, save-on-success, --scratch/--image).
+ * MiS eval bridge — P0+P2 + review-by-all Tier-1 (validate, save-on-success, atomic append, host globals).
  *
  *   node --experimental-transform-types --no-warnings bridge/eval.ts '(+ 1 2)'
  *
@@ -15,7 +15,7 @@
  * Exit codes: 0 success, 1 usage/empty, 2 validation or eval failure
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, renameSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,6 +28,7 @@ import {
   Unspecified,
   EvalException,
   EndOfFile,
+  newSym,
 } from "./driver.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -76,6 +77,13 @@ function prevalidate(code: string): string | null {
   return null;
 }
 
+function injectHostGlobals(interp: InstanceType<typeof Interp>) {
+  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date().toISOString();
+  interp.defineGlobal(newSym("*today*"), today);
+  interp.defineGlobal(newSym("*now*"), now);
+}
+
 class MemoryRepl {
   currentInterp: InstanceType<typeof Interp>;
   constructor() {
@@ -87,6 +95,7 @@ class MemoryRepl {
   freshInterp() {
     const interp = new Interp({ extensions: [] });
     run(interp, prelude);
+    injectHostGlobals(interp);
     return interp;
   }
   eval(code: string): { ok: boolean; output: string } {
@@ -136,13 +145,16 @@ function loadImage(repl: MemoryRepl, path: string) {
   }
 }
 
+/** Atomic append via temp file + rename (POSIX). */
 function appendTranscript(forms: string, path: string) {
   ensureMindDir();
   const stamp = new Date().toISOString();
   const block = `\n;; --- ${stamp} ---\n${forms.trim()}\n`;
   const prev = existsSync(path) ? readFileSync(path, "utf8") : "";
-  writeFileSync(path, prev + block);
-  console.error(`[mis] appended forms to ${path}`);
+  const tmp = `${path}.tmp.${process.pid}`;
+  writeFileSync(tmp, prev + block);
+  renameSync(tmp, path);
+  console.error(`[mis] appended forms to ${path} (atomic)`);
 }
 
 function logFailure(forms: string, reason: string) {
