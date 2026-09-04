@@ -37,9 +37,9 @@ reflection / wander / OSS / transcript
 
 - [x] Taxonomy documented (this file)
 - [x] ADR 0006 recorded
-- [ ] `(promote-candidate candidate-id)` helper
-- [ ] `prevalidate` heuristic rejection of raw OSS-shaped prose (bridge)
-- [ ] Explicit tagging of all proposal-file entries
+- [x] `(promote-candidate candidate-id)` helper (host-mediated reminder; does not auto-elevate)
+- [x] `prevalidate` heuristic rejection of raw OSS-shaped prose (bridge)
+- [x] Explicit tagging of proposal-file entries (file headers declare candidate class)
 
 ## Related
 

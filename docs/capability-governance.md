@@ -1,8 +1,8 @@
 # Capability Governance (P0.1 framework)
 
-**Status:** design baseline 2026-09-04  
+**Status:** design baseline + ADR 2026-09-04  
 **Phase:** [plan/P0.1-state-governance.md](../plan/P0.1-state-governance.md)  
-**ADR (planned):** 0007
+**ADR:** [adr/0007-capability-governance.md](../adr/0007-capability-governance.md)
 
 ## Principle
 
@@ -38,9 +38,9 @@ Each loaded binding should declare:
 
 - [x] Deny-by-default baseline (`extensions: []` in bridge)
 - [x] Profiles documented
+- [x] ADR 0007 formal decision record
 - [ ] `CapabilityDescriptor` schema
 - [ ] `mind-load-capability` / `mind-unload-capability` / `mind-capabilities` / `mind-execute` helpers
-- [ ] ADR 0007 formal decision record
 - [ ] First real capability load (Vestige / P5) follows this framework
 
 ## Related

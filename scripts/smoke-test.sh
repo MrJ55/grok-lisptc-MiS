@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test for documented MiS helpers (post review-by-all + P0.1 partial)
+# Smoke test for documented MiS helpers (post review-by-all + P0.1 wave-2)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME="${MIS_RUNTIME:-/tmp/mis}"
@@ -34,6 +34,7 @@ run '(mis-state-summary)' 'mis-state-summary'
 run '(dmn-reflect-pack 3)' 'dmn-reflect-pack'
 run '(dmn-autobiography 1)' 'dmn-autobiography'
 run '(audit-reality-status)' 'audit-reality-status'
+run "(promote-candidate 'wave-2-demo)" 'promote-candidate'
 run '(square 5)' 'square'
 run '(half 8)' 'half'
 

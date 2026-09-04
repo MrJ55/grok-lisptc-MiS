@@ -1,6 +1,6 @@
 /**
  * MiS eval bridge — P0+P2 + P0.1 trust base (validate, save-on-success, atomic append,
- * host globals, last-known-good, light OSS-shape rejection).
+ * host globals, last-known-good, OSS-shape rejection, manifest check, state/manifest.json).
  *
  *   node --experimental-transform-types --no-warnings bridge/eval.ts '(+ 1 2)'
  *
@@ -11,7 +11,7 @@
  *   --save          append forms ONLY after successful eval
  *   --reset         ignore existing image
  *   --checkpoint    copy image to <stem>.prev.ptc before save
- *   --strict-load   treat image-load errors as fatal (exit 2)
+ *   --strict-load   treat image-load / manifest errors as fatal (exit 2)
  *
  * Env: MIS_IMAGE overrides default path; MIS_SAVE=1 enables save.
  * Exit codes: 0 success, 1 usage/empty, 2 validation or eval failure
@@ -46,6 +46,10 @@ const SCRATCH_IMAGE = join(MIND_DIR, "mind-scratch.ptc");
 const FAILURES_LOG = join(MIND_DIR, "mind-failures.log");
 const LKG_IMAGE = join(CHECKPOINTS_DIR, "last-known-good.ptc");
 const MUTATIONS_LOG = join(AUDIT_DIR, "mutations.jsonl");
+const STATE_MANIFEST = join(STATE_DIR, "manifest.json");
+
+const KNOWN_GMOD_SCHEMAS = new Set(["0.1.0"]);
+const EXPECTED_CAPABILITY_PROFILE = "mind-sandbox-v1";
 
 /** Common pure-DMN / nudge-craft openings that must never be eval'd as code. */
 const OSS_SHAPE_PREFIXES = [
@@ -82,7 +86,7 @@ function prevalidate(code: string): string | null {
     return "looks like untrusted OSS/prose (not a lisptc form); refuse to eval — store as candidate data only";
   }
   const trimmed = code.trim();
-  if (!trimmed.includes("(") && !/^-?\d+(\.\d+)?$/.test(trimmed) && !/^"[^"]*"$/.test(trimmed) && !/^[a-zA-Z_*?!+\-*/<>=][\w\-?!*]*$/.test(trimmed)) {
+  if (!trimmed.includes("(") && !/^-?\d+(\.\d+)?$/.test(trimmed) && !/^"[^"]*"$/.test(trimmed) && !/^[a-zA-Z_*?!+\-*/<>=][\w\-?!*]*/.test(trimmed)) {
     if (/\s/.test(trimmed) && !trimmed.startsWith('"')) {
       return "does not look like lisptc (no s-expression); refuse to eval prose";
     }
@@ -108,6 +112,58 @@ function prevalidate(code: string): string | null {
   if (inStr) return "unbalanced: unclosed string";
   if (depth !== 0) return "unbalanced: unclosed '('";
   return null;
+}
+
+/**
+ * Extract successive top-level s-expressions, skipping ; line comments and
+ * respecting strings. Good enough for mind-image form-by-form load.
+ */
+function extractTopLevelForms(src: string): string[] {
+  const forms: string[] = [];
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    while (i < n && /\s/.test(src[i])) i++;
+    if (i >= n) break;
+    if (src[i] === ";") {
+      while (i < n && src[i] !== "\n") i++;
+      continue;
+    }
+    if (src[i] !== "(") {
+      // skip non-form tokens (rare in image)
+      while (i < n && !/\s/.test(src[i]) && src[i] !== "(" && src[i] !== ";") i++;
+      continue;
+    }
+    const start = i;
+    let depth = 0;
+    let inStr = false;
+    let escape = false;
+    for (; i < n; i++) {
+      const c = src[i];
+      if (inStr) {
+        if (escape) escape = false;
+        else if (c === "\\") escape = true;
+        else if (c === '"') inStr = false;
+        continue;
+      }
+      if (c === '"') inStr = true;
+      else if (c === "(") depth++;
+      else if (c === ")") {
+        depth--;
+        if (depth === 0) {
+          i++;
+          forms.push(src.slice(start, i));
+          break;
+        }
+      }
+    }
+    if (depth !== 0) {
+      // unbalanced remainder — let eval report it
+      forms.push(src.slice(start));
+      break;
+    }
+  }
+  return forms;
 }
 
 function injectHostGlobals(interp: InstanceType<typeof Interp>) {
@@ -166,6 +222,19 @@ function ensureDirs() {
   if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
 }
 
+function shortHash(buf: Buffer | string): string {
+  return createHash("sha256").update(buf).digest("hex").slice(0, 16);
+}
+
+function fullHash(buf: Buffer | string): string {
+  return createHash("sha256").update(buf).digest("hex");
+}
+
+/**
+ * Load image form-by-form. First form should set *mind-manifest*; we validate
+ * schema/profile after it (and again after full load). Remaining forms continue
+ * even if an intermediate form fails (unless --strict-load).
+ */
 function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   if (!existsSync(path)) {
     console.error(`[mis] no image at ${path} — starting fresh`);
@@ -173,15 +242,60 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   }
   const src = readFileSync(path, "utf8");
   if (!src.trim()) return;
-  const { ok, output } = repl.eval(src);
-  console.error(`[mis] loaded ${path} (${src.length} chars) ok=${ok}`);
-  if (output.trim()) console.error(output.trim());
-  if (!ok) {
-    console.error(`[mis] warning: image load reported errors (definitions may be partial)`);
-    if (strict) {
-      console.error(`[mis] --strict-load: treating image load failure as fatal`);
-      process.exit(2);
+
+  const forms = extractTopLevelForms(src);
+  if (forms.length === 0) {
+    console.error(`[mis] no top-level forms in ${path}`);
+    if (strict) process.exit(2);
+    return;
+  }
+
+  let anyFail = false;
+  let manifestChecked = false;
+
+  for (let idx = 0; idx < forms.length; idx++) {
+    const form = forms[idx];
+    const { ok, output } = repl.eval(form);
+    if (output.trim()) console.error(output.trim());
+    if (!ok) {
+      anyFail = true;
+      console.error(`[mis] form ${idx + 1}/${forms.length} failed`);
+      if (strict) {
+        console.error(`[mis] --strict-load: treating form failure as fatal`);
+        process.exit(2);
+      }
+      continue;
     }
+
+    // After first successful form, require *mind-manifest*
+    if (idx === 0 || !manifestChecked) {
+      const m = repl.eval("*mind-manifest*");
+      if (m.ok && m.output.trim() && !m.output.includes("unbound") && !m.output.includes("Unbound")) {
+        manifestChecked = true;
+        const text = m.output.trim();
+        // Light string checks (full alist parse is overkill in TS)
+        if (!text.includes("0.1.0") && !text.includes(":gmod-schema")) {
+          console.error(`[mis] warning: *mind-manifest* present but schema not recognized`);
+          if (strict) {
+            console.error(`[mis] --strict-load: unknown gmod-schema`);
+            process.exit(2);
+          }
+        } else {
+          console.error(`[mis] manifest ok (gmod-schema present)`);
+        }
+      } else if (idx === 0) {
+        console.error(`[mis] warning: first form did not establish *mind-manifest*`);
+        if (strict) {
+          console.error(`[mis] --strict-load: missing *mind-manifest*`);
+          process.exit(2);
+        }
+      }
+    }
+  }
+
+  console.error(`[mis] loaded ${path} (${src.length} chars, ${forms.length} forms) anyFail=${anyFail}`);
+  if (anyFail && strict) {
+    process.exit(2);
   }
 }
 
@@ -210,6 +324,27 @@ function appendMutationRecord(record: Record<string, unknown>) {
   writeFileSync(MUTATIONS_LOG, (existsSync(MUTATIONS_LOG) ? readFileSync(MUTATIONS_LOG, "utf8") : "") + line);
 }
 
+function writeStateManifest(imagePath: string, mutationId: string, beforeHash: string, afterHash: string) {
+  ensureDirs();
+  const imageFull = existsSync(imagePath) ? fullHash(readFileSync(imagePath)) : null;
+  const payload = {
+    schema_version: "0.1.0",
+    gmod_schema: "0.1.0",
+    capability_profile: EXPECTED_CAPABILITY_PROFILE,
+    image_path: imagePath,
+    image_sha256: imageFull,
+    image_short_hash: afterHash,
+    previous_short_hash: beforeHash,
+    last_mutation_id: mutationId,
+    last_known_good: LKG_IMAGE,
+    updated_at: new Date().toISOString(),
+  };
+  const tmp = `${STATE_MANIFEST}.tmp.${process.pid}`;
+  writeFileSync(tmp, JSON.stringify(payload, null, 2) + "\n");
+  renameSync(tmp, STATE_MANIFEST);
+  console.error(`[mis] state/manifest.json updated (${mutationId})`);
+}
+
 function logFailure(forms: string, reason: string) {
   ensureDirs();
   const stamp = new Date().toISOString();
@@ -223,10 +358,6 @@ function checkpointImage(path: string) {
   const prevPath = path.replace(/\.ptc$/i, "") + ".prev.ptc";
   copyFileSync(path, prevPath);
   console.error(`[mis] checkpoint → ${prevPath}`);
-}
-
-function shortHash(buf: Buffer | string): string {
-  return createHash("sha256").update(buf).digest("hex").slice(0, 16);
 }
 
 const args = process.argv.slice(2);
@@ -289,8 +420,9 @@ if (doSave) {
   if (doCheckpoint) checkpointImage(loadPath);
   appendTranscript(stripped, loadPath);
   const afterHash = shortHash(readFileSync(loadPath));
+  const mutationId = `mut-${randomUUID()}`;
   appendMutationRecord({
-    mutation_id: `mut-${randomUUID()}`,
+    mutation_id: mutationId,
     actor: process.env.MIS_SESSION_ID || "grok-session",
     timestamp: new Date().toISOString(),
     operation: "append-forms",
@@ -300,6 +432,7 @@ if (doSave) {
     validation_result: "success",
     rollback_target: LKG_IMAGE,
   });
+  writeStateManifest(loadPath, mutationId, beforeHash, afterHash);
 }
 
 process.exit(0);
