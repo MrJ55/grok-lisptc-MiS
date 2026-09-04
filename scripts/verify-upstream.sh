@@ -6,14 +6,19 @@ if [[ ! -f UPSTREAM.lock.json ]]; then
   echo "FAIL: UPSTREAM.lock.json missing" >&2
   exit 1
 fi
-if ! command -v jq >/dev/null 2>&1; then
-  echo "WARN: jq not found; skipping hash check" >&2
-  exit 0
-fi
 
-PIN=$(jq -r .lisptc_commit UPSTREAM.lock.json)
-EXPECTED_LISP=$(jq -r .lisp_source_sha256 UPSTREAM.lock.json)
-EXPECTED_ARITH=$(jq -r .arith_source_sha256 UPSTREAM.lock.json)
+read_lock() {
+  local key="$1"
+  if command -v jq >/dev/null 2>&1; then
+    jq -r ".$key" UPSTREAM.lock.json
+  else
+    python3 -c "import json; print(json.load(open('UPSTREAM.lock.json'))['$key'])"
+  fi
+}
+
+PIN=$(read_lock lisptc_commit)
+EXPECTED_LISP=$(read_lock lisp_source_sha256)
+EXPECTED_ARITH=$(read_lock arith_source_sha256)
 LISP_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
 ARITH_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/arith.ts"
 
@@ -31,6 +36,17 @@ fi
 
 ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
 ACTUAL_ARITH=$(sha256sum src/arith.ts | cut -d' ' -f1)
+if [[ "$EXPECTED_LISP" != "$ACTUAL_LISP" ]]; then
+  echo "[verify] lisp.ts hash mismatch — re-fetching pinned upstream…"
+  curl -fsSL -o src/lisp.ts "$LISP_URL"
+  ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
+fi
+if [[ "$EXPECTED_ARITH" != "$ACTUAL_ARITH" ]]; then
+  echo "[verify] arith.ts hash mismatch — re-fetching pinned upstream…"
+  curl -fsSL -o src/arith.ts "$ARITH_URL"
+  ACTUAL_ARITH=$(sha256sum src/arith.ts | cut -d' ' -f1)
+fi
+
 if [[ "$EXPECTED_LISP" != "$ACTUAL_LISP" ]]; then
   echo "FAIL: src/lisp.ts hash mismatch" >&2
   echo "  expected $EXPECTED_LISP" >&2

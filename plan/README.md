@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS (grok-mis-oss-dmn)
 
-**Last updated:** 2026-09-04 (review-by-all + revised-plan-GLM applied)  
+**Last updated:** 2026-09-04 (P0.1 exit items: CI + tests + vendor verify)  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.  
 **Creative mechanisms:** [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md)  
 **OSS-DMN channel:** [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md)  
@@ -27,12 +27,12 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 |----|------|--------|----------|
 | P00 | [P00-cold-start.md](./P00-cold-start.md) | permanent ref | Restore mind + verify + review OSS proposals |
 | P0 | [P0-safety.md](./P0-safety.md) | done (hardened) | Validate, atomic save-on-success, no brick |
-| **P0.1** | [P0.1-state-governance.md](./P0.1-state-governance.md) | **active** | Trust classes, reality-status, upstream lock, transactional persistence |
+| **P0.1** | [P0.1-state-governance.md](./P0.1-state-governance.md) | **exit substantially met** | Trust, reality-status, upstream lock, transactional persistence, CI |
 | P1 | [P1-ux-pins.md](./P1-ux-pins.md) | done | English-first, upstream pins |
 | P2 | [P2-helpers-scratch-push.md](./P2-helpers-scratch-push.md) | done | Mind API, scratch, push |
 | P3 | [P3-self-schema.md](./P3-self-schema.md) | done | Self-schema + episodic buffer (trim restored) |
 | P4 | [P4-reflection-protocol.md](./P4-reflection-protocol.md) | done | `dmn-reflect-pack` / `dmn-apply-reflection` live |
-| **P6** | [P6-evaluation.md](./P6-evaluation.md) | **next after P0.1** | Metrics, smoke CI, continuity tests |
+| **P6** | [P6-evaluation.md](./P6-evaluation.md) | **active next** | Metrics, smoke CI, continuity tests |
 | P7 | [P7-narrative-self.md](./P7-narrative-self.md) | planned (after P6) | Autobiography + arc + OSS dual-write |
 | P8 | [P8-replay-scenes.md](./P8-replay-scenes.md) | planned | Tagged replay + scene packs |
 | P9 | [P9-prospection.md](./P9-prospection.md) | planned | Future / counterfactual / light ToM |
@@ -42,8 +42,8 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 
 ## Current focus
 
-1. **P0.1 — State Governance** (trust classes, reality-status, capability profiles, transactional persistence).
-2. **P6 — Evaluation** (smoke CI, false-assertion metrics, load success rate).
+1. **P0.1** exit criteria substantially met (CI + crash/malicious tests + vendor hash lock).
+2. **P6 — Evaluation** is the active next phase.
 3. Only then expand P7–P11 and the six named extensions.
 
 ## Novel extensions (design targets, not yet implemented)
@@ -63,9 +63,9 @@ Full contrast: [docs/gmod-extensions-contrast-20260902.md](../docs/gmod-extensio
 
 - **Host:** Grok (emits Lisp, owns permanence, mediates all OSS calls, owns salience switch).
 - **Mind:** transcript image `mind/mind-image.ptc` (v0.4).
-- **Bridge:** validate → eval → atomic save only on success; injects `*today*` / `*now*`.
-- **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (vendored upstream; no Reader patch).
-- **Pin:** `UPSTREAM.lock.json` + `scripts/verify-upstream.sh`.
+- **Bridge:** validate → form-by-form load → eval → atomic save only on success; injects `*today*` / `*now*`; LKG + mutations + state/manifest.
+- **Runtime:** `/tmp/mis` via `scripts/bootstrap.sh` (pinned upstream; hash-checked).
+- **Pin:** `UPSTREAM.lock.json` + `scripts/verify-upstream.sh` + CI.
 - **OSS role:** pure DMN candidate-texture generator; never receives system/TPN framing.
 
 ## Resource policy
