@@ -1,42 +1,39 @@
-# P9 — Prospection (Future, Counterfactual, Light ToM)
+# P9 — Prospection & Simulation
 
-**Status:** planned  
-**Depends on:** P8 scenes (soft); P4 reflection; P11 OSS channel useful  
-**DMN subsystem:** Prospective / Simulation  
-**Neuroscience note:** Imagination in DMN is fMRI-supported constructive simulation (past/future overlap); not mere next-token prediction.  
-**Related extension:** Counterfactual curriculum / offline RL — Third-voice bridge ([contrast report §4](../docs/gmod-extensions-contrast-20260902.md#4-counterfactual-curriculum-as-offline-rl))
+**Status:** planned → **revised 2026-09-04** (GLM+Terra synthesis) — gated on P6; requires reality-status; counterfactual curriculum
+**Depends on:** P7 (or sufficient arc/episodes), P8 helpful; **P6 (evaluation gate)**
+**DMN subsystem:** Prospective / Simulation (DMN-inspired)
+**Related extensions:** Third-voice bridge / counterfactual curriculum
 
 ## Goal
-Share machinery between memory and **constructive simulation**: future scenarios, counterfactuals, and light other-mind models — structured data for Grok to narrate or act on. OSS may supply pure-DMN phenomenological texture.
+Support future-oriented simulation: counterfactuals, plan sketches, light theory-of-mind — always as **candidate** material (`:reality-status planned` or `:simulated`), never auto-promoted into identity.
+
+## P6 gate
+Do not start P9 until P6 exit criteria pass.
 
 ## Objective
-- Simulate turns return structured scenes + predicted schema/goal deltas.
-- Modes: `:future` | `:counterfactual` | `:other-mind`.
-- Ground in autobiography, arc tensions, or recent scenes.
-- **Counterfactual curriculum:** after failures, simulate safer policy; promote consistent insights. Prefer an OSS-sourced pure-DMN continuation (Third-voice style) before writing the reflection insight.
-- After a failure, Grok may ask OSS (P11 pure-DMN mode) for a short counterfactual continuation seeded from the error episode; the result becomes a candidate for the curriculum.
-- Simulation results remain structured data; OSS supplies only the free-form phenomenological layer that Grok may adopt or discard.
+- `(dmn-simulate-pack goal-or-question)` assembles context for host or OSS-assisted simulation.
+- Simulations are tagged `:reality-status simulated` (or `:planned` for intentions).
+- Optional OSS texture under pure-DMN protocol for counterfactual richness.
+- Feed outcomes into reflection (P4) and narrative (P7) only via explicit Grok promotion.
+- **Third-voice bridge:** offline RL / counterfactual curriculum as design target (see contrast report §4).
 
 ## Implementation method
-- Lisp stores seeds/results as data; heavy reasoning stays with Grok.
-- Optional `(dmn-simulate-pack mode seed-ref)`.
-- Result shape: `(:mode . …) (:scene . …) (:predicted-outcomes . …) (:schema-delta . …) (:confidence . …)`
-- Never execute predicted actions automatically.
+- Pack recent episodes, open threads, and relevant autobiography chapters.
+- Host emits simulation results as Lisp data (not free prose into the image).
+- Dual-write optional: episode log + proposal file for large simulations.
+- All simulation outputs carry `:reality-status simulated` unless explicitly reconstructing recorded history.
 
 ## Checklist
-- [ ] Spec result alist shape in docs
-- [ ] Simulate-pack and/or host protocol for full simulate turns
-- [ ] One future simulation from current `:active-goals`
-- [ ] One counterfactual from a real error / failure episode
-- [ ] One counterfactual simulation that includes an OSS-sourced continuation (P11, Third-voice style)
-- [ ] Optional: promote one counterfactual insight via reflection
-- [ ] Document in mind-api + reflection docs + “OSS as texture provider only” rule
-- [ ] Prefer OSS pure-DMN texture after high-cost TPN outcomes before finalising the insight
+- [ ] Spec simulate-pack shape and reality-status rules
+- [ ] Implement `(dmn-simulate-pack …)` helper
+- [ ] Document promotion path into P4/P7
+- [ ] One end-to-end simulation that is reviewed and selectively applied
+- [ ] No auto-save of raw OSS simulation text
 
 ## Exit criteria
-At least two saved simulation results that cite seeds; no auto-execution of simulated actions; at least one OSS-textured candidate reviewed.
+Simulation packs are data-only; promoted insights update schema/narrative only via explicit Grok forms; `(audit-reality-status)` clean.
 
 ## Non-goals
-- Full multi-agent ToM engine
-- Unconstrained story generation as identity
-- System prompts to OSS
+- Full agentic planning stack
+- Unbounded future branching without review
