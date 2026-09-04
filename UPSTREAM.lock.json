@@ -1,0 +1,14 @@
+{
+  "lisptc_repository": "https://github.com/1hachem/lisptc",
+  "lisptc_commit": "2c10ea8ed6edb16e065b746a7f52080956b895de",
+  "lisp_source_path": "packages/interpreter/src/lisp.ts",
+  "arith_source_path": "packages/interpreter/src/arith.ts",
+  "lisp_source_sha256": "ad42e6bc123d05894c32783f32bbadf46a8660a9c44bdeb3527f9a8b772026e2",
+  "arith_source_sha256": "aa0e58ca95731c99f3df0acbacba0d5406b8dbc3975b68a2f228f2914f3a50a2",
+  "patch_id": null,
+  "patched_sha256": null,
+  "license": "MIT",
+  "capability_profile": "mind-sandbox-v1",
+  "acquired_at": "2026-09-04T00:00:00Z",
+  "notes": "Reverted fork arith.ts divergence (undefined vs null). No Reader patch required."
+}

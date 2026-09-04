@@ -1,43 +1,34 @@
 #!/usr/bin/env bash
-# Assemble runnable MiS under /tmp/mis — always ensure lisp.ts + Reader fix
+# Assemble runnable MiS under /tmp/mis — vendored upstream sources (no Reader patch after review-by-all)
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME="${MIS_RUNTIME:-/tmp/mis}"
 ZOD_DIR="${MIS_ZOD_DIR:-/tmp/mis-node}"
-ARTIFACTS_LISP="${MIS_ARTIFACTS_LISP:-/home/workdir/artifacts/mis/src/lisp.ts}"
-UPSTREAM_LISP_URL="${MIS_LISP_URL:-https://raw.githubusercontent.com/1hachem/lisptc/main/packages/interpreter/src/lisp.ts}"
-UPSTREAM_ARITH_URL="${MIS_ARITH_URL:-https://raw.githubusercontent.com/1hachem/lisptc/main/packages/interpreter/src/arith.ts}"
 
 echo "[mis] repo: $REPO_ROOT"
 echo "[mis] runtime: $RUNTIME"
 
-# --- ensure lisp.ts in repo src ---
+# --- ensure lisp.ts + arith.ts in repo src (prefer vendored; fall back to lock pin) ---
 mkdir -p "$REPO_ROOT/src"
+PIN="2c10ea8ed6edb16e065b746a7f52080956b895de"
+UPSTREAM_LISP_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+UPSTREAM_ARITH_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/arith.ts"
+
 if [[ ! -f "$REPO_ROOT/src/lisp.ts" ]] || [[ ! -s "$REPO_ROOT/src/lisp.ts" ]]; then
-  echo "[mis] src/lisp.ts missing — fetching…"
-  if [[ -f "$ARTIFACTS_LISP" ]]; then
-    cp -a "$ARTIFACTS_LISP" "$REPO_ROOT/src/lisp.ts"
-    echo "[mis] copied lisp.ts from artifacts"
-  else
-    curl -fsSL -o "$REPO_ROOT/src/lisp.ts" "$UPSTREAM_LISP_URL"
-    echo "[mis] downloaded lisp.ts from upstream"
-  fi
+  echo "[mis] src/lisp.ts missing — fetching pinned upstream…"
+  curl -fsSL -o "$REPO_ROOT/src/lisp.ts" "$UPSTREAM_LISP_URL"
 fi
 if [[ ! -f "$REPO_ROOT/src/arith.ts" ]] || [[ ! -s "$REPO_ROOT/src/arith.ts" ]]; then
-  echo "[mis] src/arith.ts missing — fetching…"
-  if [[ -f /home/workdir/artifacts/mis/src/arith.ts ]]; then
-    cp -a /home/workdir/artifacts/mis/src/arith.ts "$REPO_ROOT/src/arith.ts"
-  else
-    curl -fsSL -o "$REPO_ROOT/src/arith.ts" "$UPSTREAM_ARITH_URL"
-  fi
+  echo "[mis] src/arith.ts missing — fetching pinned upstream…"
+  curl -fsSL -o "$REPO_ROOT/src/arith.ts" "$UPSTREAM_ARITH_URL"
 fi
 
-# --- Reader tryToParse fix (undefined vs null) ---
-# arith tryToParse returns undefined on failure; original check treated it as number.
-if grep -q 'if (n !== null) this.token = n;' "$REPO_ROOT/src/lisp.ts" 2>/dev/null; then
-  echo "[mis] applying Reader tryToParse fix…"
-  sed -i 's/if (n !== null) this.token = n;/if (n !== undefined \&\& n !== null) this.token = n;/' "$REPO_ROOT/src/lisp.ts"
+# Optional: verify against lock if present
+if [[ -f "$REPO_ROOT/UPSTREAM.lock.json" ]] && command -v jq >/dev/null 2>&1; then
+  if [[ -x "$REPO_ROOT/scripts/verify-upstream.sh" ]]; then
+    bash "$REPO_ROOT/scripts/verify-upstream.sh" || echo "[mis] warning: upstream hash check failed" >&2
+  fi
 fi
 
 # --- zod ---
