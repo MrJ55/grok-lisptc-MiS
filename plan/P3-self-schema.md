@@ -1,37 +1,24 @@
-# P3 — Self-Schema & Episodic Buffer (DMN foundation)
+# P3 — Self-Schema & Episodic Buffer
 
-**Status:** in progress → nearly complete (primitives live; reflection protocol is P4)
+**Status:** done → **revised 2026-09-04** (trim restored; reality-status seeded)
 
 ## Goal
-Give the mind an evolving, inspectable self-model and a bounded episodic buffer so Grok can perform deliberate consolidation.
+Maintain a durable self-model (`*self-schema*`) and a bounded episodic buffer that reflection can consume.
 
 ## Objective
-- Persistent `*self-schema*` alist in the transcript image.
-- Merge primitive `update-self-schema`.
-- Bounded `*episodic-buffer*` with log/fetch helpers.
-- Readers integrated into `mis-state-summary`.
-- Optional meta tag `:source 'oss-dmn` on episodes that originate from pure-DMN OSS continuations (P11).
-
-## Implementation method
-- All state is ordinary Lisp in `mind-image.ptc` (no separate DB yet).
-- Schema keys (convention): `:core-values`, `:active-goals`, `:working-insights`, `:episodic-summary`, `:last-reflection`.
-- Episodes: newest-first list of `(input result meta)`, max `*episodic-max*` (40).
-- Fixed arity for `dmn-log-episode` (pass `nil` for unused meta).
-- Single-line docstrings only.
+- `*self-schema*` alist with core-values, goals, insights, summaries.
+- `update-self-schema` merges without reversing entry order incorrectly.
+- `*episodic-buffer*` + `*episodic-max*` with trim on log.
+- Episodes carry optional `:reality-status` (required after P0.1).
+- Helpers: `mis-schema`, `mis-insights`, `dmn-log-episode`, `dmn-fetch-unreflected`.
 
 ## Checklist
-- [x] `*self-schema*` default in image
-- [x] `(mis-schema)` `(mis-insights)` `(update-self-schema alist)`
-- [x] `*episodic-buffer*` + `(dmn-log-episode input result meta)` `(dmn-fetch-unreflected n)`
-- [x] Extended `(mis-state-summary)` includes schema
-- [x] Reader tryToParse fix + bootstrap auto-apply
-- [x] Verified save/reload of schema + episodes in sandbox
-- [ ] Optional: tighten schema shape validators (pure Lisp predicates)
-- [ ] Optional: auto-log every successful TPN eval from a thin wrapper (defer if noisy)
-- [ ] Optional: document `:source 'oss-dmn` convention for P11 dual-write
+- [x] `*self-schema*` live in mind-image
+- [x] `update-self-schema` order fixed (2026-09-04)
+- [x] Episodic trim restored in `dmn-log-episode`
+- [x] `:reality-status` seeded on existing episodes
+- [ ] Strict required reality-status validation (P0.1)
+- [ ] Optional rename `dmn-fetch-unreflected` → `dmn-fetch-recent` or real filter
 
 ## Exit criteria
-Cold bootstrap → schema present → update + log episode + `--save` → new process sees both.
-
-## Notes for next session
-P3 primitives are sufficient for P4 and for P11 dual-write. Do not re-implement schema; only extend keys if needed.
+Schema and buffer survive cold start; buffer never grows unbounded; reflection can pack recent episodes.

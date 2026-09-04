@@ -1,35 +1,20 @@
-# P8 — Structured Replay & Scene Construction
+# P8 — Replay & Scenes
 
-**Status:** planned  
-**Depends on:** P7 (or at least P3 buffer)  
-**DMN subsystem:** Episodic / Hippocampal
+**Status:** planned (after P6; revised 2026-09-04)
 
 ## Goal
-Upgrade the flat episodic buffer into **tagged, replayable episodes** and extract **scene packs** suitable for simulation and narrative.
+Support tagged replay of episode clusters as “scenes” for reflection, narrative, and prospection.
 
 ## Objective
-- Tag episodes (valence, error?, goal-relevance, novelty, social?).
-- Importance- or tag-weighted replay, not only “last N”.
-- Extract lightweight scene structures: actors, setting, actions, outcome, affect.
-- Feed scenes into P9 prospection and P7 narrative.
-
-## Implementation method
-- Extend episode record via meta tags or parallel tag map.
-- Prefer fixed-arity helpers; pass `nil` for unused fields.
-- Primitives: `(dmn-tag-episode …)` `(dmn-replay query-or-tag n)` `(dmn-scene-from episode)`
-- After errors, bias replay toward `:error` tags before reflection.
+- Scene packs: named groups of episode refs + summary.
+- Replay helper returns structured scene for host or OSS texture.
+- Optional link to P5/Vestige graph later.
 
 ## Checklist
-- [ ] Document episode record + tag vocabulary
-- [ ] Implement tag + replay + scene-from primitives
-- [ ] Seed tags on existing smoke/error-sim episodes
-- [ ] One replay query returns non-trivial filtered set
-- [ ] Scene extraction produces stable shape for P9
-- [ ] Update mind-api + learnings-log
+- [ ] Scene record schema (`:title`, `:episode-refs`, `:summary`, `:reality-status`)
+- [ ] `dmn-scene-pack` / `dmn-replay` helpers
+- [ ] Integration with reflection and narrative phases
+- [ ] No auto-promotion of OSS scene text
 
 ## Exit criteria
-`(dmn-replay 'error 5)` and `(dmn-scene-from …)` work after cold load; scenes are data-only.
-
-## Non-goals
-- Full temporal knowledge graph
-- Local embedding search (P5)
+Host can request a scene by tag and receive a stable, provenance-bearing pack without mutating the mind unless explicitly saved.
