@@ -1,0 +1,39 @@
+name: MiS CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Verify upstream sources match lock
+        run: bash scripts/verify-upstream.sh
+
+      - name: Bootstrap runtime
+        run: bash scripts/bootstrap.sh
+
+      - name: Smoke test
+        run: bash scripts/smoke-test.sh
+
+      - name: Crash-recovery / LKG test
+        run: bash scripts/test-crash-recovery.sh
+
+      - name: Malicious-PTC form resilience
+        run: bash scripts/test-malicious-ptc.sh
