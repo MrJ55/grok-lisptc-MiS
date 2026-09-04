@@ -50,27 +50,30 @@ export function multiply(x: Numeric, y: Numeric): Numeric {
 	}
 }
 
-// x / y
-export function divide(x: Numeric, y: Numeric): number {
+// x / y (rounded quotient)
+export function divide(x: Numeric, y: Numeric): Numeric {
 	return Number(x) / Number(y);
 }
 
-// quotient of x / y (towards zero)
+// Calculate the quotient of x and y.
 export function quotient(x: Numeric, y: Numeric): Numeric {
-	if (typeof x === "number" || typeof y === "number")
-		return Math.trunc(Number(x) / Number(y));
-	else
-		return (x as bigint) / (y as bigint);
+	if (typeof x === "number" || typeof y === "number") {
+		const q = Math.trunc(Number(x) / Number(y));
+		if (typeof BigInt === "undefined") return q;
+		else return BigInt(q);
+	} else {
+		return x / y;
+	}
 }
 
-// remainder of x / y
+// Calculate the remainder of the quotient of x and y.
 export function remainder(x: Numeric, y: Numeric): Numeric {
 	if (typeof x === "number" || typeof y === "number")
 		return Number(x) % Number(y);
-	else
-		return (x as bigint) % (y as bigint);
+	else return x % y;
 }
 
+// Compare x and y.
 // -1, 0 or 1 as x is less than, equal to, or greater than y.
 export function compare(x: Numeric, y: Numeric): number {
 	if (typeof x === "number") {
