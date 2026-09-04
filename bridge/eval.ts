@@ -80,17 +80,28 @@ function looksLikeOssProse(code: string): boolean {
   return false;
 }
 
+/** Bare atom allowed without parentheses (number, string, or symbol including :kw, <=, string->symbol). */
+const BARE_ATOM =
+  /^(?:-?\d+(?:\.\d+)?|"[^"]*"|:?[a-zA-Z_*?!+\-*/<>=][\w\-?!*><=]*)$/;
+
 function prevalidate(code: string): string | null {
   if (!code.trim()) return "empty input";
   if (looksLikeOssProse(code)) {
     return "looks like untrusted OSS/prose (not a lisptc form); refuse to eval — store as candidate data only";
   }
   const trimmed = code.trim();
-  if (!trimmed.includes("(") && !/^-?\d+(\.\d+)?$/.test(trimmed) && !/^"[^"]*"$/.test(trimmed) && !/^[a-zA-Z_*?!+\-*/<>=][\w\-?!*]*/.test(trimmed)) {
-    if (/\s/.test(trimmed) && !trimmed.startsWith('"')) {
-      return "does not look like lisptc (no s-expression); refuse to eval prose";
-    }
+
+  // Multi-word input without an s-expression is prose (e.g. "hello world").
+  // Do not allow a leading identifier to bypass this check.
+  if (!trimmed.includes("(") && /\s/.test(trimmed) && !trimmed.startsWith('"')) {
+    return "does not look like lisptc (no s-expression); refuse to eval prose";
   }
+
+  // Single bare atom: number, string, or symbol (UR7: :keyword, <=, >=, string->symbol).
+  if (!trimmed.includes("(") && !BARE_ATOM.test(trimmed)) {
+    return "does not look like lisptc (no s-expression); refuse to eval prose";
+  }
+
   let depth = 0;
   let inStr = false;
   let escape = false;
