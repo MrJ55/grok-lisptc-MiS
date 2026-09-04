@@ -79,47 +79,47 @@ function looksLikeOssProse(code: string): boolean {
   return false;
 }
 
-function prevalidate(code: string): { ok: boolean; reason?: string } {
+function prevalidate(code: string): { ok: true } | { ok: false; reason: string } {
   const s = stripFences(code);
-  if (!s) return { ok: false, reason: "empty input" };
+  if (!s) return { ok: false, reason: "empty form" };
+
+  // Reject multi-word prose that is not a parenthesized form
+  if (!s.trimStart().startsWith("(") && !s.trimStart().startsWith("'") && !s.trimStart().startsWith("`")) {
+    // bare atom ok (symbol, keyword, number)
+    if (/\s/.test(s.trim())) {
+      return { ok: false, reason: "multi-word prose (not a Lisp form)" };
+    }
+  }
+
   if (looksLikeOssProse(s)) {
     return { ok: false, reason: "OSS-shaped prose rejected (pure-DMN discipline)" };
   }
-  // Multi-word prose without a leading form is rejected.
-  const first = s.split(/\s+/)[0] ?? "";
-  const hasForm = s.includes("(") || s.startsWith("'") || s.startsWith("`");
-  if (!hasForm) {
-    // Allow bare atoms / keywords / identifiers, reject multi-word.
-    if (/\s/.test(s.trim())) {
-      return { ok: false, reason: "multi-word prose without form rejected" };
-    }
-  }
-  // Paren balance (approximate; strings ignored for speed).
+
+  // Paren balance (rough)
   let depth = 0;
   let inStr = false;
   let esc = false;
-  for (const ch of s) {
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
     if (inStr) {
-      if (esc) {
-        esc = false;
-        continue;
-      }
-      if (ch === "\\") {
-        esc = true;
-        continue;
-      }
-      if (ch === '"') inStr = false;
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
       continue;
     }
-    if (ch === '"') {
+    if (c === '"') {
       inStr = true;
       continue;
     }
-    if (ch === "(") depth++;
-    else if (ch === ")") depth--;
-    if (depth < 0) return { ok: false, reason: "unbalanced parens (extra )" };
+    if (c === ";") {
+      while (i + 1 < s.length && s[i + 1] !== "\n") i++;
+      continue;
+    }
+    if (c === "(") depth++;
+    else if (c === ")") depth--;
+    if (depth < 0) return { ok: false, reason: "unbalanced parentheses (extra )" };
   }
-  if (depth !== 0) return { ok: false, reason: `unbalanced parens (depth ${depth})` };
+  if (depth !== 0) return { ok: false, reason: "unbalanced parentheses" };
   return { ok: true };
 }
 
@@ -129,44 +129,33 @@ function extractTopLevelForms(src: string): string[] {
   let start = -1;
   let inStr = false;
   let esc = false;
-  let inComment = false;
   for (let i = 0; i < src.length; i++) {
-    const ch = src[i];
-    if (inComment) {
-      if (ch === "\n") inComment = false;
-      continue;
-    }
+    const c = src[i];
     if (inStr) {
-      if (esc) {
-        esc = false;
-        continue;
-      }
-      if (ch === "\\") {
-        esc = true;
-        continue;
-      }
-      if (ch === '"') inStr = false;
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
       continue;
     }
-    if (ch === ";") {
-      inComment = true;
-      continue;
-    }
-    if (ch === '"') {
+    if (c === '"') {
       inStr = true;
       if (depth === 0 && start < 0) start = i;
       continue;
     }
-    if (ch === "(") {
+    if (c === ";") {
+      while (i + 1 < src.length && src[i + 1] !== "\n") i++;
+      continue;
+    }
+    if (c === "(") {
       if (depth === 0) start = i;
       depth++;
-    } else if (ch === ")") {
+    } else if (c === ")") {
       depth--;
       if (depth === 0 && start >= 0) {
         forms.push(src.slice(start, i + 1));
         start = -1;
       }
-    } else if (depth === 0 && start < 0 && /[^\s]/.test(ch)) {
+    } else if (depth === 0 && start < 0 && /[^\s]/.test(c)) {
       // bare atom / keyword at top level
       start = i;
       // consume until whitespace or end
@@ -184,7 +173,8 @@ class MemoryRepl {
     this.currentInterp = this.freshInterp();
   }
   freshInterp(): Interp {
-    const interp = prelude();
+    const interp = new Interp();
+    run(interp, prelude);
     injectHostGlobals(interp);
     return interp;
   }
@@ -369,9 +359,8 @@ function writeStateManifest(imagePath: string, mutationId: string, beforeHash: s
     image_path: imagePath,
     image_sha256: imageFull,
     image_short_hash: afterHash,
-    last_mutation_id: mutationId,
-    before_hash: beforeHash,
-    after_hash: afterHash,
+    previous_short_hash: beforeHash,
+    mutation_id: mutationId,
     updated_at: new Date().toISOString(),
   };
   writeFileSync(STATE_MANIFEST, JSON.stringify(payload, null, 2) + "\n");
@@ -379,7 +368,7 @@ function writeStateManifest(imagePath: string, mutationId: string, beforeHash: s
 
 function logFailure(reason: string, form: string) {
   ensureDirs();
-  const line = `${new Date().toISOString()}\t${reason}\t${form.replace(/\n/g, " ").slice(0, 200)}\n`;
+  const line = `${new Date().toISOString()}\t${reason}\t${form.slice(0, 200).replace(/\n/g, " ")}\n`;
   writeFileSync(FAILURES_LOG, (existsSync(FAILURES_LOG) ? readFileSync(FAILURES_LOG, "utf8") : "") + line);
   console.error(`[mis] logged failure to ${FAILURES_LOG}`);
 }
