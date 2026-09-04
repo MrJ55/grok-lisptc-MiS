@@ -1,0 +1,6 @@
+;; MiS arithmetic sample defs (P2 module)
+(defun square (x) (* x x))
+(defun triple (x) (* x 3))
+(defun double (x) (* x 2))
+(defun quadruple (x) (* x 4))
+(defun half (x) (/ x 2))
