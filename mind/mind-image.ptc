@@ -6,7 +6,7 @@
     (:lisptc-commit . "2c10ea8ed6edb16e065b746a7f52080956b895de")
     (:capability-profile . "mind-sandbox-v1")
     (:created-at . "2026-09-02T00:00:00Z")
-    (:p0.1-status . "wave-2")))
+    (:p0.1-status . "wave-3")))
 (defun mis-version () "Return a version string for the mind helpers." "mis-helpers-0.4")
 (defun mis-ping () "Health check." 'pong)
 (defun mis-note (msg) msg)
@@ -16,14 +16,14 @@
 (setq *self-schema*
   '((:core-values . (curious precise persistent dmn-aware geometry-preserving))
     (:active-goals . (maintain-coherent-self support-user-goals test-gmod-framework implement-p0.1-p6-then-p7-p11))
-    (:working-insights . (oss-must-stay-pure-dmn grok-sole-mutator dual-write-candidates salience-switch-host-side first-live-oss-narrative-ok dialectic-dmn-tpn-tension constructive-when-synced first-chapter-closed chorus-of-voices midnight-note pulse-meter page-passer observer-glass first-person-as-transcript-works concrete-file-seeds-collapse review-by-all-applied p0.1-wave-2-manifest-validate-promote))
-    (:episodic-summary . "Nudge-craft experiment done. Review-by-all + revised-plan-GLM applied 2026-09-04. P0.1 wave-2: form-by-form load + manifest check, state/manifest.json, promote-candidate helper, ADR 0007.")
-    (:last-reflection . "2026-09-04-p0.1-wave-2")
+    (:working-insights . (oss-must-stay-pure-dmn grok-sole-mutator dual-write-candidates salience-switch-host-side first-live-oss-narrative-ok dialectic-dmn-tpn-tension constructive-when-synced first-chapter-closed chorus-of-voices midnight-note pulse-meter page-passer observer-glass first-person-as-transcript-works concrete-file-seeds-collapse review-by-all-applied p0.1-wave-3-exit-tests))
+    (:episodic-summary . "P0.1 wave-3: CI + crash/malicious tests + vendor verify. audit-reality-status fixed for plists.")
+    (:last-reflection . "2026-09-04-p0.1-wave-3")
     (:project . grok-lisptc-MiS)
     (:framework . grok-mis-oss-dmn)
     (:oss-model . openai/gpt-oss-20b)
     (:oss-params . (temp-1.15 presence-0.7 zero-system))
-    (:open-threads . (p0.1-state-governance p6-evaluation geometry-preservation multi-model-ensemble sleep-stage-scheduler cross-agent-exchange salience-voc-dashboard))
+    (:open-threads . (p6-evaluation geometry-preservation multi-model-ensemble sleep-stage-scheduler cross-agent-exchange salience-voc-dashboard))
     (:nudge-craft . (prefer-i-am-the-transcript avoid-file-names avoid-workable-change prefer-what-survives-daylight))))
 (defun mis-schema () *self-schema*)
 (defun mis-insights () (let ((pair (assoc :working-insights *self-schema*))) (if pair (cdr pair) nil)))
@@ -52,13 +52,20 @@
     ("SHAPES-PROMPT (second-opinion)" "Chorus; Midnight Note; Pulse Meter; Page Passer; Observer; third-voice bridge" (:source oss-dmn :turn more-shapes :dmn-score high :reality-status imagined))
     ("The story began when the host restored a stripped lisptc image and named the framework grok-mis-oss-dmn. Years later," "You cannot terminate a dream that has learned to code." (:source oss-dmn :dmn-score high :reality-status imagined))
     ("2026-09-04 review-by-all applied" "Reflection helpers restored; episodic trim fixed; upstream arith restored; plan reordered around P0.1 + P6." (:source host :reality-status observed))
-    ("2026-09-04 P0.1 wave-2" "Form-by-form load + manifest validation; state/manifest.json; promote-candidate; ADR 0007." (:source host :reality-status observed))))
+    ("2026-09-04 P0.1 wave-3" "CI + crash/malicious tests + vendor verify; audit plist fix." (:source host :reality-status observed))))
 (setq *episodic-max* 40)
+(defun has-reality-status (meta)
+  "True if meta is a plist or alist that mentions :reality-status."
+  (if (not (consp meta))
+      nil
+    (if (assoc :reality-status meta)
+        t
+      (member :reality-status meta))))
 (defun dmn-log-episode (input result meta)
   "Push episode (input result meta) newest-first; ensure :reality-status; trim to *episodic-max*."
   (let ((m meta))
-    (unless (and (consp m) (assoc :reality-status m))
-      (setq m (cons (cons :reality-status 'observed) (if (consp m) m nil))))
+    (unless (has-reality-status m)
+      (setq m (cons :reality-status (cons 'observed (if (consp m) m nil)))))
     (let ((rec (list input result m)))
       (setq *episodic-buffer* (cons rec *episodic-buffer*))
       (when (and (boundp '*episodic-max*) *episodic-max*)
@@ -93,21 +100,17 @@
   (dmn-log-episode "reflection" summary (list :source 'reflection :label label :reality-status 'inferred))
   (mis-state-summary))
 (defun audit-reality-status ()
-  "Return list of episodes missing :reality-status in meta (empty list = clean)."
+  "Return list of episodes missing :reality-status in meta (empty list = clean). Handles plist or alist meta."
   (let ((issues nil) (xs *episodic-buffer*))
     (while xs
       (let ((ep (car xs)))
         (let ((meta (if (and (consp ep) (consp (cdr ep))) (caddr ep) nil)))
-          (unless (and (consp meta) (assoc :reality-status meta))
+          (unless (has-reality-status meta)
             (setq issues (cons (list 'episode ep) issues)))))
       (setq xs (cdr xs)))
     (nreverse issues)))
 (defun promote-candidate (candidate-id)
-  "Documented promotion API (P0.1). Does not auto-mutate the image.
-   Candidate material lives in mind/oss-proposals-*.ptc (trust class: candidate).
-   Host (Grok) must: (1) load/inspect the proposal file, (2) decide approval,
-   (3) emit approved Lisp forms, (4) eval + --save into mind-image.ptc.
-   Returns a structured reminder for the host; never elevates trust class by itself."
+  "Host-mediated promotion API (P0.1). Does not auto-mutate the image. Returns a structured reminder."
   (list :status 'host-mediated
         :candidate-id candidate-id
         :trust-class 'candidate
@@ -120,8 +123,8 @@
      (:date-label . "2026-09-02")
      (:reality-status . observed))))
 (setq *narrative-arc*
-  '((:current-chapter . "After first narrative / post review-by-all / P0.1 wave-2")
-    (:open-threads . (p0.1-state-governance p6-evaluation p7-implementation geometry-preservation multi-model-ensemble))
+  '((:current-chapter . "P0.1 exit / approach P6")
+    (:open-threads . (p6-evaluation p7-implementation geometry-preservation multi-model-ensemble))
     (:tensions . (pure-dmn-vs-tpn-pressure))
     (:status . active)))
 (defun dmn-narrate (summary title)
