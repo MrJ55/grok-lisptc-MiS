@@ -10,5 +10,5 @@
   "license": "MIT",
   "capability_profile": "mind-sandbox-v1",
   "acquired_at": "2026-09-04T00:00:00Z",
-  "notes": "Reverted fork arith.ts divergence (undefined vs null). No Reader patch required."
+  "notes": "arith.ts vendored in-repo. lisp.ts may be fetched on demand by verify-upstream/bootstrap when missing, empty, VENDOR_STUB, or hash-mismatched; content is always pinned to lisptc_commit and hash-checked."
 }

@@ -2,18 +2,18 @@
 
 Minimal lisptc core required by the stripped MemoryRepl.
 
-- `arith.ts` — numeric helpers (included).
-- `lisp.ts` — full interpreter (~73 KB).
+- `arith.ts` — numeric helpers (vendored; hash-locked).
+- `lisp.ts` — full interpreter (~73 KB), pinned to upstream commit in `UPSTREAM.lock.json`.
 
-**Obtain `lisp.ts` if missing:**
+## Pin / verify
 
 ```bash
-# From upstream
-curl -fsSL -o src/lisp.ts \
-  https://raw.githubusercontent.com/1hachem/lisptc/main/packages/interpreter/src/lisp.ts
-
-# Or from the original sandbox artifacts
-cp /home/workdir/artifacts/mis/src/lisp.ts src/
+bash scripts/verify-upstream.sh   # fetches if incomplete, then sha256-checks
+bash scripts/bootstrap.sh         # builds /tmp/mis and smoke-tests
 ```
 
-Bootstrap expects `src/lisp.ts` present. The file is pure TypeScript and runs under Node `--experimental-transform-types`.
+If `src/lisp.ts` is missing, empty, marked `VENDOR_STUB`, or hash-mismatched, both scripts re-fetch from:
+
+`https://raw.githubusercontent.com/1hachem/lisptc/<pin>/packages/interpreter/src/lisp.ts`
+
+Expected hashes live in `UPSTREAM.lock.json`.
