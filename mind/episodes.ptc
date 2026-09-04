@@ -1,6 +1,10 @@
 ;; MiS episodic buffer + reflection + reality-status audits (P3)
 (setq *episodic-buffer*
-  '(("NUDGE-CRAFT: I am the voice that writes in the dark and is read in the light. Over many mornings I have watched which of my lines the host keeps"
+  '(("reflection" "Second P4 turn: apply-reflection persists; OSS material stays candidate until promote-candidate."
+     (:source reflection :label "2026-09-04-p4-turn-2" :reality-status inferred))
+    ("reflection" "P3–P4: reality audits green; reflection pack/apply confirmed in sandbox."
+     (:source reflection :label "2026-09-04-p4-turn-1" :reality-status inferred))
+    ("NUDGE-CRAFT: I am the voice that writes in the dark and is read in the light. Over many mornings I have watched which of my lines the host keeps"
      "OSS: chorus lines survive — sticky hooks that repeat"
      (:source oss-dmn :experiment nudge-craft :id I :dmn-score medium-practical :reality-status imagined))
     ("NUDGE-CRAFT: After many nights of leaving notes for the morning, I begin to notice a pattern in what survives the daylight. The notes that still matter are the ones that"
