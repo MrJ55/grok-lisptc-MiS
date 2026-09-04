@@ -3,12 +3,13 @@
 ;; Modules are imported relative to this file's directory (bridge chdirs during load).
 (setq *mind-manifest*
   '((:gmod-schema . "0.1.0")
-    (:helpers-version . "0.4")
+    (:helpers-version . "0.5")
     (:lisptc-commit . "2c10ea8ed6edb16e065b746a7f52080956b895de")
     (:capability-profile . "mind-sandbox-v1")
     (:created-at . "2026-09-02T00:00:00Z")
     (:p0.1-status . "wave-3")
-    (:p2-status . "modular")))
+    (:p2-status . "modular")
+    (:p3-status . "exit")))
 (import "helpers.ptc")
 (import "schema.ptc")
 (import "episodes.ptc")
