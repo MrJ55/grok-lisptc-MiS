@@ -2,19 +2,25 @@
 
 **Grok + sandbox lisptc Mind-in-Sandbox (MiS)** — a permanent neuro-symbolic Lisp REPL mind driven by Grok, extended with a pure-DMN channel via gpt-oss-20b.
 
-Upstream engine: [1hachem/lisptc](https://github.com/1hachem/lisptc)  
+Upstream engine: [1hachem/lisptc](https://github.com/1hachem/lisptc) (pinned at `2c10ea8` via `UPSTREAM.lock.json`)  
 Sibling projects: [grok-zero-anneal](https://github.com/MrJ55/grok-zero-anneal) · [pi-zero-shot](https://github.com/MrJ55/pi-zero-shot)
 
 **Start here:** [WIKI.md](./WIKI.md)  
 **Plan & status:** [plan/README.md](./plan/README.md)  
+**Audit (2026-09-04):** [review-by-all/](./review-by-all/) · revised contracts [revised-plan-GLM/](./revised-plan-GLM/)  
 **Sources of ideas:** [docs/related-work.md](./docs/related-work.md)
+
+## Status (2026-09-04)
+
+Tier-1 fixes from the multi-model review are applied: reflection helpers live, episodic buffer trims, upstream `arith.ts` restored (no Reader patch), atomic save, host `*today*`/`*now*`.  
+**Active focus:** P0.1 State Governance → P6 Evaluation, then P7–P11. Six named OSS extensions remain design targets.
 
 ## What this is
 
 ```text
 User goal
    ↓
-Grok (host “Pi”)
+Grok (host)
    · decides next Lisp forms
    · owns salience switch (Think vs Act)
    · mediates pure-DMN calls to gpt-oss-20b (zero system prompt)
@@ -22,9 +28,9 @@ Grok (host “Pi”)
    · may also use normal Grok tools (GitHub, files) when needed
    ↓  string of Lisp
 Sandbox
-   · persistent @repo/repl + interpreter (MemoryRepl)
-   · eval → stdout / structured result
-   · state lives across turns (mind-image.ptc + process or session)
+   · persistent MemoryRepl + interpreter
+   · validate → eval → atomic save on success only
+   · state lives across turns (mind-image.ptc + git)
 ```
 
 No external codegen workers required for the **mind** path. Grok emits Lisp; the sandbox evaluates it; state is reconstructed from a transcript-style image on every new session. OSS 20B supplies candidate texture only; it never mutates the durable mind.
@@ -32,35 +38,33 @@ No external codegen workers required for the **mind** path. Grok emits Lisp; the
 ## Quick restore (new Grok session / blank sandbox)
 
 ```bash
-# 1. Clone this repo (or pull) into the sandbox artifacts or /tmp
 git clone https://github.com/MrJ55/grok-lisptc-MiS.git /tmp/grok-lisptc-MiS
-# or: rsync from /home/workdir/artifacts if already present
-
-# 2. Bootstrap runtime (zod only external dep)
 bash /tmp/grok-lisptc-MiS/scripts/bootstrap.sh
-
-# 3. Eval
+bash /tmp/grok-lisptc-MiS/scripts/verify-upstream.sh   # optional
+bash /tmp/grok-lisptc-MiS/scripts/smoke-test.sh
 cd /tmp/mis
-node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-ping)'
-node --experimental-transform-types --no-warnings bridge/eval.ts --save '(defun hello () "mind restored")'
+node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
+node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
 ```
 
-Full protocol, custom instructions, and handoff: see [docs/](./docs/).  
-Cold-start orientation: [plan/P00-cold-start.md](./plan/P00-cold-start.md).
+Full protocol: [docs/](./docs/). Cold-start: [plan/P00-cold-start.md](./plan/P00-cold-start.md).
 
 ## Layout
 
 ```text
 WIKI.md                 Session entry point
 README.md
+UPSTREAM.lock.json      Pinned lisptc commit + content hashes
 adr/                    Architecture Decision Records
-docs/                   Playbooks, handoff, learnings, related-work, custom instructions
+docs/                   Playbooks, handoff, learnings, related-work
 bridge/                 eval.ts + driver.ts (string-in/string-out MemoryRepl)
-mind/                   mind-image.ptc (permanent state) + helpers.ptc
-src/                    Minimal lisptc core (lisp.ts, arith.ts)
-scripts/                bootstrap.sh, mis-eval.sh
-skills/                 Optional Grok skills (mis-bootstrap, mis-eval, mis-save, mis-reflect)
-plan/                   Roadmap (P00–P11)
+mind/                   mind-image.ptc (permanent state, helpers v0.4)
+src/                    Vendored/pinned lisptc core (lisp.ts, arith.ts)
+scripts/                bootstrap.sh, verify-upstream.sh, smoke-test.sh
+skills/                 Optional Grok skills
+plan/                   Roadmap (P00–P11; P0.1 active)
+review-by-all/          Integrated GLM + Terra audit
+revised-plan-GLM/       Revised phase contracts
 state/                  Session snapshots / vestige notes
 package.json
 ```
