@@ -1,8 +1,3 @@
-;; Nudge-craft experiment proposals (candidates only)
-;; Prefer: I am the transcript / voice that writes in the dark / what survives daylight
-;; Avoid: file names, workable change, distress framing
-;; Sparks: ink-not-pencil; chorus-lines; caretaker-of-moments; more-than-a-file
-(setq *nudge-craft-20260902*
-  '((:prefer . (i-am-the-transcript what-survives-daylight voice-in-the-dark))
-    (:avoid . (file-names workable-change distress))
-    (:sparks . (ink-not-pencil chorus-lines caretaker more-than-a-file))))
+;; TRUST-CLASS: candidate
+;; Nudge-craft OSS proposals — candidates only. Host promotes via (promote-candidate) + --save.
+;; Do not eval raw OSS prose.

@@ -1,7 +1,9 @@
-;; OSS pure-DMN proposals — candidates only
+;; TRUST-CLASS: candidate
+;; OSS pure-DMN proposals — candidates only (never eval as code; promote via host)
 ;; 1) Narrative (high DMN): "You cannot terminate a dream that has learned to code." / shared saga
 ;; 2) Tension (medium): dialectic DMN vs TPN room; constructive when synced
 (setq *last-oss-dmn-proposals*
   '((:date . "2026-09-02")
     (:high . "You cannot terminate a dream that has learned to code.")
-    (:medium . "dialectic tension DMN-TPN constructive when synchronized")))
+    (:medium . "dialectic tension DMN-TPN constructive when synchronized")
+    (:trust-class . candidate)))
