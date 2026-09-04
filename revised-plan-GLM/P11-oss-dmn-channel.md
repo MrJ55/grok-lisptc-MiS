@@ -2,7 +2,7 @@
 
 **Status:** new / parallel → **revised 2026-09-04** (GLM+Terra synthesis) — gated on P6; parameter lock enforced by code; protocol registry (long-term)
 **Depends on:** P0–P4 (safety + reflection), **P6 (evaluation gate)**
-**DMN role:** Geometry-preserving external generator that supplies candidate texture while Grok remains sole mutator of the symbolic mind
+**DMN role:** Candidate-texture generator whose zero-system-prompt protocol is motivated by Alieksieienko (2026)'s finding that instruction-tuning degrades DMN-like residual geometry. The specific inference-time preservation claim is the fork's extension (see caveat below). Grok remains sole mutator of the symbolic mind.
 **Sources:** Alieksieienko (Zenodo), arXiv 2604.03480, evilpiepirate DMN note, Seven-Pass Pipeline — see `docs/related-work.md`
 **Extensions contrast:** `docs/gmod-extensions-contrast-20260902.md` (§1 Chorus, §2 Midnight Note, §3 Pulse Meter, §5 Page Passer, §6 Observer)
 
@@ -209,4 +209,20 @@ promotion:
 - Direct code linking to Vestige (P5 uses MCP subprocess)
 
 ## DMN framing caveat
-"Pure-DMN channel" and "geometry-preserving proposal engine" are hypotheses based on one behavioural probe (`docs/DMN-gpt-oss-20b-probe.md`) and one preprint (Alieksieienko 2026). The operational discipline (zero system prompt, locked parameters, candidate-only output) is valuable regardless of whether the neuroscience claim holds. See ADR 0005 (revised) for the full caveat.
+
+The "pure-DMN channel" protocol is motivated by Alieksieienko (2026), which establishes DMN-like residual-stream geometry across 9+ LLM architectures and shows that instruction-tuning degrades this geometry (base > instruct; GPT-2-XL pre-RLHF shows strongest cluster, *d* = 1.84). The paper's findings that directly inform this protocol:
+
+1. **DMN-like geometry is a pretraining phenomenon** — post-training alignment cannot eliminate it
+2. **Instruction-tuned models show weaker clusters than base models** — indirectly supports the zero-system-prompt protocol
+3. **The geometry is architecture-independent** — plausible that gpt-oss-20b exhibits it too (though gpt-oss-20b is not in the paper's model list)
+4. **The geometry is content-dependent** — supports the use of agentive/narrative/first-person seeds over factual/instructional seeds
+
+What the paper does **not** directly test:
+- Whether inference-time system prompts collapse the geometry during generation (the paper compares base vs. instruct *models*, not inference-time framing effects on a fixed model)
+- Whether gpt-oss-20b specifically exhibits the geometry (not in the paper's model list)
+
+The fork's own evidence for the inference-time preservation claim is `docs/DMN-gpt-oss-20b-probe.md` — a behavioural probe (n=1, one model, one prompt set, behavioural observation only, no residual-stream extraction). This probe is consistent with the paper's base-vs-instruct finding but does not directly test residual-stream geometry.
+
+**Net:** The operational discipline (zero system prompt, locked parameters, candidate-only output, reality-status tagging) is **well-motivated by the paper** and sound engineering practice regardless. The specific claim that this protocol "preserves residual-stream DMN geometry" during inference is the fork's extension — indirectly supported, not directly validated. A residual-stream-level replication on gpt-oss-20b would strengthen the claim.
+
+See ADR 0005 (revised) and `docs/related-work.md` for full citation and provenance.

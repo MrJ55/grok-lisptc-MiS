@@ -3,7 +3,7 @@
 **Status:** planned → **revised 2026-09-04** (GLM+Terra synthesis) — gated on P6; requires reality-status; Vestige causal backfill
 **Depends on:** P8 scenes (soft); P4 reflection; P11 OSS channel useful; **P6 (evaluation gate)**
 **DMN subsystem:** Prospective / Simulation (DMN-inspired)
-**Neuroscience note:** Imagination in DMN is fMRI-supported constructive simulation (past/future overlap); not mere next-token prediction. **Caveat:** This is metaphor, not a claim that the Lisp code implements a DMN.
+**Neuroscience note:** Alieksieienko (2026) shows that Imagination subspaces cluster with Self-Reference, Theory of Mind, and Narrative in LLM residual streams (part of the DMN-like cluster, mean *d* = 1.03 across 9 architectures). Human neuroscience (Hassabis & Maguire 2007) links DMN to constructive simulation. **Caveat:** The paper establishes the *geometric* clustering of imagination representations; it does not establish that the fork's Lisp-level `(dmn-simulate-pack ...)` implements constructive simulation. The Lisp helper stores structured results that Grok (the actual simulator) produces; the DMN label is organizational metaphor.
 **Related extension:** Counterfactual curriculum / offline RL — Third-voice bridge
 
 ## Goal
@@ -70,4 +70,4 @@ Do not start P9 until P6 exit criteria pass.
 - Merging simulated content with observed history
 
 ## DMN framing caveat
-"Prospective / Simulation" is DMN-inspired metaphor. The Lisp data structures do not implement constructive simulation; they store structured results that Grok (the actual simulator) produces. See ADR 0005 (revised).
+"Prospective / Simulation" is organizational metaphor. The Alieksieienko (2026) paper establishes that Imagination and Narrative subspaces cluster geometrically in LLM residual streams — this supports using these as category labels for candidate generation. The paper does not support the claim that the fork's Lisp helpers `(dmn-simulate-pack ...)`, `(dmn-wander ...)` implement simulation or wandering; they store structured results that Grok produces. The operational protocol (zero-system-prompt OSS calls for candidate texture) is well-motivated by the paper's base-vs-instruct finding. See ADR 0005 (revised).

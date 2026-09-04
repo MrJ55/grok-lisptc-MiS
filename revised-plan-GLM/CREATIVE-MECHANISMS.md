@@ -1,18 +1,32 @@
 # Creative mechanisms (cross-cutting)
 
-**Revised 2026-09-04** (GLM+Terra synthesis) — DMN framing softened to metaphor; reality-status required on all candidates.
+**Revised 2026-09-04** (GLM+Terra synthesis) — DMN framing calibrated to paper's actual scope; reality-status required on all candidates.
 
 Track across P7–P11; do not require all at once.
 Sources of ideas: see [docs/related-work.md](../docs/related-work.md).
 Extensions contrast (original → OSS shape → value): [docs/gmod-extensions-contrast-20260902.md](../docs/gmod-extensions-contrast-20260902.md).
 
-## DMN framing caveat (important)
+## DMN framing — two levels (calibrated)
 
-The "Default Mode Network" framing in this project is **metaphor inspired by neuroscience literature**, not a claim that the Lisp data structures implement a DMN. The five subsystems (Narrative, Episodic, Prospective, Spontaneous, Consolidation) are organizational labels. The "pure-DMN" OSS channel is a heuristic generator of candidate texture; whether it "preserves residual-stream DMN geometry" is a hypothesis based on one behavioural probe and one preprint (Alieksieienko 2026), not established fact.
+The "Default Mode Network" framing in this project operates at two levels that should be distinguished:
 
-The operational discipline (zero system prompt, locked parameters, candidate-only output, reality-status tagging) is valuable regardless of whether the neuroscience claim holds.
+**Level 1 — The OSS channel protocol (zero system prompt, locked parameters).**
+This is **well-motivated by Alieksieienko (2026)**, a substantial multi-model study across 9 primary architectures (Llama, Gemma, Mistral, Qwen, GPT-2, OPT, Pythia, Bloom, DeepSeek) plus 9 control models (Mamba SSM, DeepSeek-Math, BERT, RoBERTa, DeBERTa, ALBERT, CodeLlama, DNA transformer, GPT-2-117M). The paper establishes that:
 
-See ADR 0005 (revised) for the full caveat.
+- DMN-like residual-stream geometry (SR + ToM + Imagination + Narrative cluster; Factual + Abstract Logic outside) is present across architectures (mean Cohen's *d* = 1.03; 7/8 significant at *p* < 0.01)
+- The geometry is **pretraining-inherited** — strongest in GPT-2-XL (2019, pre-RLHF, *d* = 1.84); base models consistently outscore instruct versions
+- The geometry is **architecture-independent** (Transformer + SSM/Mamba + math/code models all converge; *d* = 0.92–1.16)
+- The geometry is **content-dependent** (DNA models show no cluster, *d* = −0.12; RoBERTa MLM-only shows none, *d* = −0.08)
+- The geometry **does not scale with model size** (Pearson *r* = −0.163, *p* = 0.699)
+
+The fork's zero-system-prompt protocol is a reasonable operationalization of the paper's finding that instruction-tuning degrades DMN-like geometry. The paper does not directly test whether inference-time system prompts collapse the geometry during generation — that specific operational claim is the fork's extension, supported indirectly by the paper's base-vs-instruct comparison and directly by the fork's own behavioural probe (`docs/DMN-gpt-oss-20b-probe.md`, n=1, gpt-oss-20b not in the paper's model list).
+
+**Level 2 — The five-subsystem Lisp mapping (Narrative, Episodic, Prospective, Spontaneous, Consolidation).**
+This is **organizational metaphor inspired by neuroscience**, not a claim the paper supports. The paper is about residual-stream geometry in trained neural networks. The fork's `*self-schema*`, `*episodic-buffer*`, `*autobiography*` are Lisp alists with no residual stream. The five-subsystem labels are useful as organizational categories for the Lisp state, but they do not implement a DMN.
+
+**Operational discipline remains valuable regardless.** The zero-system-prompt invariant, locked parameters, candidate-only output, and reality-status tagging are sound engineering practices for any LLM-as-candidate-generator design, independent of whether the inference-time preservation hypothesis is later confirmed.
+
+See ADR 0005 (revised) and `docs/related-work.md` for full citation and provenance.
 
 | Mechanism | Phase | Intent under grok-mis-oss-dmn | Source shape |
 |-----------|-------|-------------------------------|--------------|

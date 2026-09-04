@@ -79,4 +79,4 @@ Turn flat insights and raw episodes into a **continuous internal narrative** —
 - Direct mutation without candidate flow (after P0.1)
 
 ## DMN framing caveat
-The "Narrative Self" label is DMN-inspired metaphor, not a claim that the Lisp data structure implements a Default Mode Network. See ADR 0005 (revised) for the full caveat.
+The "Narrative Self" label is **directly grounded** in Alieksieienko (2026)'s finding that Narrative subspaces cluster with Self-Reference, Theory of Mind, and Imagination in LLM residual streams (one of the four DMN cluster members, mean *d* = 1.03). The paper supports using "Narrative" as a category label for candidate generation. The paper does not support the claim that the fork's Lisp `*autobiography*` / `*narrative-arc*` data structures implement a narrative self; they are organizational state that Grok (the actual narrator) populates. The Lisp-level DMN mapping is metaphor; the OSS channel protocol (zero-system-prompt narrative seeds) is well-motivated by the paper. See ADR 0005 (revised).
