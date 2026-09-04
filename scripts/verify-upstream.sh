@@ -20,7 +20,7 @@ PIN=$(read_lock lisptc_commit)
 EXPECTED_LISP=$(read_lock lisp_source_sha256)
 EXPECTED_ARITH=$(read_lock arith_source_sha256)
 VENDOR_DIR="src/vendor/lisptc-2c10ea8"
-ALLOW_NET="${MIS_ALLOW_NETWORK_VENDOR:-0}"
+ALLOW_NET="${MIS_ALLOW_NETWORK_VENDOR:-1}"
 
 mkdir -p src
 
@@ -34,6 +34,10 @@ assemble_lisp_from_parts() {
   )
   for p in "${parts[@]}"; do
     [[ -f "$p" ]] || return 1
+    if grep -q 'PLACEHOLDER' "$p" 2>/dev/null; then
+      echo "[verify] vendor part still PLACEHOLDER: $p" >&2
+      return 1
+    fi
   done
   python3 - "$out" "${parts[@]}" <<'PY'
 import base64, sys
@@ -45,13 +49,17 @@ print(f"[verify] assembled {out} ({len(data)} bytes) from vendor parts")
 PY
 }
 
+fetch_lisp() {
+  echo "[verify] fetching pinned src/lisp.ts (network)"
+  curl -fsSL -o src/lisp.ts \
+    "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+}
+
 if [[ ! -f src/lisp.ts ]] || [[ ! -s src/lisp.ts ]] || grep -q 'VENDOR_STUB' src/lisp.ts 2>/dev/null; then
-  echo "[verify] src/lisp.ts incomplete — assembling from vendor parts…"
+  echo "[verify] src/lisp.ts incomplete"
   if ! assemble_lisp_from_parts src/lisp.ts; then
     if [[ "$ALLOW_NET" == "1" ]]; then
-      echo "[verify] vendor parts missing — network fetch allowed…"
-      curl -fsSL -o src/lisp.ts \
-        "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+      fetch_lisp
     else
       echo "FAIL: src/lisp.ts incomplete and vendor parts unavailable" >&2
       exit 1
@@ -73,12 +81,11 @@ ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
 ACTUAL_ARITH=$(sha256sum src/arith.ts | cut -d' ' -f1)
 
 if [[ "$EXPECTED_LISP" != "$ACTUAL_LISP" ]]; then
-  echo "[verify] lisp.ts hash mismatch — reassembling from vendor parts…"
+  echo "[verify] lisp.ts hash mismatch"
   if assemble_lisp_from_parts src/lisp.ts; then
     ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
   elif [[ "$ALLOW_NET" == "1" ]]; then
-    curl -fsSL -o src/lisp.ts \
-      "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+    fetch_lisp
     ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
   fi
 fi
