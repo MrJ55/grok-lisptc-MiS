@@ -1,19 +1,19 @@
-# Reader tryToParse fix (P3)
+# Reader fix — DEPRECATED (2026-09-04)
 
-In `src/lisp.ts` around the `readToken` method, change:
+**Status:** no longer required.
 
-```ts
-const n = tryToParse(t);
+The fork previously rewrote `src/arith.ts` so `tryToParse` returned `undefined` on failure (upstream returns `null`). That forced a sed patch in `scripts/bootstrap.sh`:
+
+```
 if (n !== null) this.token = n;
+→ if (n !== undefined && n !== null) this.token = n;
 ```
 
-to:
+## Resolution (review-by-all UR4)
 
-```ts
-const n = tryToParse(t);
-if (n !== undefined && n !== null) this.token = n;
-```
+- `src/arith.ts` restored to upstream at commit `2c10ea8ed6edb16e065b746a7f52080956b895de` (`tryToParse` → `null`).
+- Bootstrap no longer applies the sed patch.
+- `UPSTREAM.lock.json` pins both `lisp.ts` and `arith.ts` content hashes.
+- Run `bash scripts/verify-upstream.sh` after any source change.
 
-`arith.ts` `tryToParse` returns `undefined` on failure; the original check treated that as a successful parse and set `this.token = undefined`, breaking all list evaluation.
-
-Bootstrap already prefers a present `src/lisp.ts`. If you fetch a fresh upstream copy, re-apply this one-line fix (or keep the vendored fixed copy).
+If `src/lisp.ts` is missing, bootstrap fetches the pinned upstream commit automatically.
