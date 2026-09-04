@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS (grok-mis-oss-dmn)
 
-**Last updated:** 2026-09-04 (P00 cold-start verified; next P0 checklist close)  
+**Last updated:** 2026-09-04 (P0 exit-complete; next P6 Evaluation)  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.  
 **Creative mechanisms:** [CREATIVE-MECHANISMS.md](./CREATIVE-MECHANISMS.md)  
 **OSS-DMN channel:** [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md)  
@@ -25,14 +25,14 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 
 | ID | File | Status | One-line |
 |----|------|--------|----------|
-| **P00** | [P00-cold-start.md](./P00-cold-start.md) | **verified 2026-09-04** | Restore mind + verify + review OSS proposals |
-| **P0** | [P0-safety.md](./P0-safety.md) | **active next** | Close remaining safety checklist against live bridge |
+| P00 | [P00-cold-start.md](./P00-cold-start.md) | verified 2026-09-04 | Restore mind + verify + review OSS proposals |
+| **P0** | [P0-safety.md](./P0-safety.md) | **exit-complete** | Validate, atomic save-on-success, form-by-form, LKG, no brick |
 | P0.1 | [P0.1-state-governance.md](./P0.1-state-governance.md) | exit substantially met | Trust, reality-status, upstream lock, transactional persistence, CI |
 | P1 | [P1-ux-pins.md](./P1-ux-pins.md) | done | English-first, upstream pins |
 | P2 | [P2-helpers-scratch-push.md](./P2-helpers-scratch-push.md) | done | Mind API, scratch, push |
 | P3 | [P3-self-schema.md](./P3-self-schema.md) | done | Self-schema + episodic buffer (trim restored) |
 | P4 | [P4-reflection-protocol.md](./P4-reflection-protocol.md) | done | `dmn-reflect-pack` / `dmn-apply-reflection` live |
-| P6 | [P6-evaluation.md](./P6-evaluation.md) | planned (after P0 close) | Metrics, smoke CI, continuity tests |
+| **P6** | [P6-evaluation.md](./P6-evaluation.md) | **active next** | Metrics, smoke CI, continuity tests |
 | P7 | [P7-narrative-self.md](./P7-narrative-self.md) | planned (after P6) | Autobiography + arc + OSS dual-write |
 | P8 | [P8-replay-scenes.md](./P8-replay-scenes.md) | planned | Tagged replay + scene packs |
 | P9 | [P9-prospection.md](./P9-prospection.md) | planned | Future / counterfactual / light ToM |
@@ -42,9 +42,9 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 
 ## Current focus
 
-1. **P00** cold-start path verified (2026-09-04).
-2. **P0 — Safety:** reconcile revised checklist with live code (atomic save, form-by-form, LKG, strict-load already implemented under P0.1); close or defer remaining items.
-3. Then **P6 — Evaluation** before P7–P11 expansion.
+1. **P00** + **P0** closed (2026-09-04).
+2. **P0.1** exit substantially met.
+3. **P6 — Evaluation** is the active next phase before P7–P11 expansion.
 
 ## Novel extensions (design targets, not yet implemented)
 
