@@ -1,19 +1,13 @@
 # src/
 
-Minimal lisptc core required by the stripped MemoryRepl.
+Pinned lisptc core (commit `2c10ea8`).
 
-- `arith.ts` — numeric helpers (vendored; hash-locked).
-- `lisp.ts` — full interpreter (~73 KB), pinned to upstream commit in `UPSTREAM.lock.json`.
-
-## Pin / verify
+- `arith.ts` — vendored upstream verbatim (hash-locked).
+- `lisp.ts` — assembled from `vendor/lisptc-2c10ea8/lisp.b64.part{0-3}` by `scripts/verify-upstream.sh` / `scripts/bootstrap.sh` (offline).
 
 ```bash
-bash scripts/verify-upstream.sh   # fetches if incomplete, then sha256-checks
-bash scripts/bootstrap.sh         # builds /tmp/mis and smoke-tests
+bash scripts/verify-upstream.sh
+bash scripts/bootstrap.sh
 ```
 
-If `src/lisp.ts` is missing, empty, marked `VENDOR_STUB`, or hash-mismatched, both scripts re-fetch from:
-
-`https://raw.githubusercontent.com/1hachem/lisptc/<pin>/packages/interpreter/src/lisp.ts`
-
-Expected hashes live in `UPSTREAM.lock.json`.
+Network fetch of interpreter sources is off by default. Set `MIS_ALLOW_NETWORK_VENDOR=1` only as emergency fallback.

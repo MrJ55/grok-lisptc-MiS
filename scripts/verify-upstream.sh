@@ -19,32 +19,68 @@ read_lock() {
 PIN=$(read_lock lisptc_commit)
 EXPECTED_LISP=$(read_lock lisp_source_sha256)
 EXPECTED_ARITH=$(read_lock arith_source_sha256)
-LISP_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
-ARITH_URL="https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/arith.ts"
+VENDOR_DIR="src/vendor/lisptc-2c10ea8"
+ALLOW_NET="${MIS_ALLOW_NETWORK_VENDOR:-0}"
 
 mkdir -p src
 
-# Auto-heal incomplete vendor (missing, empty, or VENDOR_STUB marker)
+assemble_lisp_from_parts() {
+  local out="$1"
+  local parts=(
+    "$VENDOR_DIR/lisp.b64.part0"
+    "$VENDOR_DIR/lisp.b64.part1"
+    "$VENDOR_DIR/lisp.b64.part2"
+    "$VENDOR_DIR/lisp.b64.part3"
+  )
+  for p in "${parts[@]}"; do
+    [[ -f "$p" ]] || return 1
+  done
+  python3 - "$out" "${parts[@]}" <<'PY'
+import base64, sys
+out = sys.argv[1]
+parts = sys.argv[2:]
+data = b"".join(base64.b64decode(open(p, "rb").read()) for p in parts)
+open(out, "wb").write(data)
+print(f"[verify] assembled {out} ({len(data)} bytes) from vendor parts")
+PY
+}
+
 if [[ ! -f src/lisp.ts ]] || [[ ! -s src/lisp.ts ]] || grep -q 'VENDOR_STUB' src/lisp.ts 2>/dev/null; then
-  echo "[verify] src/lisp.ts incomplete — fetching pinned upstream…"
-  curl -fsSL -o src/lisp.ts "$LISP_URL"
+  echo "[verify] src/lisp.ts incomplete — assembling from vendor parts…"
+  if ! assemble_lisp_from_parts src/lisp.ts; then
+    if [[ "$ALLOW_NET" == "1" ]]; then
+      echo "[verify] vendor parts missing — network fetch allowed…"
+      curl -fsSL -o src/lisp.ts \
+        "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+    else
+      echo "FAIL: src/lisp.ts incomplete and vendor parts unavailable" >&2
+      exit 1
+    fi
+  fi
 fi
+
 if [[ ! -f src/arith.ts ]] || [[ ! -s src/arith.ts ]]; then
-  echo "[verify] src/arith.ts incomplete — fetching pinned upstream…"
-  curl -fsSL -o src/arith.ts "$ARITH_URL"
+  if [[ "$ALLOW_NET" == "1" ]]; then
+    curl -fsSL -o src/arith.ts \
+      "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/arith.ts"
+  else
+    echo "FAIL: src/arith.ts missing" >&2
+    exit 1
+  fi
 fi
 
 ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
 ACTUAL_ARITH=$(sha256sum src/arith.ts | cut -d' ' -f1)
+
 if [[ "$EXPECTED_LISP" != "$ACTUAL_LISP" ]]; then
-  echo "[verify] lisp.ts hash mismatch — re-fetching pinned upstream…"
-  curl -fsSL -o src/lisp.ts "$LISP_URL"
-  ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
-fi
-if [[ "$EXPECTED_ARITH" != "$ACTUAL_ARITH" ]]; then
-  echo "[verify] arith.ts hash mismatch — re-fetching pinned upstream…"
-  curl -fsSL -o src/arith.ts "$ARITH_URL"
-  ACTUAL_ARITH=$(sha256sum src/arith.ts | cut -d' ' -f1)
+  echo "[verify] lisp.ts hash mismatch — reassembling from vendor parts…"
+  if assemble_lisp_from_parts src/lisp.ts; then
+    ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
+  elif [[ "$ALLOW_NET" == "1" ]]; then
+    curl -fsSL -o src/lisp.ts \
+      "https://raw.githubusercontent.com/1hachem/lisptc/${PIN}/packages/interpreter/src/lisp.ts"
+    ACTUAL_LISP=$(sha256sum src/lisp.ts | cut -d' ' -f1)
+  fi
 fi
 
 if [[ "$EXPECTED_LISP" != "$ACTUAL_LISP" ]]; then
