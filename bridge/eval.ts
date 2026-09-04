@@ -20,7 +20,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, renameSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 
 import {
   Interp,
@@ -35,7 +35,6 @@ import {
 } from "./driver.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = resolve(__dirname, "..");
 const MIND_DIR = resolve(__dirname, "../mind");
 const STATE_DIR = resolve(__dirname, "../state");
 const CHECKPOINTS_DIR = join(STATE_DIR, "checkpoints");
@@ -73,7 +72,6 @@ function looksLikeOssProse(code: string): boolean {
   for (const p of OSS_SHAPE_PREFIXES) {
     if (lower.startsWith(p) || lower.includes("\n" + p)) return true;
   }
-  // Long prose without any open paren is almost never intentional Lisp.
   if (!code.includes("(") && code.length > 80 && /\s/.test(code)) return true;
   return false;
 }
@@ -227,6 +225,10 @@ function checkpointImage(path: string) {
   console.error(`[mis] checkpoint → ${prevPath}`);
 }
 
+function shortHash(buf: Buffer | string): string {
+  return createHash("sha256").update(buf).digest("hex").slice(0, 16);
+}
+
 const args = process.argv.slice(2);
 let loadPath = DEFAULT_IMAGE;
 let doSave = process.env.MIS_SAVE === "1";
@@ -282,14 +284,11 @@ if (!ok) {
 }
 
 if (doSave) {
-  const beforeHash = existsSync(loadPath)
-    ? (await import("node:crypto")).createHash("sha256").update(readFileSync(loadPath)).digest("hex").slice(0, 16)
-    : "none";
-  // Always refresh last-known-good before mutating the durable image.
+  const beforeHash = existsSync(loadPath) ? shortHash(readFileSync(loadPath)) : "none";
   writeLastKnownGood(loadPath);
   if (doCheckpoint) checkpointImage(loadPath);
   appendTranscript(stripped, loadPath);
-  const afterHash = (await import("node:crypto")).createHash("sha256").update(readFileSync(loadPath)).digest("hex").slice(0, 16);
+  const afterHash = shortHash(readFileSync(loadPath));
   appendMutationRecord({
     mutation_id: `mut-${randomUUID()}`,
     actor: process.env.MIS_SESSION_ID || "grok-session",
