@@ -27,7 +27,7 @@ See `docs/DMN-gpt-oss-20b-probe.md` for the behavioural probe and parameter lock
 |----|------|--------|----------|
 | P00 | [P00-cold-start.md](./P00-cold-start.md) | permanent ref | Restore mind + verify + review OSS proposals |
 | P0 | [P0-safety.md](./P0-safety.md) | done (hardened) | Validate, atomic save-on-success, no brick |
-| **P0.1** | [revised-plan-GLM/P0.1-state-governance.md](../revised-plan-GLM/P0.1-state-governance.md) | **active** | Trust classes, reality-status, upstream lock, transactional persistence |
+| **P0.1** | [P0.1-state-governance.md](./P0.1-state-governance.md) | **active** | Trust classes, reality-status, upstream lock, transactional persistence |
 | P1 | [P1-ux-pins.md](./P1-ux-pins.md) | done | English-first, upstream pins |
 | P2 | [P2-helpers-scratch-push.md](./P2-helpers-scratch-push.md) | done | Mind API, scratch, push |
 | P3 | [P3-self-schema.md](./P3-self-schema.md) | done | Self-schema + episodic buffer (trim restored) |
