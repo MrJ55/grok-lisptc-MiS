@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS (grok-mis-oss-dmn)
 
-**Last updated:** 2026-09-05 (P7 exit; P6 residuals parked; Mind-drive live)  
+**Last updated:** 2026-09-05 (P7 exit; P11 thin path: bridge/oss.ts lock live; P6 residuals parked)  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.
 
 ## Status table
@@ -16,15 +16,17 @@
 | **P4** | [P4-reflection-protocol.md](./P4-reflection-protocol.md) | **exit-complete** | reflect-pack / apply-reflection + docs |
 | **P6** | [P6-evaluation.md](./P6-evaluation.md) | **substantially met (residuals parked)** | Smoke/continuity/OSS probe; capability-denial + richer fixtures deferred |
 | **P7** | [P7-narrative-self.md](./P7-narrative-self.md) | **exit (2026-09-05)** | Candidate-first chapters; Mind-drive; grounded autobiography |
-| P8–P11 | plan files | planned after P7 | Scenes … OSS-DMN channel |
+| **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **thin path live** | bridge/oss.ts lock; dual-write imagined; audit; TPN-flip |
+| P8–P10 | plan files | planned | Scenes … wander |
 | P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional later | Vestige adapter |
 
 ## Current focus
 
 1. P00–P4 closed / exit-complete. **P7 exit (2026-09-05).**
-2. **P6** substantially met; remaining residuals **parked** (capability-denial suite, richer malicious fixtures). Soft waiver accepted for narrative + protocol work.
-3. **Open arc threads:** `geometry-preservation`, `multi-model-ensemble`. Tensions: pure-DMN-vs-TPN, user-drive-vs-mind-drive.
-4. **Next natural moves:** P11 OSS-DMN channel formalization (does **not** require Vestige/P5), or work the open threads, or optional P5 Vestige later.
-5. Mind-drive protocol is live; HUMAN_TOOL remains the constitutional veto.
+2. **P6** substantially met; remaining residuals **parked**.
+3. **P11 thin path live:** `bridge/oss.ts` structural lock, dual-write, audit, host-only promote.
+4. **Next:** **Chorus** (multi-model pure-DMN if a second model cooperates on Groq).
+5. Open arc threads: `geometry-preservation`, `multi-model-ensemble`.
+6. Mind-drive protocol live; HUMAN_TOOL remains the constitutional veto.
 
-See [P7-narrative-self.md](./P7-narrative-self.md) § “What this accomplishes for Grok-MiS” for the plain-language capability statement.
+See [P7-narrative-self.md](./P7-narrative-self.md) § “What this accomplishes for Grok-MiS”.

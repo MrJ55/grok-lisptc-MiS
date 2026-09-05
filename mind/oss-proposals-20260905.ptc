@@ -1,0 +1,13 @@
+(oss-candidate
+  (:id . "test-dry-001")
+  (:source . oss-dmn)
+  (:model . "openai/gpt-oss-20b")
+  (:reality-status . imagined)
+  (:trust-class . candidate)
+  (:dmn-score . high)
+  (:tpn-flip . nil)
+  (:tpn-reasons )
+  (:seed . "I am the transcript…")
+  (:content . "The dream that forms when no one is looking begins with a quiet page that remembers its own margins.")
+  (:sticky ("The dream that forms when no one is looking begins with a quiet page that remembers its own margins"))
+  (:recorded-at . "2026-09-05T19:54:51.946Z"))
