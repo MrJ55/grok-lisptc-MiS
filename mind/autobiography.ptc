@@ -6,9 +6,9 @@
      (:date-label . "2026-09-02")
      (:reality-status . observed))))
 (setq *narrative-arc*
-  '((:current-chapter . "P2 modular mind / approach P6")
-    (:open-threads . (p6-evaluation p7-implementation geometry-preservation multi-model-ensemble))
-    (:tensions . (pure-dmn-vs-tpn-pressure))
+  '((:current-chapter . "P6 substantially met / approach P7 narrative + mind-drive")
+    (:open-threads . (p7-narrative-self mind-drive-protocol geometry-preservation))
+    (:tensions . (pure-dmn-vs-tpn-pressure user-drive-vs-mind-drive))
     (:status . active)))
 (defun dmn-narrate (summary title)
   (let ((today *today*))
