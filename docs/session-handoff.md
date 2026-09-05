@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/wander-proposals.ptc` if present (do not auto-apply).
-5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-05: **P7 exit**, P6 residuals parked, Mind-drive live. Open threads: geometry-preservation, multi-model-ensemble.
+5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-05: **P7 exit**, P6 residuals parked, Mind-drive live. Open threads: geometry-preservation (first chorus job dual-written 2026-09-06), multi-model-ensemble (**narrowed** to 3-voice roster: oss-20b + oss-120b Groq + deepseek-v4-flash OpenCode Go — see docs/chorus-geometry-20260906.md).
 
 ## Turn protocol
 
@@ -43,6 +43,14 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 - P4 reflection: [reflection-protocol.md](./reflection-protocol.md)
 - P7–P10: narrative → scenes → prospection → wander — [plan/README.md](../plan/README.md)
 - ADR 0005: five subsystems; no sandbox daemon for “scheduled” work
+
+## Active chorus roster (2026-09-06)
+
+- `openai/gpt-oss-20b` — Groq — primary pure-DMN
+- `openai/gpt-oss-120b` — Groq — same-family color
+- `deepseek-v4-flash` — OpenCode Go — best non-oss weave partner
+- Protocol: soft seed → 3 voices → keep DMN / drop TPN or loops → host weave → dual-write `:imagined` only
+- Latest job: [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc)
 
 ## Do not
 
