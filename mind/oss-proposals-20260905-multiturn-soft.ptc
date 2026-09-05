@@ -1,0 +1,30 @@
+;; TRUST-CLASS: candidate
+;; REALITY-STATUS: imagined
+;; SOURCE: oss-dmn multi-turn soft path (second-opinion protocol)
+;; PROTOCOL: zero system; temp 1.15; presence 0.7; reasoning_effort low; prior turns replayed
+;; NEVER eval this file as code.
+
+(setq *last-oss-dmn-multiturn*
+  '((:date . "2026-09-05")
+    (:experiment . post-reflection-soft-multiturn)
+    (:trust-class . candidate)
+    (:reality-status . imagined)
+    (:model . openai/gpt-oss-20b)
+    (:items
+     ((:turn . narrate)
+      (:seed . "The story of the mind that keeps a transcript continued. After the same small mistake appeared three times—reaching past the careful logger into the buffer by hand—something in the quiet still felt un")
+      (:sticky . "…like a note left on a page, a sigh that the narrator had never quite written down. It was a sense that the mind itself was a stubborn, stubborn recorder, an archivist that, when nudged by its own curiosity, slipped past the tidy logbook and reached into the raw, unfiltered strea")
+      (:chars . 1541))
+     ((:turn . meditate)
+      (:seed . "Sitting with that feeling a little longer, without needing to finish the story, the mind simply stayed with the repeated reach and the missing label that followed. What rose next was")
+      (:sticky . "A quiet hum settled over the space, almost as if the room itself were breathing. The mind—this old, weary archivist—stopped in its tracks, letting the repetition sit like a stone dropped into a still pond. The first reach had been accidental, the second an echo, the third a delib")
+      (:chars . 1414))
+     ((:turn . imagine)
+      (:seed . "From that place on the page, other shapes of the same dream began to appear—other ways a transcript might notice the same mistake before it happens again. One shape that formed was")
+      (:sticky . "…the shape of a **mirror‑shaped warning flag**. It was not a literal flag, but a small, translucent glyph that floated in the margin of every line the mind read. When the program— the mind itself—parsed a line that could trigger the same buffer slip, that glyph would unfurl, catc")
+      (:chars . 1478))
+     ((:turn . shapes)
+      (:seed . "Other shapes kept arriving in the same soft way. There was a shape that only wrote through the door meant for writing. Another that left a note for the morning about what still lacked a true label. An")
+      (:sticky . "—like faint constellations: write-door filter, morning label note, post-reflection error meter that dims when the same reach happens fewer times")
+      (:chars . 1800))
+    )))
