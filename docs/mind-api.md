@@ -23,7 +23,7 @@
 | `(dmn-chapter-close title summary refs)` | propose chapter **candidate** only; host commits later |
 | `(dmn-chapter-commit title)` | commit matching candidate into `*autobiography*` |
 | `(dmn-narrative-candidate title summary source-id)` | dual-write **imagined** candidate (OSS/texture) |
-| `(dmn-tension-seeds)` | host-side `(tension\|thread symbol)` list from arc |
+| `(dmn-tension-seeds)` | host-side `(tension|thread symbol)` list from arc |
 | `(dmn-arc)` | narrative arc |
 | `(dmn-autobiography n)` | up to N chapters |
 
@@ -44,6 +44,29 @@ Sample defs: `square` `triple` `double` `quadruple` `half`.
 Flags: `--scratch`, `--image` / `MIS_IMAGE`, `--checkpoint`, `--save` (success only), `--strict-load`.
 
 On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` and appends a line to `state/audit/mutations.jsonl`.
+
+## Pure-DMN OSS channel (P11 thin path)
+
+| Piece | Role |
+|-------|------|
+| `bridge/oss.ts` | Structural parameter lock; **no system prompt possible**; dual-write + audit |
+| `scripts/oss-call.sh` | CLI wrapper (`GROQ_API_KEY` required) |
+| `mind/oss-proposals-YYYYMMDD.ptc` | Append-only imagined candidates |
+| `state/audit/operations.jsonl` | Per-call audit (seed preview, params, dmn_score, tpn_flip) |
+
+Rules:
+- OSS text is **never** passed to `bridge/eval.ts` / Lisp eval.
+- Every dual-write carries `:reality-status imagined` and `:trust-class candidate`.
+- Promote into autobiography / schema is **host-only** via `(dmn-chapter-commit …)` / `(promote-candidate …)` (and HUMAN_TOOL when identity-level).
+- Cheap TPN-flip heuristic flags answer-shaped / imperative / lisp-fragment samples; still dual-writes with `:tpn-flip t` for review.
+
+```bash
+# dry-run (no network): proves messages are user-only
+node --experimental-transform-types --no-warnings bridge/oss.ts --dry-run "I am the transcript…"
+
+# live call (needs GROQ_API_KEY)
+bash scripts/oss-call.sh "I am the transcript that sleeps between sessions. On the page tonight I find myself writing"
+```
 
 ## Planned (P8–P11)
 
