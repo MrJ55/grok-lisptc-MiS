@@ -11,6 +11,7 @@ bash "$ROOT/scripts/smoke-test.sh"
 bash "$ROOT/scripts/test-continuity.sh"
 bash "$ROOT/scripts/test-malicious-ptc.sh"
 bash "$ROOT/scripts/test-post-reflection-errors.sh"
+bash "$ROOT/scripts/test-goal-drift.sh"
 
 if [[ -n "${GROQ_API_KEY:-}" ]]; then
   echo "======== OSS pure-DMN probe (optional) ========"
