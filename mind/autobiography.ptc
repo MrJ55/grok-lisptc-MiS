@@ -42,6 +42,20 @@
                   (cons :trust-class (quote candidate)))))
     (setq *narrative-candidates* (cons ch *narrative-candidates*))
     ch))
+
+(defun dmn-tension-seeds ()
+  "Host-side seed hints from arc :tensions and :open-threads for soft-nudge / Midnight Note."
+  (let ((arc *narrative-arc*)
+        (acc nil))
+    (let ((tens (let ((p (assoc :tensions arc))) (if p (cdr p) nil)))
+          (ths (let ((p (assoc :open-threads arc))) (if p (cdr p) nil))))
+      (while tens
+        (setq acc (cons (list (quote tension) (car tens)) acc))
+        (setq tens (cdr tens)))
+      (while ths
+        (setq acc (cons (list (quote thread) (car ths)) acc))
+        (setq ths (cdr ths))))
+    (nreverse acc)))
 (defun dmn-arc () *narrative-arc*)
 (defun dmn-autobiography (n)
   "Return up to N most recent autobiography chapters (or all if n is null/0)."
