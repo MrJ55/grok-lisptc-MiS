@@ -2,7 +2,7 @@
 (defun mis-version () "Return a version string for the mind helpers." "mis-helpers-0.6")
 (defun mis-ping () "Health check." 'pong)
 (defun mis-note (msg) msg)
-(setq *mis-known* '(mis-version mis-ping mis-note mis-register mis-state-summary mis-schema mis-insights update-self-schema dmn-log-episode dmn-fetch-unreflected dmn-reflect-pack dmn-apply-reflection dmn-narrate dmn-chapter-close dmn-narrative-candidate dmn-tension-seeds dmn-arc dmn-autobiography audit-reality-status audit-autobiography-grounding audit-self-schema-evidence promote-candidate square triple double quadruple half))
+(setq *mis-known* '(mis-version mis-ping mis-note mis-register mis-state-summary mis-schema mis-insights update-self-schema dmn-log-episode dmn-fetch-unreflected dmn-reflect-pack dmn-apply-reflection dmn-narrate dmn-chapter-close dmn-chapter-commit dmn-narrative-candidate dmn-tension-seeds dmn-arc dmn-autobiography audit-reality-status audit-autobiography-grounding audit-self-schema-evidence promote-candidate square triple double quadruple half))
 (defun mis-register (sym) (if (member sym *mis-known*) sym (progn (setq *mis-known* (cons sym *mis-known*)) sym)))
 (defun mis-state-summary ()
   (list (list 'version (mis-version))
