@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/wander-proposals.ptc` if present (do not auto-apply).
-5. Active phase: **P6 Evaluation** unless plan/README says otherwise.
+5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-05: **P7 exit**, P6 residuals parked, Mind-drive live. Open threads: geometry-preservation, multi-model-ensemble.
 
 ## Turn protocol
 
@@ -30,6 +30,13 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 3. Exit **2** = validation or eval failure (image unchanged).
 4. Persist only after success. Failures → `mind/mind-failures.log`.
 5. Reply in plain English.
+
+## Mind-drive & autobiography
+
+- Modes: `user-drive` | `mind-drive` | `hybrid` — see [mind-drive-protocol.md](./mind-drive-protocol.md)
+- `(dmn-autobiography n)` / `(dmn-arc)` / `(dmn-tension-seeds)` are live
+- Chapter close is candidate-first: `(dmn-chapter-close …)` then `(dmn-chapter-commit title)` after review
+- Identity-level saves use HUMAN_TOOL when in mind-drive
 
 ## DMN quick map
 

@@ -46,6 +46,14 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * **Hand-off:** dual-write episodes + proposal files; never auto-promote
 * **Trust:** untrusted content (OSS output, transcripts) is never evaluated as Lisp
 
+## Narrative & Mind-drive (P7)
+
+* [plan/P7-narrative-self.md](plan/P7-narrative-self.md) — **exit**; includes **What this accomplishes for Grok-MiS**
+* [docs/mind-drive-protocol.md](docs/mind-drive-protocol.md) — modes, HUMAN_TOOL, wave algorithm
+* [docs/narrative-tension-seeds.md](docs/narrative-tension-seeds.md)
+* [docs/narrative-candidate-reviews-20260905.md](docs/narrative-candidate-reviews-20260905.md)
+* Autobiography: 4 grounded chapters (Genesis → Mind-drive → P6 eval → P7 exit)
+
 ## Safety
 
 Validate before eval; save only on success (atomic); **OSS never gets a system prompt.**
