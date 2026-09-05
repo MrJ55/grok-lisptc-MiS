@@ -1,6 +1,6 @@
 # OSS Nudge Craft (pure-DMN)
 
-**Last updated:** 2026-09-05  
+**Last updated:** 2026-09-06  
 Experiment: same extension (sleep-stage / midnight-note scheduler), many **fresh single-turn** first-person seeds. No system prompt. No task instructions.
 
 ## Core finding
@@ -38,10 +38,10 @@ please invent a mechanism / list ideas / make it practical
 
 ## Parameters (locked)
 
-- Model: `openai/gpt-oss-20b`
-- temperature 1.15, presence_penalty 0.7, frequency_penalty 0.3, top_p 0.93
+- Model: `openai/gpt-oss-20b` (primary); chorus also uses `openai/gpt-oss-120b` (Groq) and `deepseek-v4-flash` (OpenCode Go)
+- temperature 1.15 (Go max 1.0), presence_penalty 0.7, frequency_penalty 0.3, top_p 0.93
 - Zero system prompt; single user message (or multi-turn user/assistant replay only)
-- reasoning_effort: low
+- reasoning_effort: low (oss family)
 
 ## Protocol
 
@@ -58,6 +58,16 @@ Open-thread seeds (geometry-preservation, salience-voc-dashboard) using the same
 - **Prefer** incomplete transcript/dream continuations; dual-write only sticky phrases.
 - Results dual-written as imagined candidates: [oss-proposals-20260905-geometry-salience.ptc](../mind/oss-proposals-20260905-geometry-salience.ptc)
 - Full write-up: [oss-nudge-exercise-20260905.md](./oss-nudge-exercise-20260905.md)
+
+## Chorus roster (2026-09-06)
+
+After multi-provider batteries, the **usable** pure-DMN chorus is three voices:
+
+1. `openai/gpt-oss-20b` (Groq) — primary
+2. `openai/gpt-oss-120b` (Groq) — same-family color
+3. `deepseek-v4-flash` (OpenCode Go chat, user-only) — best non-oss weave partner
+
+First real job (geometry-preservation): [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc).
 
 ## Related
 
