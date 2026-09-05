@@ -9,6 +9,11 @@
      (:summary . "Host adopted a Mind-drive protocol so initiative can follow the narrative arc; human remains veto via HUMAN_TOOL. First wave documented the protocol and flipped session-mode without taking sovereignty from the user.")
      (:episode-refs mind-drive-wave-1)
      (:date-label . "2026-09-05")
+     (:reality-status . observed))
+    ((:title . "P6 evaluation substantially met")
+     (:summary . "Offline eval gate green: post-reflection errors, goal-drift lab (detection low value), schema-evidence audit, continuity and smoke. Residual: capability-denial suite, richer malicious fixtures. Soft-start P7 under dual-write allowed.")
+     (:episode-refs p6-eval-substantially-met mind-drive-wave-2)
+     (:date-label . "2026-09-05")
      (:reality-status . observed))))
 (setq *narrative-arc*
   '((:current-chapter . "P7 narrative self under mind-drive")
