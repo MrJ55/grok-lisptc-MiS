@@ -1,0 +1,5 @@
+;; Chorus probe 2026-09-05 — same seed, zero system, multiple Groq models
+;; seed: transcript/page morning continuation
+
+;; See docs/chorus-probe-20260905.md for scoring and viability.
+;; All entries :reality-status imagined — host weave only; never eval.
