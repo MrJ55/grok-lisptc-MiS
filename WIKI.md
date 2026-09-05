@@ -31,6 +31,9 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/gmod-extensions-contrast-20260902.md](docs/gmod-extensions-contrast-20260902.md) — original ideas vs OSS responses vs value
 * [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
 * [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
+* [docs/chorus-probe-20260905.md](docs/chorus-probe-20260905.md) — multi-provider pure-DMN probes
+* [docs/chorus-geometry-20260906.md](docs/chorus-geometry-20260906.md) — first real chorus job (geometry-preservation); **3-voice roster** locked
+* [mind/oss-proposals-20260906-geometry-chorus.ptc](mind/oss-proposals-20260906-geometry-chorus.ptc) — seed + DMN replies + host weave (`:imagined`)
 * [docs/post-reflection-error-study.md](docs/post-reflection-error-study.md) — quantitative post-reflection errors + multiturn OSS
 * [docs/goal-drift-scenario.md](docs/goal-drift-scenario.md) — goal-drift lab note (harness + why detection is low value here)
 * [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
@@ -42,7 +45,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 * **Host:** Grok — Lisp forms, salience switch, sole mutator, mediates OSS
 * **Mind image:** durable transcript state (`mind/*.ptc`)
-* **OSS:** pure DMN only (zero system prompt, temp 1.15, presence 0.7)
+* **OSS / Chorus:** pure DMN only (zero system prompt, temp 1.15, presence 0.7). Active roster (2026-09-06): **gpt-oss-20b + gpt-oss-120b (Groq)** + **deepseek-v4-flash (OpenCode Go)**. Host weaves sticky lines; never auto-promote.
 * **Hand-off:** dual-write episodes + proposal files; never auto-promote
 * **Trust:** untrusted content (OSS output, transcripts) is never evaluated as Lisp
 
