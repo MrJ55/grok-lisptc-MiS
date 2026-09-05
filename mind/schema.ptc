@@ -29,3 +29,50 @@
       (setq old (cdr old)))
     (setq *self-schema* acc)
     *self-schema*))
+
+(defun schema-claim-status (c)
+  "Bare symbol => inferred; structured list may carry :reality-status."
+  (if (not (consp c))
+      'inferred
+    (let ((p (assoc :reality-status c)))
+      (if p
+          (cdr p)
+        (let ((xs c) (found nil))
+          (while (and xs (not found))
+            (if (eq (car xs) :reality-status)
+                (setq found (cadr xs))
+              (setq xs (cdr xs))))
+          (if found found 'inferred))))))
+
+(defun schema-claim-evidence (c)
+  "Return evidence list from structured claim, or nil."
+  (if (not (consp c))
+      nil
+    (let ((p (assoc :evidence c)))
+      (if p
+          (cdr p)
+        (let ((xs c) (found nil) (seen nil))
+          (while (and xs (not seen))
+            (if (eq (car xs) :evidence)
+                (progn (setq found (cadr xs)) (setq seen t))
+              (setq xs (cdr xs))))
+          found)))))
+
+(defun schema-claim-name (c)
+  (if (consp c) (car c) c))
+
+(defun audit-self-schema-evidence ()
+  "Return unsupported durable schema claims; bare inferred symbols OK; observed/reported need :evidence."
+  (let ((issues nil)
+        (xs (mis-insights)))
+    (while xs
+      (let ((c (car xs)))
+        (when (consp c)
+          (let ((st (schema-claim-status c))
+                (ev (schema-claim-evidence c))
+                (nm (schema-claim-name c)))
+            (when (and (or (eq st 'observed) (eq st 'reported))
+                       (null ev))
+              (setq issues (cons (list 'missing-evidence nm st) issues))))))
+      (setq xs (cdr xs)))
+    (nreverse issues)))

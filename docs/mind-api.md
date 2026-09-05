@@ -17,6 +17,7 @@
 | `(dmn-apply-reflection insights summary label)` | schema + reflection episode (`:reality-status inferred`) |
 | `(audit-reality-status)` | episodes/chapters missing `:reality-status` (empty = clean) |
 | `(audit-autobiography-grounding)` | chapters lacking grounded evidence (empty = clean) |
+| `(audit-self-schema-evidence)` | structured observed/reported insights missing `:evidence` (empty = clean; bare symbols OK) |
 | `(promote-candidate id)` | host-mediated candidate gate (no auto-mutate) |
 | `(dmn-narrate summary title)` | append chapter (`:reality-status observed`) |
 | `(dmn-chapter-close title summary refs)` | append chapter with refs |

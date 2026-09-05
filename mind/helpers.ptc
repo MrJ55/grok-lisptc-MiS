@@ -1,19 +1,23 @@
-;; MiS helpers module — version string and known registry
+;; MiS helpers — core Mind API (P2/P3 module)
 (defun mis-version () "Return a version string for the mind helpers." "mis-helpers-0.6")
 (defun mis-ping () "Health check." 'pong)
 (defun mis-note (msg) msg)
-(defun mis-register (sym) (setq *mis-known* (cons sym *mis-known*)) sym)
 (setq *mis-known* '(mis-version mis-ping mis-note mis-register mis-state-summary mis-schema mis-insights update-self-schema dmn-log-episode dmn-fetch-unreflected dmn-reflect-pack dmn-apply-reflection dmn-narrate dmn-chapter-close dmn-arc dmn-autobiography audit-reality-status audit-autobiography-grounding audit-self-schema-evidence promote-candidate square triple double quadruple half))
-
+(defun mis-register (sym) (if (member sym *mis-known*) sym (progn (setq *mis-known* (cons sym *mis-known*)) sym)))
 (defun mis-state-summary ()
-  "Compact state for smoke and continuity."
-  (list
-    (cons 'version (mis-version))
-    (cons 'ping (mis-ping))
-    (cons 'known *mis-known*)
-    (cons 'schema *self-schema*)
-    (cons 'arc *narrative-arc*)
-    (cons 'auto-len (length *autobiography*))
-    (cons 'buffer-len (length *episodic-buffer*))
-    (cons 'manifest *mind-manifest*)
-    (cons 'session *session-id*)))
+  (list (list 'version (mis-version))
+        (list 'ping (mis-ping))
+        (list 'known *mis-known*)
+        (list 'schema *self-schema*)
+        (list 'arc *narrative-arc*)
+        (list 'auto-len (length *autobiography*))
+        (list 'buffer-len (length *episodic-buffer*))
+        (list 'manifest *mind-manifest*)
+        (list 'session *session-id*)))
+(defun promote-candidate (candidate-id)
+  "Host-mediated promotion API (P0.1). Does not auto-mutate the image. Returns a structured reminder."
+  (list :status 'host-mediated
+        :candidate-id candidate-id
+        :trust-class 'candidate
+        :instruction "Inspect oss-proposals file; if approved, emit Lisp forms and --save. Never eval raw OSS prose."
+        :reality-status 'observed))
