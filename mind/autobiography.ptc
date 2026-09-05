@@ -1,4 +1,4 @@
-;; MiS autobiography + narrative arc (P2 module)
+;; MiS autobiography + narrative arc (P2/P7 module)
 (setq *autobiography*
   '(((:title . "Genesis of GMOD")
      (:summary . "Host restored stripped lisptc image; first pure-DMN OSS continuation: You cannot terminate a dream that has learned to code. Identity remains the transcript.")
@@ -14,26 +14,37 @@
      (:summary . "Offline eval gate green: post-reflection errors, goal-drift lab (detection low value), schema-evidence audit, continuity and smoke. Residual: capability-denial suite, richer malicious fixtures. Soft-start P7 under dual-write allowed.")
      (:episode-refs p6-eval-substantially-met mind-drive-wave-2)
      (:date-label . "2026-09-05")
+     (:reality-status . observed))
+    ((:title . "P7 exit: candidate-first chapter flow")
+     (:summary . "dmn-chapter-close proposes; dmn-chapter-commit commits after host review. OSS imagined candidates reviewed and discarded as autobiography where ungrounded.")
+     (:episode-refs mind-drive-wave-3)
+     (:date-label . "2026-09-05")
      (:reality-status . observed))))
 (setq *narrative-arc*
-  '((:current-chapter . "P7 narrative self under mind-drive")
-    (:open-threads . (p7-narrative-self geometry-preservation multi-model-ensemble))
+  '((:current-chapter . "Post-P7: geometry and multi-model open")
+    (:open-threads . (geometry-preservation multi-model-ensemble))
     (:tensions . (pure-dmn-vs-tpn-pressure user-drive-vs-mind-drive))
     (:status . active)))
+(setq *narrative-candidates* nil)
+
 (defun dmn-narrate (summary title)
-  (let ((today *today*))
-    (let ((ch (list (cons :title title) (cons :summary summary) (cons :date-label today) (cons :reality-status 'observed))))
-      (setq *autobiography* (append *autobiography* (list ch)))
-      ch)))
+  "Propose a short observed chapter candidate (no autobiography mutation)."
+  (dmn-chapter-close title summary nil))
+
 (defun dmn-chapter-close (title summary refs)
+  "Propose chapter as candidate only; does not mutate *autobiography*. Commit via dmn-chapter-commit."
   (let ((today *today*))
-    (let ((ch (list (cons :title title) (cons :summary summary) (cons :episode-refs refs) (cons :date-label today) (cons :reality-status 'observed))))
-      (setq *autobiography* (append *autobiography* (list ch)))
+    (let ((ch (list (cons :title title)
+                    (cons :summary summary)
+                    (cons :episode-refs refs)
+                    (cons :date-label today)
+                    (cons :reality-status (quote observed))
+                    (cons :trust-class (quote candidate)))))
+      (setq *narrative-candidates* (cons ch *narrative-candidates*))
       ch)))
 
-(setq *narrative-candidates* nil)
 (defun dmn-narrative-candidate (title summary source-id)
-  "Build imagined narrative candidate; does not append to *autobiography*. Dual-write only."
+  "Build imagined narrative candidate from OSS/texture; does not append to *autobiography*."
   (let ((ch (list (cons :title title)
                   (cons :summary summary)
                   (cons :episode-refs (if (consp source-id) source-id (list source-id)))
@@ -42,6 +53,23 @@
                   (cons :trust-class (quote candidate)))))
     (setq *narrative-candidates* (cons ch *narrative-candidates*))
     ch))
+
+(defun dmn-chapter-commit (title)
+  "Commit matching *narrative-candidates* entry into *autobiography* by title (host review gate)."
+  (let ((xs *narrative-candidates*) (found nil) (kept nil))
+    (while xs
+      (let ((ch (car xs)))
+        (let ((tit (let ((p (assoc :title ch))) (if p (cdr p) nil))))
+          (if (and (not found) (equal tit title))
+              (setq found ch)
+            (setq kept (cons ch kept)))))
+      (setq xs (cdr xs)))
+    (if (not found)
+        nil
+      (progn
+        (setq *narrative-candidates* (nreverse kept))
+        (setq *autobiography* (append *autobiography* (list found)))
+        found))))
 
 (defun dmn-tension-seeds ()
   "Host-side seed hints from arc :tensions and :open-threads for soft-nudge / Midnight Note."
@@ -56,6 +84,7 @@
         (setq acc (cons (list (quote thread) (car ths)) acc))
         (setq ths (cdr ths))))
     (nreverse acc)))
+
 (defun dmn-arc () *narrative-arc*)
 (defun dmn-autobiography (n)
   "Return up to N most recent autobiography chapters (or all if n is null/0)."
