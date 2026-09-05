@@ -1,44 +1,48 @@
-# grok-lisptc-MiS — Wiki
+# Wiki — grok-lisptc-MiS
 
-**Mind-in-Sandbox for Grok** + pure-DMN generation via gpt-oss-20b (**GMOD** / grok-mis-oss-dmn).
+Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN OSS channel.
 
-Repo: https://github.com/MrJ55/grok-lisptc-MiS
+## Start here
 
-**Status (2026-09-04):** Review-by-all (GLM + Terra) applied. Tier-1 correctness fixes landed (reflection helpers, episodic trim, upstream arith, atomic save, `*today*`). Active focus: **P0.1 State Governance** → **P6 Evaluation**, then P7–P11 expansion. Six novel extensions remain design targets (not yet implemented).
+* [README.md](README.md)
+* [docs/session-handoff.md](docs/session-handoff.md)
+* [plan/README.md](plan/README.md)
+* [docs/CUSTOM_INSTRUCTIONS.md](docs/CUSTOM_INSTRUCTIONS.md)
 
-Canonical plan: [plan/README.md](plan/README.md)  
-Revised contracts: [revised-plan-GLM/](revised-plan-GLM/)  
-Synthesis audit: [review-by-all/](review-by-all/)
+## Architecture & decisions
 
-**Do not retype — canonical docs:**
+* [docs/architecture.md](docs/architecture.md)
+* [docs/decisions-index.md](docs/decisions-index.md)
+* [docs/trust-classes.md](docs/trust-classes.md)
+* [docs/capability-governance.md](docs/capability-governance.md)
+* [docs/threat-model.md](docs/threat-model.md)
 
+## Ops
+
+* [docs/ops-playbook.md](docs/ops-playbook.md)
+* [docs/bootstrap.md](docs/bootstrap.md)
+* [docs/VERIFICATION.md](docs/VERIFICATION.md)
+* [docs/UPSTREAM.md](docs/UPSTREAM.md)
+
+## DMN / OSS
+
+* [docs/reflection-protocol.md](docs/reflection-protocol.md)
+* [docs/DMN-gpt-oss-20b-probe.md](docs/DMN-gpt-oss-20b-probe.md)
 * [docs/gmod-extensions-contrast-20260902.md](docs/gmod-extensions-contrast-20260902.md) — original ideas vs OSS responses vs value
 * [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
-* [docs/related-work.md](docs/related-work.md) — sources
-* [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md) — pure-DMN protocol
+* [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
+* [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
+* [docs/related-work.md](docs/related-work.md)
 * [plan/CREATIVE-MECHANISMS.md](plan/CREATIVE-MECHANISMS.md) — salience, sleep-stage, etc.
-* [docs/DMN-gpt-oss-20b-probe.md](docs/DMN-gpt-oss-20b-probe.md) — behavioural probe + params
+* [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md)
 
-## What this is
+## Roles
 
 * **Host:** Grok — Lisp forms, salience switch, sole mutator, mediates OSS
-* **Mind:** transcript image `mind/mind-image.ptc` (helpers v0.4)
+* **Mind image:** durable transcript state (`mind/*.ptc`)
 * **OSS:** pure DMN only (zero system prompt, temp 1.15, presence 0.7)
 * **Hand-off:** dual-write episodes + proposal files; never auto-promote
 * **Trust:** untrusted content (OSS output, transcripts) is never evaluated as Lisp
-
-## Quick start
-
-```bash
-bash scripts/bootstrap.sh
-bash scripts/verify-upstream.sh   # optional but recommended
-bash scripts/smoke-test.sh
-cd /tmp/mis
-node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
-node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
-```
-
-Cold start: [plan/P00-cold-start.md](plan/P00-cold-start.md) (aligned with revised-plan-GLM)
 
 ## Safety
 

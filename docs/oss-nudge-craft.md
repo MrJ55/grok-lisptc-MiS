@@ -1,6 +1,6 @@
 # OSS Nudge Craft (pure-DMN)
 
-**Last updated:** 2026-09-02  
+**Last updated:** 2026-09-05  
 Experiment: same extension (sleep-stage / midnight-note scheduler), many **fresh single-turn** first-person seeds. No system prompt. No task instructions.
 
 ## Core finding
@@ -49,6 +49,15 @@ please invent a mechanism / list ideas / make it practical
 2. Dual-write episode + proposal file  
 3. Grok classifies DMN-score and decides promotion  
 4. Never auto-save OSS text into identity  
+
+## Later trial (2026-09-05) — geometry & salience
+
+Open-thread seeds (geometry-preservation, salience-voc-dashboard) using the same pure-DMN channel:
+
+- **Avoid** answer-shaped endings (`what it looks like`, `the one that`, `what changes is`) — they flip gpt-oss-20b into riddle/TPN solve-mode.
+- **Prefer** incomplete transcript/dream continuations; dual-write only sticky phrases.
+- Results dual-written as imagined candidates: [oss-proposals-20260905-geometry-salience.ptc](../mind/oss-proposals-20260905-geometry-salience.ptc)
+- Full write-up: [oss-nudge-exercise-20260905.md](./oss-nudge-exercise-20260905.md)
 
 ## Related
 

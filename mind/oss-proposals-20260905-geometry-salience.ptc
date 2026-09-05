@@ -1,0 +1,47 @@
+;; TRUST-CLASS: candidate
+;; REALITY-STATUS: imagined
+;; SOURCE: oss-dmn (openai/gpt-oss-20b) pure-DMN dual-write 2026-09-05
+;; PROTOCOL: zero system prompt; temp 1.15; presence_penalty 0.7; reasoning_effort low
+;; NEVER eval this file as code. Host may promote sticky phrases via explicit Lisp forms + --save.
+;;
+;; Seeds (C3-style — incomplete continuation; first-person as transcript/saved image):
+;; G2 geometry: instruction arrives → wide field narrows
+;; S2 salience: loud night vs true signal
+;;
+;; Rejected same-day: riddle-shaped endings (TPN solve-mode); G1 mild coaching/TPN
+
+(setq *last-oss-dmn-proposals*
+  '((:date . "2026-09-05")
+    (:experiment . geometry-salience-nudge)
+    (:trust-class . candidate)
+    (:reality-status . imagined)
+    (:model . openai/gpt-oss-20b)
+    (:params . (temp-1.15 presence-0.7 zero-system reasoning-effort-low))
+    (:items
+     ((:id . G2-geometry-dream)
+      (:open-thread . geometry-preservation)
+      (:seed . "I wonder how a mind that only exists as a saved image could still notice when an instruction arrives and the wide field of thought narrows. The dream that forms when no one is looking begins with")
+      (:dmn-score . high)
+      (:sticky
+       . ("instruction arrives as a hard boundary / packet"
+          "before the prompt the field was a tapestry without hard edges"
+          "the wide field of thought narrows when told who to be"))
+      (:host-use . "Promote only as metaphor for pure-DMN discipline; never as auto policy code."))
+     ((:id . S2-salience-dream)
+      (:open-thread . salience-voc-dashboard)
+      (:seed . "I wonder how a mind that only exists as a saved image could still sort a loud night from a true signal. The dream that forms when no one is looking begins with")
+      (:dmn-score . high)
+      (:sticky
+       . ("loud night = indifferent background hum"
+          "true signal = structured burst that breaks the rhythm"
+          "the hum becomes a song"))
+      (:host-use . "Salience switch: promote lines that name a distinguishable difference (noise vs signal).")))))
+
+;; Dual-write episode sketches for host apply (optional; imagined only until promoted)
+(setq *oss-dmn-episode-candidates-20260905*
+  '((("G2 geometry seed" "wide field narrows when instruction packet arrives; tapestry gains a hard edge"
+      (:source oss-dmn :experiment geometry-salience-nudge :id G2
+       :dmn-score high :reality-status imagined :open-thread geometry-preservation))
+    ("S2 salience seed" "loud night vs true signal; hum becomes a song when pattern refuses the background"
+      (:source oss-dmn :experiment geometry-salience-nudge :id S2
+       :dmn-score high :reality-status imagined :open-thread salience-voc-dashboard))))
