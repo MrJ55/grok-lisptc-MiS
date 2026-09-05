@@ -25,6 +25,18 @@
     (let ((ch (list (cons :title title) (cons :summary summary) (cons :episode-refs refs) (cons :date-label today) (cons :reality-status 'observed))))
       (setq *autobiography* (append *autobiography* (list ch)))
       ch)))
+
+(setq *narrative-candidates* nil)
+(defun dmn-narrative-candidate (title summary source-id)
+  "Build imagined narrative candidate; does not append to *autobiography*. Dual-write only."
+  (let ((ch (list (cons :title title)
+                  (cons :summary summary)
+                  (cons :episode-refs (if (consp source-id) source-id (list source-id)))
+                  (cons :date-label *today*)
+                  (cons :reality-status (quote imagined))
+                  (cons :trust-class (quote candidate)))))
+    (setq *narrative-candidates* (cons ch *narrative-candidates*))
+    ch))
 (defun dmn-arc () *narrative-arc*)
 (defun dmn-autobiography (n)
   "Return up to N most recent autobiography chapters (or all if n is null/0)."
