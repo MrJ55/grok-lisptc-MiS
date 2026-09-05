@@ -21,6 +21,7 @@
 | `(promote-candidate id)` | host-mediated candidate gate (no auto-mutate) |
 | `(dmn-narrate summary title)` | append chapter (`:reality-status observed`) |
 | `(dmn-chapter-close title summary refs)` | append chapter with refs |
+| `(dmn-narrative-candidate title summary source-id)` | dual-write **imagined** chapter candidate (does not mutate autobiography) |
 | `(dmn-arc)` | narrative arc |
 | `(dmn-autobiography n)` | up to N chapters |
 
@@ -33,6 +34,7 @@ Globals of note:
 | `*episodic-buffer*` | Newest-first episodes (max `*episodic-max*`) |
 | `*autobiography*` | Chapter list |
 | `*narrative-arc*` | Current chapter / open threads / tensions |
+| `*narrative-candidates*` | Imagined dual-write chapter proposals (P7) |
 | `*today*` / `*now*` / `*session-id*` | Host-injected (bridge) |
 
 Sample defs: `square` `triple` `double` `quadruple` `half`.
@@ -51,3 +53,11 @@ On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` an
 
 Reflection ops: [reflection-protocol.md](./reflection-protocol.md).  
 OSS pure-DMN protocol: [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md).
+
+## Narrative / dual-write (P7)
+
+- **Grok** is the narrator; Lisp stores chapters Grok commits.
+- `(dmn-chapter-close …)` / `(dmn-narrate …)` → durable autobiography (`:reality-status` required).
+- `(dmn-narrative-candidate …)` → pushes onto `*narrative-candidates*` with `:reality-status imagined` / `:trust-class candidate`. Never eval OSS prose as code.
+- Promote path: host reviews candidate → rewrite grounded summary + episode-refs → `(dmn-chapter-close …)` + `--save`.
+- `(audit-autobiography-grounding)` must stay empty for observed chapters.
