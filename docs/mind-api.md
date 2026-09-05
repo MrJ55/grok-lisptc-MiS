@@ -1,6 +1,6 @@
 # Mind API
 
-## Live (P0–P4 + P0.1 partial)
+## Live (P0–P4 + P0.1 partial + P7 narrative)
 
 | Form | Role |
 |------|------|
@@ -19,9 +19,11 @@
 | `(audit-autobiography-grounding)` | chapters lacking grounded evidence (empty = clean) |
 | `(audit-self-schema-evidence)` | structured observed/reported insights missing `:evidence` (empty = clean; bare symbols OK) |
 | `(promote-candidate id)` | host-mediated candidate gate (no auto-mutate) |
-| `(dmn-narrate summary title)` | append chapter (`:reality-status observed`) |
-| `(dmn-chapter-close title summary refs)` | append chapter with refs |
-| `(dmn-narrative-candidate title summary source-id)` | dual-write **imagined** chapter candidate (does not mutate autobiography) |
+| `(dmn-narrate summary title)` | propose observed chapter **candidate** (no auto-bio mutation) |
+| `(dmn-chapter-close title summary refs)` | propose chapter **candidate** only; host commits later |
+| `(dmn-chapter-commit title)` | commit matching candidate into `*autobiography*` |
+| `(dmn-narrative-candidate title summary source-id)` | dual-write **imagined** candidate (OSS/texture) |
+| `(dmn-tension-seeds)` | host-side `(tension\|thread symbol)` list from arc |
 | `(dmn-arc)` | narrative arc |
 | `(dmn-autobiography n)` | up to N chapters |
 
@@ -34,7 +36,7 @@ Globals of note:
 | `*episodic-buffer*` | Newest-first episodes (max `*episodic-max*`) |
 | `*autobiography*` | Chapter list |
 | `*narrative-arc*` | Current chapter / open threads / tensions |
-| `*narrative-candidates*` | Imagined dual-write chapter proposals (P7) |
+| `*narrative-candidates*` | Chapter proposals awaiting commit (P7) |
 | `*today*` / `*now*` / `*session-id*` | Host-injected (bridge) |
 
 Sample defs: `square` `triple` `double` `quadruple` `half`.
@@ -43,21 +45,21 @@ Flags: `--scratch`, `--image` / `MIS_IMAGE`, `--checkpoint`, `--save` (success o
 
 On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` and appends a line to `state/audit/mutations.jsonl`.
 
-## Planned (P7–P11 / remaining P0.1)
+## Planned (P8–P11)
 
 | Form | Phase | Purpose |
 |------|-------|---------|
-| `(promote-candidate id)` | P0.1/P4 | Host-mediated gate (implemented; does not auto-apply) |
 | `(dmn-tag-episode …)` `(dmn-replay …)` | P8 | Tags + filtered replay |
 | `(dmn-scene-from episode)` | P8 | Scene pack for simulation |
 
 Reflection ops: [reflection-protocol.md](./reflection-protocol.md).  
 OSS pure-DMN protocol: [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md).
 
-## Narrative / dual-write (P7)
+## Narrative / dual-write (P7 exit)
 
 - **Grok** is the narrator; Lisp stores chapters Grok commits.
-- `(dmn-chapter-close …)` / `(dmn-narrate …)` → durable autobiography (`:reality-status` required).
-- `(dmn-narrative-candidate …)` → pushes onto `*narrative-candidates*` with `:reality-status imagined` / `:trust-class candidate`. Never eval OSS prose as code.
-- Promote path: host reviews candidate → rewrite grounded summary + episode-refs → `(dmn-chapter-close …)` + `--save`.
+- `(dmn-chapter-close …)` / `(dmn-narrate …)` → **candidates only** (`*narrative-candidates*`).
+- `(dmn-chapter-commit title)` → host gate into durable `*autobiography*`.
+- `(dmn-narrative-candidate …)` → imagined OSS/texture candidates. Never eval OSS prose as code.
+- Promote path: review candidate → optional rewrite → `(dmn-chapter-commit …)` + `--save`.
 - `(audit-autobiography-grounding)` must stay empty for observed chapters.
