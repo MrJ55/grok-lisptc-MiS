@@ -31,6 +31,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/gmod-extensions-contrast-20260902.md](docs/gmod-extensions-contrast-20260902.md) — original ideas vs OSS responses vs value
 * [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
 * [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
+* [docs/post-reflection-error-study.md](docs/post-reflection-error-study.md) — quantitative post-reflection errors + multiturn OSS
 * [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
 * [docs/related-work.md](docs/related-work.md)
 * [plan/CREATIVE-MECHANISMS.md](plan/CREATIVE-MECHANISMS.md) — salience, sleep-stage, etc.
