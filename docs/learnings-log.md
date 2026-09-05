@@ -2,6 +2,14 @@
 
 Newest first.
 
+## 2026-09-05 — Goal-drift experience (practical limits)
+
+- User-led course change ≠ model drift; detection has limited ops value when host already holds the pack.
+- Pure-DMN OSS elaborates pre-framed tension; does not detect drift.
+- TPN + pack can answer YES/NO with citations; rarely better than host.
+- Keep `test-goal-drift.sh` as representation-loop hygiene; do not put OSS on critical path for drift QA.
+- Full write-up: docs/goal-drift-scenario.md
+
 ## 2026-09-05 — OSS geometry/salience nudge trial
 
 - Pure-DMN seeds aimed at open-threads `geometry-preservation` and `salience-voc-dashboard`.

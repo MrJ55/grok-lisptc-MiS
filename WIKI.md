@@ -32,7 +32,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
 * [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
 * [docs/post-reflection-error-study.md](docs/post-reflection-error-study.md) — quantitative post-reflection errors + multiturn OSS
-* [docs/goal-drift-scenario.md](docs/goal-drift-scenario.md) — qualitative goal-drift reflect/re-align scenario
+* [docs/goal-drift-scenario.md](docs/goal-drift-scenario.md) — goal-drift lab note (harness + why detection is low value here)
 * [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
 * [docs/related-work.md](docs/related-work.md)
 * [plan/CREATIVE-MECHANISMS.md](plan/CREATIVE-MECHANISMS.md) — salience, sleep-stage, etc.
