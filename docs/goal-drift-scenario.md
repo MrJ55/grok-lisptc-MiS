@@ -35,6 +35,27 @@ MIS_RUNTIME=/tmp/mis bash scripts/test-goal-drift.sh
 
 This does not prove every future session will notice drift. It proves the **mind loop can represent drift, reflect on it, and record re-alignment** without breaking audits — the minimum bar before relying on reflection during P7–P10 scope pressure (especially wander).
 
+## Honesty note — what reflection does and does not do
+
+In MiS, **reflection is host-mediated**:
+
+1. `(dmn-reflect-pack n)` only **packages** `*self-schema*` + recent episodes for the host to read. It does not classify drift by itself.
+2. `(dmn-apply-reflection insights summary label)` **writes** host-chosen insights and summary into schema / buffer.
+
+The harness therefore:
+
+| Step | Who acts |
+|------|----------|
+| Log user goal + drift action episodes | Host script |
+| Set drifted `:open-threads` / episodic-summary | Host script |
+| Call reflect-pack (exposes drifted schema+episodes) | Host script |
+| Apply insights naming the drift | Host script (not an automatic detector) |
+| Re-align `:open-threads` + realign episode | Host script |
+
+**What PASS means:** the loop can *represent* drift in schema/episodes, *run* reflection apply, and *record* re-alignment with audits still clean.
+
+**What PASS does not mean:** that `dmn-reflect-pack` autonomously “noticed” drift without the host encoding it. A stronger future test would require a host classifier (or OSS dual-write) that reads the pack and proposes the insight *without* the script hard-coding `detect-goal-drift`.
+
 ## Relation
 
 | Item | Relation |
