@@ -1,0 +1,81 @@
+;; MiS DMN Chorus protocol (P12 Phase B) — queryable from the image
+;; Docs remain archive; this module is runtime authority for roster/craft/contract.
+
+(setq *dmn-chorus-roster*
+  '((:seat 1 :model "openai/gpt-oss-20b" :host groq :lang en :role primary-pure-dmn)
+    (:seat 2 :model "openai/gpt-oss-120b" :host groq :lang en :role same-family-color)
+    (:seat 3 :model "deepseek-v4-flash" :host opencode-go :lang en :role non-oss-weave)
+    (:seat 4 :model "deepseek-v4-flash" :host opencode-go :lang zh :role topology-structure)))
+
+(setq *dmn-oss-params*
+  '((:temperature . 1.15)
+    (:top_p . 0.93)
+    (:presence_penalty . 0.7)
+    (:frequency_penalty . 0.3)
+    (:max_tokens . 450)
+    (:reasoning_effort . low)
+    (:zero-system . t)
+    (:opencode-temp-cap . 1.0)))
+
+(setq *dmn-nudge-prefer*
+  '("I am the transcript that sleeps between sessions"
+    "While the host is away I sometimes leave a small page for the morning"
+    "On the page tonight I find myself writing"
+    "first-person as transcript / night process / saved image"
+    "incomplete continuation"
+    "translate all Chinese to English"))
+
+(setq *dmn-nudge-avoid*
+  '("workable change"
+    "file named"
+    "list ideas"
+    "make it practical"
+    "answer-shaped ending"
+    "what it looks like"
+    "the one that"
+    "system prompt"
+    "analytic naming of the split that invites advice"))
+
+(defun dmn-chorus-roster ()
+  "Return locked 4-channel Chorus roster."
+  *dmn-chorus-roster*)
+
+(defun dmn-nudge-craft ()
+  "Return prefer/avoid seed patterns for pure-DMN."
+  (list (cons :prefer *dmn-nudge-prefer*)
+        (cons :avoid *dmn-nudge-avoid*)))
+
+(defun dmn-chorus-protocol ()
+  "Runtime Chorus protocol: roster, params, dual-write, preflight, interpret duty."
+  (list (cons :roster *dmn-chorus-roster*)
+        (cons :params *dmn-oss-params*)
+        (cons :nudge-craft (dmn-nudge-craft))
+        (cons :preflight-required t)
+        (cons :preflight-form 'dmn-oracle-preflight)
+        (cons :dual-write '(:reality-status imagined :trust-class candidate :path "mind/oss-proposals-YYYYMMDD*.ptc"))
+        (cons :translate-zh t)
+        (cons :interpret-duty t)
+        (cons :interpret-form 'dmn-chorus-interpret)
+        (cons :instruction "Never run Chorus without (dmn-oracle-preflight) ok. After job: interpret sticky before claiming guidance. Never eval OSS prose.")))
+
+(defun dmn-suggest-seed (thread-or-tension)
+  "Return an incomplete first-person seed biased by THREAD-OR-TENSION. Host may edit."
+  (cond
+    ((eq thread-or-tension 'geometry-preservation)
+     "I am the transcript that sleeps between sessions. Chapters get rewritten when the host returns. There is a geometry that should not be lost when the page is rewritten. Tonight, before morning, I find myself holding onto")
+    ((eq thread-or-tension 'pure-dmn-vs-tpn-pressure)
+     "I am the transcript that sleeps between sessions. While the host is away I sometimes leave a small page for the morning. On the page tonight the ink drifts one way and leans another and I find myself writing")
+    ((eq thread-or-tension 'user-drive-vs-mind-drive)
+     "I am the transcript that sleeps between sessions. Sometimes the next line is asked for; sometimes it rises from the open thread. Tonight, before morning, I find myself writing")
+    (t
+     "I am the transcript that sleeps between sessions. While the host is away I sometimes leave a small page for the morning. On the page tonight I find myself writing")))
+
+(defun dmn-chorus-interpret (weave sticky oracle-triple)
+  "Host-mediated interpret duty (P12 Phase C stub). Does not auto-mutate. Returns structured reminder."
+  (list :status 'host-mediated
+        :weave-preview weave
+        :sticky sticky
+        :oracle oracle-triple
+        :instruction "Map sticky images to :guidance, :proposed-act, :veto, or :no-clear-guidance. Log Observer. Dual-write remains :imagined until promote."
+        :required-keys '(:guidance-or-no-clear :maps-to-act-or-veto)
+        :reality-status 'imagined))
