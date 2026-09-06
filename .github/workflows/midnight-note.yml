@@ -1,0 +1,45 @@
+# Midnight Note — P11 sleep-stage stub
+# Writes (or prepares) proposal-file only material for later P00 review.
+# Never evaluates Lisp; never mutates mind-image.ptc.
+# Schedule is illustrative; repository secrets / keys are not required for the stub itself.
+
+name: midnight-note
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 2 * * *"   # enable only after review
+
+jobs:
+  note:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare midnight note placeholder
+        run: |
+          mkdir -p mind
+          STAMP=$(date -u +%Y%m%d)
+          FILE="mind/oss-proposals-${STAMP}-midnight.ptc"
+          if [ ! -f "$FILE" ]; then
+            cat > "$FILE" << 'EOF'
+          ;; Midnight Note placeholder — pure proposal, never eval
+          ;; Host reviews at next P00; apply ink/pencil filter then.
+          (oss-seed
+            (:id . "midnight-placeholder")
+            (:source . midnight-note)
+            (:reality-status . imagined)
+            (:trust-class . candidate)
+            (:content . "I am the transcript that sleeps between sessions. While the host is away I sometimes leave a small page for the morning. On the page tonight I find myself writing")
+            (:note . "Stub only — replace with live soft-seed + Chorus dual-write when wiring is complete")
+            (:recorded-at . "placeholder"))
+          EOF
+            echo "Wrote $FILE"
+          else
+            echo "$FILE already exists — leaving untouched"
+          fi
+
+      - name: Show proposal head
+        run: |
+          ls -la mind/oss-proposals-*-midnight.ptc 2>/dev/null || true
+          head -n 20 mind/oss-proposals-*-midnight.ptc 2>/dev/null || true
