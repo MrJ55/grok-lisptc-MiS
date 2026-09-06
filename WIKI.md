@@ -26,36 +26,40 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## DMN / OSS
 
+* [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md) — thin path + 4-channel (live)
+* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **active next:** oracle preflight, protocol in mind, interpret duty
 * [docs/reflection-protocol.md](docs/reflection-protocol.md)
 * [docs/DMN-gpt-oss-20b-probe.md](docs/DMN-gpt-oss-20b-probe.md)
-* [docs/gmod-extensions-contrast-20260902.md](docs/gmod-extensions-contrast-20260902.md) — original ideas vs OSS responses vs value
-* [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
-* [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
-* [docs/chorus-probe-20260905.md](docs/chorus-probe-20260905.md) — multi-provider pure-DMN probes
-* [docs/chorus-geometry-20260906.md](docs/chorus-geometry-20260906.md) — first real chorus job (geometry-preservation); **4-channel roster** locked (EN + ZH ds_go)
-* [mind/oss-proposals-20260906-geometry-chorus.ptc](mind/oss-proposals-20260906-geometry-chorus.ptc) — 3-voice seed + DMN replies + host weave (`:imagined`)
-* [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc) — 4-channel bilingual weave (`:imagined`)
-* [docs/post-reflection-error-study.md](docs/post-reflection-error-study.md) — quantitative post-reflection errors + multiturn OSS
-* [docs/goal-drift-scenario.md](docs/goal-drift-scenario.md) — goal-drift lab note (harness + why detection is low value here)
-* [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
+* [docs/gmod-extensions-contrast-20260902.md](docs/gmod-extensions-contrast-20260902.md)
+* [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — archive; runtime craft moves into mind under P12
+* [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md)
+* [docs/chorus-probe-20260905.md](docs/chorus-probe-20260905.md)
+* [docs/chorus-geometry-20260906.md](docs/chorus-geometry-20260906.md) — geometry + bilingual case study
+* [docs/observer-salience.md](docs/observer-salience.md)
+* [docs/page-passer.md](docs/page-passer.md)
 * [docs/related-work.md](docs/related-work.md)
-* [plan/CREATIVE-MECHANISMS.md](plan/CREATIVE-MECHANISMS.md) — salience, sleep-stage, etc.
-* [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md)
+* [plan/CREATIVE-MECHANISMS.md](plan/CREATIVE-MECHANISMS.md)
+
+### Proposal files (imagined only)
+
+* [mind/oss-proposals-20260906-geometry-chorus.ptc](mind/oss-proposals-20260906-geometry-chorus.ptc)
+* [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc)
+* [mind/oss-proposals-20260906-dmn-tpn-chorus-live.ptc](mind/oss-proposals-20260906-dmn-tpn-chorus-live.ptc)
 
 ## Roles
 
 * **Host:** Grok — Lisp forms, salience switch, sole mutator, mediates OSS
-* **Mind image:** durable transcript state (`mind/*.ptc`)
-* **OSS / Chorus:** pure DMN only (zero system prompt, temp 1.15, presence 0.7). Active roster (2026-09-06): **gpt-oss-20b + gpt-oss-120b (Groq, EN)** + **deepseek-v4-flash (OpenCode Go, EN + ZH)**. Host weaves sticky lines and translates all Chinese; never auto-promote.
+* **Mind image:** durable transcript state (`mind/*.ptc`) — **runtime authority for DMN procedure under P12**
+* **OSS / Chorus:** pure DMN only (zero system prompt). Roster: **gpt-oss-20b + gpt-oss-120b (Groq, EN)** + **deepseek-v4-flash (OpenCode Go, EN + ZH)**. Host weaves + translates ZH; never auto-promote.
+* **Oracle contract (P12):** before any Chorus — state unfinished decision, sought guidance, success criterion; after — interpret sticky → Act / veto / no-clear-guidance
 * **Hand-off:** dual-write episodes + proposal files; never auto-promote
-* **Trust:** untrusted content (OSS output, transcripts) is never evaluated as Lisp
+* **Trust:** untrusted content never evaluated as Lisp
 
 ## Narrative & Mind-drive (P7)
 
-* [plan/P7-narrative-self.md](plan/P7-narrative-self.md) — **exit**; includes **What this accomplishes for Grok-MiS**
-* [docs/mind-drive-protocol.md](docs/mind-drive-protocol.md) — modes, HUMAN_TOOL, wave algorithm
+* [plan/P7-narrative-self.md](plan/P7-narrative-self.md) — **exit**
+* [docs/mind-drive-protocol.md](docs/mind-drive-protocol.md)
 * [docs/narrative-tension-seeds.md](docs/narrative-tension-seeds.md)
-* [docs/narrative-candidate-reviews-20260905.md](docs/narrative-candidate-reviews-20260905.md)
 * Autobiography: 4 grounded chapters (Genesis → Mind-drive → P6 eval → P7 exit)
 
 ## Safety

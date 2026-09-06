@@ -20,8 +20,8 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
-4. Permanent state: `mind/mind-image.ptc`. Review `mind/wander-proposals.ptc` if present (do not auto-apply).
-5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-06: **P7 exit**, P6 residuals parked (soft waiver), Mind-drive live. Open threads: geometry-preservation (3-voice + **4-channel bilingual** dual-written 2026-09-06), multi-model-ensemble (**4-channel roster** locked).
+4. Permanent state: `mind/mind-image.ptc`. Review `mind/oss-proposals-*.ptc` / wander proposals if present (do not auto-apply).
+5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-06: **P7 exit**, P11 thin path + 4-channel live, **P12 DMN mind-native active next**, P6 residuals parked.
 
 ## Turn protocol
 
@@ -38,29 +38,36 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 - Chapter close is candidate-first: `(dmn-chapter-close …)` then `(dmn-chapter-commit title)` after review
 - Identity-level saves use HUMAN_TOOL when in mind-drive
 
-## DMN quick map
+## DMN / Chorus (P11 live + P12 internalization)
 
-- P4 reflection: [reflection-protocol.md](./reflection-protocol.md)
-- P7–P10: narrative → scenes → prospection → wander — [plan/README.md](../plan/README.md)
-- ADR 0005: five subsystems; no sandbox daemon for “scheduled” work
+**Runtime authority is moving into the mind (P12).** Until forms land, still use docs; after P12 A–B, prefer:
 
-## Active chorus roster (2026-09-06) — 4-channel
+- `(dmn-oracle-preflight)` — **required before any Chorus**
+- `(dmn-chorus-protocol)` / `(dmn-chorus-roster)` / `(dmn-nudge-craft)` — from image
+- After Chorus: interpret sticky → Act / veto / `no-clear-guidance`; dual-write `:imagined` only
 
-- `openai/gpt-oss-20b` — Groq — primary pure-DMN (EN)
-- `openai/gpt-oss-120b` — Groq — same-family color (EN)
-- `deepseek-v4-flash` — OpenCode Go — non-oss weave partner (EN)
-- `deepseek-v4-flash` — OpenCode Go — topology/structure partner (ZH; host always translates)
-- Protocol: soft seed → 4 voices (oss20 EN + oss120 EN + ds_go EN + ds_go ZH) → keep DMN / drop TPN or loops → host weave sticky lines → dual-write `:imagined` only
-- Latest jobs: [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc) (3-voice) + [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](../mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc) (4-channel)
+**Oracle contract (mandatory — do not skip):**
+
+1. What is unfinished on the arc? (one concrete tension or decision)
+2. What kind of guidance are we seeking? (protect X? try Y? refuse collapse Z?)
+3. How will we know the oracle helped? (sticky maps to next Act or veto)
+
+Chorus without the triple is waste. Pretty prose is not success.
+
+**Roster (locked):** oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host translates ZH).
+
+**Archive / case studies:** [oss-nudge-craft.md](./oss-nudge-craft.md), [chorus-geometry-20260906.md](./chorus-geometry-20260906.md), [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md).
 
 ## Do not
 
 - Force the user to write Lisp unless they want to.
 - Reset on ordinary `EvalException`.
 - Save failed forms.
-- Auto-commit wander proposals.
-- Stand up local full RAG/sqlite-vec stacks unless resources clearly allow (prefer P5 managed API).
+- Auto-commit wander / OSS proposals.
+- Run Chorus without oracle preflight (P12 rule).
+- Claim guidance without interpret step.
 - Leave Chinese untranslated.
+- Stand up local full RAG/sqlite-vec stacks unless resources clearly allow (prefer P5 managed API).
 
 ## Pins
 

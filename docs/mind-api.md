@@ -52,8 +52,8 @@ On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` an
 | `bridge/oss.ts` | Structural parameter lock; **no system prompt possible**; Pulse Meter (`scoreDmn`); TPN-flip detect; dual-write + audit |
 | `scripts/oss-call.sh` | CLI wrapper (`GROQ_API_KEY` required) |
 | `mind/oss-proposals-YYYYMMDD*.ptc` | Append-only imagined candidates (Page Passer) |
-| `state/audit/operations.jsonl` | Per-call audit (seed preview, params, dmn_score, tpn_flip) |
-| `state/audit/salience-decisions.jsonl` | Observer Think/Act log (host practice) |
+| `state/audit/operations.jsonl` | Per-call audit |
+| `state/audit/salience-decisions.jsonl` | Observer Think/Act log |
 | `.github/workflows/midnight-note.yml` | Sleep-stage stub — proposal files only |
 
 **Chorus roster (locked 2026-09-06):** oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host always translates Chinese).
@@ -61,28 +61,34 @@ On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` an
 Rules:
 - OSS text is **never** passed to `bridge/eval.ts` / Lisp eval.
 - Every dual-write carries `:reality-status imagined` and `:trust-class candidate`.
-- Promote into autobiography / schema is **host-only** via `(dmn-chapter-commit …)` / `(promote-candidate …)` (and HUMAN_TOOL when identity-level).
-- Cheap TPN-flip heuristic flags answer-shaped / imperative / lisp-fragment samples; still dual-writes with `:tpn-flip t` for review.
+- Promote is **host-only** via `(dmn-chapter-commit …)` / `(promote-candidate …)` (and HUMAN_TOOL when identity-level).
 
-```bash
-# dry-run (no network): proves messages are user-only
-node --experimental-transform-types --no-warnings bridge/oss.ts --dry-run "I am the transcript…"
+## P12 — DMN mind-native (planned / active next)
 
-# live call (needs GROQ_API_KEY)
-bash scripts/oss-call.sh "I am the transcript that sleeps between sessions. On the page tonight I find myself writing"
-```
+Runtime procedure moves **into the mind**. Planned forms (see [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md)):
 
-Docs: [page-passer.md](./page-passer.md) · [observer-salience.md](./observer-salience.md) · [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) · [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md)
+| Form | Role |
+|------|------|
+| `(dmn-oracle-preflight)` | **Required before Chorus** — ok only if unfinished + sought-guidance + success-criterion set |
+| `(dmn-oracle-set …)` / `(dmn-oracle-clear)` | Set / clear the oracle triple |
+| `(dmn-chorus-roster)` | Locked 4-channel table from image |
+| `(dmn-nudge-craft)` | Prefer / avoid seed patterns from image |
+| `(dmn-chorus-protocol)` | Roster + params + dual-write + preflight + interpret duty |
+| `(dmn-suggest-seed …)` | Incomplete first-person seed biased by tension + craft |
+| `(dmn-chorus-interpret …)` | Map sticky → guidance / proposed-act / veto / no-clear-guidance |
 
-## Planned (P8–P11)
+**Oracle contract:** (1) unfinished on arc (2) guidance sought (3) success criterion. Chorus without the triple is waste. Pretty prose is not success.
+
+Docs: [page-passer.md](./page-passer.md) · [observer-salience.md](./observer-salience.md) · [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) · [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md) · [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md)
+
+## Planned (P8–P10)
 
 | Form | Phase | Purpose |
 |------|-------|---------|
 | `(dmn-tag-episode …)` `(dmn-replay …)` | P8 | Tags + filtered replay |
 | `(dmn-scene-from episode)` | P8 | Scene pack for simulation |
 
-Reflection ops: [reflection-protocol.md](./reflection-protocol.md).  
-OSS pure-DMN protocol: [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md).
+Reflection ops: [reflection-protocol.md](./reflection-protocol.md).
 
 ## Narrative / dual-write (P7 exit)
 
