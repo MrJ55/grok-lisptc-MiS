@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/wander-proposals.ptc` if present (do not auto-apply).
-5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-05: **P7 exit**, P6 residuals parked, Mind-drive live. Open threads: geometry-preservation (first chorus job dual-written 2026-09-06), multi-model-ensemble (**narrowed** to 3-voice roster: oss-20b + oss-120b Groq + deepseek-v4-flash OpenCode Go — see docs/chorus-geometry-20260906.md).
+5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-06: **P7 exit**, P6 residuals parked (soft waiver), Mind-drive live. Open threads: geometry-preservation (3-voice + **4-channel bilingual** dual-written 2026-09-06), multi-model-ensemble (**4-channel roster** locked).
 
 ## Turn protocol
 
@@ -29,7 +29,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 2. Run pure forms via bridge with optional `--save` / `--checkpoint`.
 3. Exit **2** = validation or eval failure (image unchanged).
 4. Persist only after success. Failures → `mind/mind-failures.log`.
-5. Reply in plain English.
+5. Reply in plain English. **Translate any Chinese prompts or model answers to English.**
 
 ## Mind-drive & autobiography
 
@@ -44,13 +44,14 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 - P7–P10: narrative → scenes → prospection → wander — [plan/README.md](../plan/README.md)
 - ADR 0005: five subsystems; no sandbox daemon for “scheduled” work
 
-## Active chorus roster (2026-09-06)
+## Active chorus roster (2026-09-06) — 4-channel
 
-- `openai/gpt-oss-20b` — Groq — primary pure-DMN
-- `openai/gpt-oss-120b` — Groq — same-family color
-- `deepseek-v4-flash` — OpenCode Go — best non-oss weave partner
-- Protocol: soft seed → 3 voices → keep DMN / drop TPN or loops → host weave → dual-write `:imagined` only
-- Latest job: [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc)
+- `openai/gpt-oss-20b` — Groq — primary pure-DMN (EN)
+- `openai/gpt-oss-120b` — Groq — same-family color (EN)
+- `deepseek-v4-flash` — OpenCode Go — non-oss weave partner (EN)
+- `deepseek-v4-flash` — OpenCode Go — topology/structure partner (ZH; host always translates)
+- Protocol: soft seed → 4 voices (oss20 EN + oss120 EN + ds_go EN + ds_go ZH) → keep DMN / drop TPN or loops → host weave sticky lines → dual-write `:imagined` only
+- Latest jobs: [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc) (3-voice) + [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](../mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc) (4-channel)
 
 ## Do not
 
@@ -59,6 +60,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 - Save failed forms.
 - Auto-commit wander proposals.
 - Stand up local full RAG/sqlite-vec stacks unless resources clearly allow (prefer P5 managed API).
+- Leave Chinese untranslated.
 
 ## Pins
 

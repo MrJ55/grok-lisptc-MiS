@@ -32,8 +32,9 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/oss-nudge-craft.md](docs/oss-nudge-craft.md) — how to seed OSS
 * [docs/oss-nudge-exercise-20260905.md](docs/oss-nudge-exercise-20260905.md) — geometry/salience dual-write trial (2026-09-05)
 * [docs/chorus-probe-20260905.md](docs/chorus-probe-20260905.md) — multi-provider pure-DMN probes
-* [docs/chorus-geometry-20260906.md](docs/chorus-geometry-20260906.md) — first real chorus job (geometry-preservation); **3-voice roster** locked
-* [mind/oss-proposals-20260906-geometry-chorus.ptc](mind/oss-proposals-20260906-geometry-chorus.ptc) — seed + DMN replies + host weave (`:imagined`)
+* [docs/chorus-geometry-20260906.md](docs/chorus-geometry-20260906.md) — first real chorus job (geometry-preservation); **4-channel roster** locked (EN + ZH ds_go)
+* [mind/oss-proposals-20260906-geometry-chorus.ptc](mind/oss-proposals-20260906-geometry-chorus.ptc) — 3-voice seed + DMN replies + host weave (`:imagined`)
+* [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc) — 4-channel bilingual weave (`:imagined`)
 * [docs/post-reflection-error-study.md](docs/post-reflection-error-study.md) — quantitative post-reflection errors + multiturn OSS
 * [docs/goal-drift-scenario.md](docs/goal-drift-scenario.md) — goal-drift lab note (harness + why detection is low value here)
 * [docs/oss-second-opinion-prompts.md](docs/oss-second-opinion-prompts.md)
@@ -45,7 +46,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 * **Host:** Grok — Lisp forms, salience switch, sole mutator, mediates OSS
 * **Mind image:** durable transcript state (`mind/*.ptc`)
-* **OSS / Chorus:** pure DMN only (zero system prompt, temp 1.15, presence 0.7). Active roster (2026-09-06): **gpt-oss-20b + gpt-oss-120b (Groq)** + **deepseek-v4-flash (OpenCode Go)**. Host weaves sticky lines; never auto-promote.
+* **OSS / Chorus:** pure DMN only (zero system prompt, temp 1.15, presence 0.7). Active roster (2026-09-06): **gpt-oss-20b + gpt-oss-120b (Groq, EN)** + **deepseek-v4-flash (OpenCode Go, EN + ZH)**. Host weaves sticky lines and translates all Chinese; never auto-promote.
 * **Hand-off:** dual-write episodes + proposal files; never auto-promote
 * **Trust:** untrusted content (OSS output, transcripts) is never evaluated as Lisp
 
