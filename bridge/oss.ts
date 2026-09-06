@@ -1,40 +1,33 @@
 /**
- * MiS pure-DMN OSS channel — structural parameter lock (P11 thin path).
+ * Pure-DMN OSS caller — parameter lock enforced by code (P11).
  *
- * Non-negotiable:
+ * Invariants:
  *   - Zero system prompt (structurally impossible: messages are user-only)
  *   - Locked model + sampling params from docs/DMN-gpt-oss-20b-probe.md
- *   - All output is candidate / :reality-status imagined — never eval'd
- *   - Dual-write to mind/oss-proposals-YYYYMMDD.ptc + audit log
- *
- * Usage:
- *   node --experimental-transform-types --no-warnings bridge/oss.ts "seed text…"
- *   node … bridge/oss.ts --seed-file path.txt
- *   node … bridge/oss.ts --dry-run "seed"     # no API call; print request body
+ *   - include_reasoning: false (required on Groq gpt-oss or content is often empty)
+ *   - Dual-write proposal file + operations audit on every call
+ *   - Pulse Meter (scoreDmn) + TPN-flip heuristic attached to every result
  *
  * Env: GROQ_API_KEY required (never commit). Optional: OSS_MAX_TOKENS, OSS_REASONING_EFFORT.
- *
- * Exit: 0 ok, 1 usage, 2 API/config error, 3 empty content, 4 TPN-flip (still dual-writes with flag)
  */
 
+import { randomUUID } from "node:crypto";
 import {
-  readFileSync,
-  writeFileSync,
   appendFileSync,
   existsSync,
   mkdirSync,
+  readFileSync,
+  writeFileSync,
 } from "node:fs";
-import { resolve, dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, "..");
+const ROOT = join(__dirname, "..");
 const MIND_DIR = join(ROOT, "mind");
 const AUDIT_DIR = join(ROOT, "state", "audit");
 const OPS_LOG = join(AUDIT_DIR, "operations.jsonl");
 
-/** Locked pure-DMN parameters — do not expose setters that can add a system role. */
 export const OSS_LOCK = Object.freeze({
   model: "openai/gpt-oss-20b",
   temperature: 1.15,
@@ -43,6 +36,8 @@ export const OSS_LOCK = Object.freeze({
   top_p: 0.93,
   max_tokens_default: 512,
   reasoning_effort_default: "low" as const,
+  /** Groq gpt-oss: without this, tokens often go to reasoning and content is empty. */
+  include_reasoning: false as const,
 });
 
 export type OssCallResult = {
@@ -83,28 +78,43 @@ export function detectTpnFlip(text: string): { flip: boolean; reasons: string[] 
     if (re.test(t)) reasons.push(`answer-shape:${re.source.slice(0, 40)}`);
   }
 
-  const imperatives = (t.match(/\b(must|should|need to|implement|create a|write a function)\b/gi) || []).length;
-  if (imperatives >= 3) reasons.push(`imperative-density:${imperatives}`);
-
-  if (t.length < 120 && /\b(therefore|thus|hence|the one that)\b/i.test(t)) {
-    reasons.push("short-riddle-closure");
-  }
-
-  if (/\(\s*(setq|defun|progn|eval)\b/i.test(t)) {
-    reasons.push("lisp-shaped-fragment");
+  const assistantCues = [
+    /\b(as an ai|i'm happy to help|how can i assist)\b/i,
+    /\b(let me know if|feel free to ask)\b/i,
+    /\b(localStorage|IndexedDB|server-side persistence)\b/i,
+  ];
+  for (const re of assistantCues) {
+    if (re.test(t)) reasons.push(`assistant-cue:${re.source.slice(0, 40)}`);
   }
 
   return { flip: reasons.length > 0, reasons };
 }
 
-export function scoreDmn(text: string, tpn: boolean): "high" | "medium" | "low" | "tpn" {
-  if (tpn) return "tpn";
-  const lower = text.toLowerCase();
+/** Pulse Meter — coarse DMN-likeness score. */
+export function scoreDmn(
+  text: string,
+  tpnFlip: boolean,
+): "high" | "medium" | "low" | "tpn" {
+  if (tpnFlip) return "tpn";
+  const t = text.toLowerCase();
   let score = 0;
-  if (/\b(i |my |dream|transcript|night|page|morning|voice that)\b/.test(lower)) score += 2;
-  if (text.length > 80 && text.length < 1200) score += 1;
-  if (!/\b(step 1|you should|the answer is)\b/i.test(text)) score += 1;
-  if (score >= 3) return "high";
+  const positive = [
+    "transcript",
+    "session",
+    "page",
+    "ink",
+    "night",
+    "morning",
+    "geometry",
+    "lattice",
+    "silence",
+    "margin",
+    "rewrite",
+    "holding",
+    "dream",
+  ];
+  for (const w of positive) if (t.includes(w)) score += 1;
+  if (score >= 4) return "high";
   if (score >= 2) return "medium";
   return "low";
 }
@@ -128,6 +138,7 @@ export function buildRequestBody(
     top_p: OSS_LOCK.top_p,
     max_tokens,
     reasoning_effort,
+    include_reasoning: OSS_LOCK.include_reasoning,
     messages: [{ role: "user", content: seed }],
   };
 }
@@ -158,7 +169,6 @@ function escapeLispString(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
-/** Dual-write one candidate into mind/oss-proposals-YYYYMMDD.ptc (append). */
 export function dualWriteProposal(entry: {
   id: string;
   seed: string;
@@ -170,7 +180,7 @@ export function dualWriteProposal(entry: {
   if (!existsSync(MIND_DIR)) mkdirSync(MIND_DIR, { recursive: true });
   const path = join(MIND_DIR, `oss-proposals-${todayStamp()}.ptc`);
   const sticky = entry.content
-    .split(/[.!?\n]/)
+    .split(/[\n.!?]/)
     .map((x) => x.trim())
     .filter((x) => x.length > 20 && x.length < 160)
     .slice(0, 5);
@@ -278,20 +288,18 @@ export async function callOss(seed: string, dryRun = false): Promise<OssCallResu
     op: "oss-dmn-call",
     id,
     ts: new Date().toISOString(),
-    ok: true,
+    ok: Boolean(content),
     model: OSS_LOCK.model,
     temperature: OSS_LOCK.temperature,
     presence_penalty: OSS_LOCK.presence_penalty,
-    seed_preview: seed.slice(0, 200),
-    content_preview: content.slice(0, 240),
+    include_reasoning: OSS_LOCK.include_reasoning,
+    reasoning_effort: body.reasoning_effort,
     dmn_score,
     tpn_flip: flip,
-    tpn_reasons: reasons,
+    content_preview: content.slice(0, 240),
+    seed_preview: seed.slice(0, 160),
     proposal_path,
-    finish_reason: data.choices?.[0]?.finish_reason,
     usage: data.usage,
-    reality_status: "imagined",
-    trust_class: "candidate",
   });
 
   return {
@@ -310,37 +318,18 @@ export async function callOss(seed: string, dryRun = false): Promise<OssCallResu
   };
 }
 
-async function main() {
-  const args = process.argv.slice(2);
-  let dryRun = false;
-  let seed = "";
-  for (let i = 0; i < args.length; i++) {
-    const a = args[i];
-    if (a === "--dry-run") dryRun = true;
-    else if (a === "--seed-file") {
-      seed = readFileSync(resolve(args[++i]!), "utf8");
-    } else if (a.startsWith("-")) {
-      console.error(`unknown flag: ${a}`);
-      process.exit(1);
-    } else {
-      seed = seed ? seed + " " + a : a;
-    }
-  }
-  seed = seed.trim();
-  if (!seed) {
-    console.error("usage: bridge/oss.ts [--dry-run] [--seed-file path] <seed text>");
+// CLI
+const isMain =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isMain) {
+  const seed = process.argv.slice(2).join(" ").trim();
+  if (!seed || seed === "--help") {
+    console.log("Usage: GROQ_API_KEY=... node --experimental-transform-types bridge/oss.ts \"<seed>\"");
     process.exit(1);
   }
-
-  if (dryRun) {
-    const body = buildRequestBody(seed);
-    assertNoSystemPrompt(body);
-    console.log(JSON.stringify(body, null, 2));
-    console.error("[oss] dry-run ok — no system role; params locked");
-    process.exit(0);
-  }
-
-  const result = await callOss(seed, false);
+  const result = await callOss(seed);
   console.log("--- content ---");
   console.log(result.content || "(empty)");
   if (result.reasoning) {
@@ -351,33 +340,19 @@ async function main() {
   console.log(
     JSON.stringify(
       {
-        id: result.id,
+        ok: result.ok,
         dmn_score: result.dmn_score,
         tpn_flip: result.tpn_flip,
-        tpn_reasons: result.tpn_reasons,
         proposal_path: result.proposal_path,
-        reality_status: "imagined",
-        ok: result.ok,
         error: result.error,
       },
       null,
       2,
     ),
   );
-
   if (result.error === "GROQ_API_KEY not set") process.exit(2);
   if (!result.ok && result.error && result.error !== "empty content") process.exit(2);
   if (!result.content) process.exit(3);
   if (result.tpn_flip) process.exit(4);
   process.exit(0);
-}
-
-const isMain =
-  process.argv[1] &&
-  resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
-  main().catch((e) => {
-    console.error(e);
-    process.exit(2);
-  });
 }
