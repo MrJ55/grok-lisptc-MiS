@@ -52,11 +52,27 @@
         (cons :nudge-craft (dmn-nudge-craft))
         (cons :preflight-required t)
         (cons :preflight-form 'dmn-oracle-preflight)
-        (cons :dual-write '(:reality-status imagined :trust-class candidate :path "mind/oss-proposals-YYYYMMDD*.ptc"))
+        (cons :dual-write (list
+                              (cons :path "mind/oss-proposals-YYYYMMDD*.ptc")
+                              (cons :required-keys '(:reality-status imagined
+                                                     :trust-class candidate
+                                                     :oracle-unfinished
+                                                     :oracle-sought-guidance
+                                                     :oracle-success-criterion
+                                                     :sticky
+                                                     :seed
+                                                     :voices
+                                                     :weave
+                                                     :interpret))
+                              (cons :note "Every Chorus dual-write records the oracle triple used and post-job interpret.")))
+        (cons :observer (list
+                          (cons :path "state/audit/salience-decisions.jsonl")
+                          (cons :think-fields '(:ts :decision think :reason :oracle-unfinished :oracle-sought-guidance :action))
+                          (cons :after-interpret-fields '(:ts :decision act-or-no-clear-guidance :reason :sticky :proposed-act :veto))))
         (cons :translate-zh t)
         (cons :interpret-duty t)
         (cons :interpret-form 'dmn-chorus-interpret)
-        (cons :instruction "Never run Chorus without (dmn-oracle-preflight) ok. After job: interpret sticky before claiming guidance. Never eval OSS prose.")))
+        (cons :instruction "Never run Chorus without (dmn-oracle-preflight) ok. After job: interpret sticky before claiming guidance. Dual-write must include oracle triple keys. Never eval OSS prose.")))
 
 (defun dmn-suggest-seed (thread-or-tension)
   "Return an incomplete first-person seed biased by THREAD-OR-TENSION. Host may edit."

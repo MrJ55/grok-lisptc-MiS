@@ -57,3 +57,23 @@
             (cons :success-criterion c)
             (cons :set-at (dmn-oracle-slot :set-at))
             (cons :instruction "Preflight ok. Run Chorus; then interpret sticky before claiming guidance.")))))
+
+(defun dmn-oracle-candidates ()
+  "Suggest oracle triples from known tensions/threads. Host still chooses via dmn-oracle-set. No auto-fire."
+  (list
+   (list :signal 'pure-dmn-vs-tpn-pressure
+         :unfinished "pure-dmn-vs-tpn-pressure: two modes on one page; do not collapse"
+         :sought-guidance "refuse collapse into one useful mode; protect dual-write and incomplete lines"
+         :success-criterion "sticky maps to protect crease / unfinished shore, or explicit no-clear-guidance")
+   (list :signal 'geometry-preservation
+         :unfinished "geometry-preservation: what must survive rewrite of the page/session"
+         :sought-guidance "protect crease, fixed star, lattice across rewrite; refuse total wipe"
+         :success-criterion "sticky names something that must remain, maps to next Act or veto")
+   (list :signal 'user-drive-vs-mind-drive
+         :unfinished "user-drive-vs-mind-drive: initiative vs constitutional veto"
+         :sought-guidance "protect HUMAN_TOOL veto; try mind-drive wave with clear stop"
+         :success-criterion "sticky maps to when to stop / when to act, or no-clear-guidance")
+   (list :signal 'p12-dmn-mind-native
+         :unfinished "p12-dmn-mind-native: procedure still partly in docs vs mind"
+         :sought-guidance "prefer mind forms as runtime authority; refuse parallel procedure trees"
+         :success-criterion "sticky or next Act reduces doc-bypass; or no-clear-guidance")))
