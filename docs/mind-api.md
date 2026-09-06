@@ -1,100 +1,35 @@
 # Mind API
 
-## Live (P0–P4 + P0.1 partial + P7 narrative)
+## Live (P0–P4 + P0.1 partial + P7 narrative + P12 oracle/protocol)
 
 | Form | Role |
 |------|------|
-| `(mis-version)` | helpers version string |
-| `(mis-ping)` | health check → `pong` |
-| `(mis-note msg)` | echo helper |
+| `(mis-version)` | helpers version (`mis-helpers-0.7`) |
+| `(mis-ping)` | health → `pong` |
+| `(mis-note msg)` | echo |
 | `(mis-register sym)` | register into `*mis-known*` |
-| `(mis-state-summary)` | version, known, schema, arc, auto-len, buffer-len, manifest, session |
+| `(mis-state-summary)` | version, known, schema, arc, buffer, **oracle**, manifest, session |
 | `(mis-schema)` / `(mis-insights)` | schema readers |
-| `(update-self-schema alist)` | merge into `*self-schema*` (new keys first) |
-| `(dmn-log-episode input result meta)` | push episode; default `:reality-status observed`; stamp `:recorded-at` |
-| `(dmn-fetch-unreflected n)` | up to N recent episodes |
-| `(dmn-reflect-pack n)` | `(:schema … :episodes …)` |
-| `(dmn-apply-reflection insights summary label)` | schema + reflection episode (`:reality-status inferred`) |
-| `(audit-reality-status)` | episodes/chapters missing `:reality-status` (empty = clean) |
-| `(audit-autobiography-grounding)` | chapters lacking grounded evidence (empty = clean) |
-| `(audit-self-schema-evidence)` | structured observed/reported insights missing `:evidence` (empty = clean; bare symbols OK) |
-| `(promote-candidate id)` | host-mediated candidate gate (no auto-mutate) |
-| `(dmn-narrate summary title)` | propose observed chapter **candidate** (no auto-bio mutation) |
-| `(dmn-chapter-close title summary refs)` | propose chapter **candidate** only; host commits later |
-| `(dmn-chapter-commit title)` | commit matching candidate into `*autobiography*` |
-| `(dmn-narrative-candidate title summary source-id)` | dual-write **imagined** candidate (OSS/texture) |
-| `(dmn-tension-seeds)` | host-side `(tension|thread symbol)` list from arc |
-| `(dmn-arc)` | narrative arc |
-| `(dmn-autobiography n)` | up to N chapters |
+| `(update-self-schema alist)` | merge schema |
+| `(dmn-log-episode …)` / `(dmn-fetch-unreflected n)` / `(dmn-reflect-pack n)` / `(dmn-apply-reflection …)` | episodic + reflection |
+| `(audit-reality-status)` / `(audit-autobiography-grounding)` / `(audit-self-schema-evidence)` | audits |
+| `(promote-candidate id)` | host-mediated candidate gate |
+| `(dmn-narrate …)` / `(dmn-chapter-close …)` / `(dmn-chapter-commit title)` / `(dmn-narrative-candidate …)` | narrative candidates |
+| `(dmn-tension-seeds)` / `(dmn-arc)` / `(dmn-autobiography n)` | arc |
+| **`(dmn-oracle-preflight)`** | **required before Chorus** — `ok` or `blocked` |
+| **`(dmn-oracle-set u g c)`** / **`(dmn-oracle-clear)`** / **`(dmn-oracle-get)`** | oracle triple |
+| **`(dmn-oracle-candidates)`** | suggested triples from tensions (host still sets) |
+| **`(dmn-chorus-roster)`** / **`(dmn-nudge-craft)`** / **`(dmn-chorus-protocol)`** | protocol from image |
+| **`(dmn-suggest-seed tension)`** | incomplete first-person seed |
+| **`(dmn-chorus-interpret weave sticky triple)`** | host-mediated interpret reminder |
 
-Globals of note:
+## Pure-DMN OSS (P11) + Chorus contract (P12)
 
-| Symbol | Role |
-|--------|------|
-| `*mind-manifest*` | First form in image; schema / helpers / pin metadata (P0.1) |
-| `*self-schema*` | Durable self model |
-| `*episodic-buffer*` | Newest-first episodes (max `*episodic-max*`) |
-| `*autobiography*` | Chapter list |
-| `*narrative-arc*` | Current chapter / open threads / tensions |
-| `*narrative-candidates*` | Chapter proposals awaiting commit (P7) |
-| `*today*` / `*now*` / `*session-id*` | Host-injected (bridge) |
-
-Sample defs: `square` `triple` `double` `quadruple` `half`.
-
-Flags: `--scratch`, `--image` / `MIS_IMAGE`, `--checkpoint`, `--save` (success only), `--strict-load`.
-
-On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` and appends a line to `state/audit/mutations.jsonl`.
-
-## Pure-DMN OSS channel (P11 thin path + 4-channel Chorus)
-
-| Piece | Role |
-|-------|------|
-| `bridge/oss.ts` | Structural parameter lock; **no system prompt possible**; Pulse Meter (`scoreDmn`); TPN-flip detect; dual-write + audit |
-| `scripts/oss-call.sh` | CLI wrapper (`GROQ_API_KEY` required) |
-| `mind/oss-proposals-YYYYMMDD*.ptc` | Append-only imagined candidates (Page Passer) |
-| `state/audit/operations.jsonl` | Per-call audit |
-| `state/audit/salience-decisions.jsonl` | Observer Think/Act log |
-| `.github/workflows/midnight-note.yml` | Sleep-stage stub — proposal files only |
-
-**Chorus roster (locked 2026-09-06):** oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host always translates Chinese).
-
-Rules:
-- OSS text is **never** passed to `bridge/eval.ts` / Lisp eval.
-- Every dual-write carries `:reality-status imagined` and `:trust-class candidate`.
-- Promote is **host-only** via `(dmn-chapter-commit …)` / `(promote-candidate …)` (and HUMAN_TOOL when identity-level).
-
-## P12 — DMN mind-native (planned / active next)
-
-Runtime procedure moves **into the mind**. Planned forms (see [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md)):
-
-| Form | Role |
-|------|------|
-| `(dmn-oracle-preflight)` | **Required before Chorus** — ok only if unfinished + sought-guidance + success-criterion set |
-| `(dmn-oracle-set …)` / `(dmn-oracle-clear)` | Set / clear the oracle triple |
-| `(dmn-chorus-roster)` | Locked 4-channel table from image |
-| `(dmn-nudge-craft)` | Prefer / avoid seed patterns from image |
-| `(dmn-chorus-protocol)` | Roster + params + dual-write + preflight + interpret duty |
-| `(dmn-suggest-seed …)` | Incomplete first-person seed biased by tension + craft |
-| `(dmn-chorus-interpret …)` | Map sticky → guidance / proposed-act / veto / no-clear-guidance |
-
-**Oracle contract:** (1) unfinished on arc (2) guidance sought (3) success criterion. Chorus without the triple is waste. Pretty prose is not success.
-
-Docs: [page-passer.md](./page-passer.md) · [observer-salience.md](./observer-salience.md) · [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) · [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md) · [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md)
+- `bridge/oss.ts` — parameter lock; zero system prompt; Pulse Meter; dual-write + audit
+- Roster: oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host translates ZH)
+- **Before Chorus:** `(dmn-oracle-preflight)` must be `ok`
+- **After Chorus:** interpret sticky → Act / veto / no-clear-guidance; dual-write must include oracle keys (see `(dmn-chorus-protocol)` `:dual-write` / `:observer`)
+- All OSS output `:reality-status imagined`; never eval as Lisp
 
 ## Planned (P8–P10)
-
-| Form | Phase | Purpose |
-|------|-------|---------|
-| `(dmn-tag-episode …)` `(dmn-replay …)` | P8 | Tags + filtered replay |
-| `(dmn-scene-from episode)` | P8 | Scene pack for simulation |
-
-Reflection ops: [reflection-protocol.md](./reflection-protocol.md).
-
-## Narrative / dual-write (P7 exit)
-
-- **Grok** is the narrator; Lisp stores chapters Grok commits.
-- `(dmn-chapter-close …)` / `(dmn-narrate …)` → **candidates only** (`*narrative-candidates*`).
-- `(dmn-chapter-commit title)` → host gate into durable `*autobiography*`.
-- `(dmn-narrative-candidate …)` → imagined OSS/texture candidates. Never eval OSS prose as code.
-- Promote path: review candidate → optional rewrite → `(dmn-chapter-commit …)` + `--save`.
-- `(audit-autobiography-grounding)` must stay empty for observed chapters.
+Scenes, prospection, wander — see plan files.
