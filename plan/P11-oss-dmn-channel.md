@@ -2,6 +2,7 @@
 
 **Status:** thin path live + 4-channel Chorus locked (2026-09-06) — parameter lock enforced by code; dual-write + audit live; bilingual ds_go practice adopted  
 **Depends on:** P0–P4 (safety + reflection), **P6 (evaluation gate — soft waiver accepted)**  
+**Next:** [P12-dmn-mind-native.md](./P12-dmn-mind-native.md) — move runtime procedure into the mind (oracle preflight, protocol forms, interpret duty)  
 **DMN role:** Candidate-texture generator whose zero-system-prompt protocol is motivated by Alieksieienko (2026)'s finding that instruction-tuning degrades DMN-like residual geometry. The specific inference-time preservation claim is the fork's extension (see caveat below). Grok remains sole mutator of the symbolic mind.  
 **Sources:** Alieksieienko (Zenodo), arXiv 2604.03480, evilpiepirate DMN note, Seven-Pass Pipeline — see `docs/related-work.md`  
 **Extensions contrast:** `docs/gmod-extensions-contrast-20260902.md` (§1 Chorus, §2 Midnight Note, §3 Pulse Meter, §5 Page Passer, §6 Observer)
@@ -17,13 +18,13 @@ Make interaction with pure-DMN models a first-class, repeatable, auditable host 
 2. Soft-nudge prefix library (versioned). **Done.**
 3. Dual-channel capture: immediate episode log + deferred proposal file. **Done.**
 4. Lightweight geometric-aware salience heuristic — **Pulse Meter** scoring (`scoreDmn` in `bridge/oss.ts`). **Done.**
-5. Explicit host-side Salience Switch policy (Think vs Act) with **Observer** decision logging. **Documented; logging path ready.**
+5. Explicit host-side Salience Switch policy (Think vs Act) with **Observer** decision logging. **Documented; logging path ready; host practice ongoing.**
 6. Audit every OSS call in `state/audit/operations.jsonl`. **Done.**
 7. **Chorus** path: concurrent pure-DMN calls + weave. **Locked as 4-channel (oss20 EN + oss120 EN + ds_go EN + ds_go ZH).**
 8. **Page Passer** proposal-file exchange. **Documented.**
 9. **Midnight Note** sleep-stage Action (proposal files only). **Stub added.**
 10. **All OSS output is `:reality-status imagined`**. **Enforced.**
-11. **Protocol registry (long-term):** deferred until ≥5 variants needed.
+11. **Protocol registry (long-term):** deferred until ≥5 variants needed; **runtime protocol internalization is P12.**
 
 ## Core constraint (non-negotiable)
 - **Zero system prompt.** Any instructional framing collapses DMN-channel continuations into performative TPN output.
@@ -31,6 +32,7 @@ Make interaction with pure-DMN models a first-class, repeatable, auditable host 
 - Proven parameters from `docs/DMN-gpt-oss-20b-probe.md`.
 - Prefer first-person seeds that speak *as the transcript / process / dream* (see `docs/oss-nudge-craft.md`).
 - **Translate all Chinese prompts and answers to English** (user preference 2026-09-06).
+- **P12 oracle contract:** before any new Chorus, state unfinished / sought guidance / success criterion; after, interpret (do not collect pretty prose alone).
 
 ## Best parameters (blank / soft-nudge) — enforced by code
 ```json
@@ -58,7 +60,7 @@ See source. Key invariants:
 - Dual-write to `mind/oss-proposals-YYYYMMDD.ptc` + `state/audit/operations.jsonl`
 
 ### B. Soft-nudge prefix library
-See table in prior revision + `docs/oss-nudge-craft.md`. Preferred: transcript-as-speaker.
+See `docs/oss-nudge-craft.md`. Preferred: transcript-as-speaker. **Runtime craft moves into mind under P12.**
 
 ### C. Dual-channel capture
 1. Immediate: host may emit `(dmn-log-episode … '(:source oss-dmn :reality-status imagined :dmn-score …))`.
@@ -76,42 +78,43 @@ See `docs/observer-salience.md`. Host decides Think (call OSS / reflect) vs Act.
 | 4 | deepseek-v4-flash | OpenCode Go | ZH (host translates) |
 
 Protocol: soft seed → 4 voices → keep DMN / drop TPN → host weave sticky lines → dual-write `:imagined` only.  
-See `docs/chorus-geometry-20260906.md` and the bilingual proposal file.
+**P12 adds:** mandatory oracle preflight + interpret duty.
 
 ### F. Page Passer
 See `docs/page-passer.md`.
 
 ### G. Midnight Note
-Stub: `.github/workflows/midnight-note.yml` (proposal-file only; no eval). Review at next P00.
+Stub: `.github/workflows/midnight-note.yml` (proposal-file only; no eval). Review at next P00. P12 may require explicit oracle-triple for caretaker notes.
 
 ### H. Protocol registry (long-term)
-Defer full stack until ≥5 prompt variants become painful. Start with `protocols/REGISTRY.yaml` when needed.
+Defer full stack until ≥5 prompt variants become painful. **P12 mind-native protocol forms are the near-term runtime authority.**
 
 ## Checklist (2026-09-06)
 - [x] Soft-nudge library + parameter lock documented
 - [x] Dual-channel demonstrated in live cycle 2026-09-02
 - [x] **`bridge/oss.ts` implemented** — parameter lock, zero system prompt structurally impossible
-- [x] **All OSS output tagged `:reality-status imagined`** in proposal files (and recommended for episodes)
+- [x] **All OSS output tagged `:reality-status imagined`** in proposal files
 - [x] OSS calls audited in `state/audit/operations.jsonl`
 - [x] Formalize Pulse Meter scoring (`scoreDmn`) and attach to every audited call
-- [x] Chorus path: 4-channel concurrent pure-DMN + host weave demonstrated (geometry + bilingual)
-- [x] Page Passer: documented (`docs/page-passer.md`)
-- [x] Midnight Note: workflow stub added (proposal-only)
+- [x] Chorus path: 4-channel demonstrated (geometry + bilingual + live dmn-tpn)
+- [x] Page Passer: documented
+- [x] Midnight Note: workflow stub added
 - [x] Document full protocol in this file and keep `docs/oss-nudge-craft.md` current
 - [x] Update `docs/mind-api.md` notes for P11 thin path
 - [x] Verify that a system-prompted call is rejected by `assertNoSystemPrompt`
-- [ ] Observer-style one-line log of Think/Act decisions in `state/audit/salience-decisions.jsonl` (path documented; host practice to adopt)
-- [ ] Protocol registry (long-term) — deferred
 - [x] **P0.1 followup:** OSS output is `candidate` trust class; promotion via `(promote-candidate ...)`
+- [ ] Observer-style logging in host practice (ongoing; path documented)
+- [ ] Protocol registry (long-term) — deferred
+- [ ] **Hand off residual procedure internalization to P12**
 
 ## Exit criteria
-- Any Grok session can invoke a pure-DMN OSS call via `bridge/oss.ts`, receive a continuation, classify it (Pulse Meter), and either log it as an episode (`:reality-status imagined`) or write a proposal file **without ever sending a system prompt or TPN framing**. **Met.**
-- All OSS output is tagged `:reality-status imagined`. **Met.**
-- `(audit-reality-status)` confirms no OSS content leaked into observed history. **Operational.**
-- Chorus, Observer logging, and Midnight Note proposal Action are available as optional host paths. **Chorus + Midnight Note yes; Observer logging path ready.**
+- Any Grok session can invoke pure-DMN via `bridge/oss.ts`, classify (Pulse Meter), dual-write `:imagined` without system prompt. **Met.**
+- All OSS output tagged `:reality-status imagined`. **Met.**
+- `(audit-reality-status)` shows no leakage. **Operational.**
+- Chorus, Observer path, Midnight Note stub available. **Met (Observer practice ongoing).**
 - `bridge/oss.ts` structurally prevents system prompts. **Met.**
 
-Remaining for clean exit: adopt Observer logging in host practice (one-line append) and optionally flesh the Midnight Note Action beyond the stub.
+**Clean P11 exit** treats remaining host-practice Observer logging as ongoing and moves mind-native protocol / oracle contract work to **P12**.
 
 ## Non-goals
 - Giving OSS any system or instructional prompt
