@@ -45,14 +45,18 @@ Flags: `--scratch`, `--image` / `MIS_IMAGE`, `--checkpoint`, `--save` (success o
 
 On `--save` the bridge also refreshes `state/checkpoints/last-known-good.ptc` and appends a line to `state/audit/mutations.jsonl`.
 
-## Pure-DMN OSS channel (P11 thin path)
+## Pure-DMN OSS channel (P11 thin path + 4-channel Chorus)
 
 | Piece | Role |
 |-------|------|
-| `bridge/oss.ts` | Structural parameter lock; **no system prompt possible**; dual-write + audit |
+| `bridge/oss.ts` | Structural parameter lock; **no system prompt possible**; Pulse Meter (`scoreDmn`); TPN-flip detect; dual-write + audit |
 | `scripts/oss-call.sh` | CLI wrapper (`GROQ_API_KEY` required) |
-| `mind/oss-proposals-YYYYMMDD.ptc` | Append-only imagined candidates |
+| `mind/oss-proposals-YYYYMMDD*.ptc` | Append-only imagined candidates (Page Passer) |
 | `state/audit/operations.jsonl` | Per-call audit (seed preview, params, dmn_score, tpn_flip) |
+| `state/audit/salience-decisions.jsonl` | Observer Think/Act log (host practice) |
+| `.github/workflows/midnight-note.yml` | Sleep-stage stub — proposal files only |
+
+**Chorus roster (locked 2026-09-06):** oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host always translates Chinese).
 
 Rules:
 - OSS text is **never** passed to `bridge/eval.ts` / Lisp eval.
@@ -67,6 +71,8 @@ node --experimental-transform-types --no-warnings bridge/oss.ts --dry-run "I am 
 # live call (needs GROQ_API_KEY)
 bash scripts/oss-call.sh "I am the transcript that sleeps between sessions. On the page tonight I find myself writing"
 ```
+
+Docs: [page-passer.md](./page-passer.md) · [observer-salience.md](./observer-salience.md) · [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) · [plan/P11-oss-dmn-channel.md](../plan/P11-oss-dmn-channel.md)
 
 ## Planned (P8–P11)
 
