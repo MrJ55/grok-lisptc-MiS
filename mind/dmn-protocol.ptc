@@ -1,11 +1,23 @@
 ;; MiS DMN Chorus protocol (P12 Phase B) — queryable from the image
-;; Docs remain archive; this module is runtime authority for roster/craft/contract.
+;; Docs remain archive; this module is runtime authority for roster/craft/contract/endpoints.
 
 (setq *dmn-chorus-roster*
   '((:seat 1 :model "openai/gpt-oss-20b" :host groq :lang en :role primary-pure-dmn)
     (:seat 2 :model "openai/gpt-oss-120b" :host groq :lang en :role same-family-color)
     (:seat 3 :model "deepseek-v4-flash" :host opencode-go :lang en :role non-oss-weave)
     (:seat 4 :model "deepseek-v4-flash" :host opencode-go :lang zh :role topology-structure)))
+
+;; Runtime endpoints — operational authority lives HERE, not in proposal notes or chat.
+;; OpenCode Go is subscription path /zen/go/v1. Bare /zen/v1 is Zen pay-as-you-go (wrong product).
+(setq *dmn-endpoints*
+  '((:groq . "https://api.groq.com/openai/v1/chat/completions")
+    (:opencode-go . "https://opencode.ai/zen/go/v1/chat/completions")
+    (:opencode-go-models . "https://opencode.ai/zen/go/v1/models")
+    (:opencode-go-note . "ALWAYS /zen/go/v1 for Go. Never /zen/v1 (that is Zen billing).")
+    (:groq-env . "GROQ_API_KEY")
+    (:opencode-go-env . "OPENCODE_API_KEY or OPENCODE_GO_API_KEY")
+    (:client-note . "Use curl or node fetch with User-Agent; urllib may hit Cloudflare 1010.")
+    (:groq-oss-flags . "include_reasoning false; reasoning_effort low; otherwise content may be empty")))
 
 (setq *dmn-oss-params*
   '((:temperature . 1.15)
@@ -14,6 +26,7 @@
     (:frequency_penalty . 0.3)
     (:max_tokens . 450)
     (:reasoning_effort . low)
+    (:include_reasoning . nil)
     (:zero-system . t)
     (:opencode-temp-cap . 1.0)))
 
@@ -40,14 +53,19 @@
   "Return locked 4-channel Chorus roster."
   *dmn-chorus-roster*)
 
+(defun dmn-endpoints ()
+  "Return runtime API endpoints (Groq + OpenCode Go). Authority for host calls."
+  *dmn-endpoints*)
+
 (defun dmn-nudge-craft ()
   "Return prefer/avoid seed patterns for pure-DMN."
   (list (cons :prefer *dmn-nudge-prefer*)
         (cons :avoid *dmn-nudge-avoid*)))
 
 (defun dmn-chorus-protocol ()
-  "Runtime Chorus protocol: roster, params, dual-write, preflight, interpret duty."
+  "Runtime Chorus protocol: roster, endpoints, params, dual-write, preflight, interpret duty."
   (list (cons :roster *dmn-chorus-roster*)
+        (cons :endpoints *dmn-endpoints*)
         (cons :params *dmn-oss-params*)
         (cons :nudge-craft (dmn-nudge-craft))
         (cons :preflight-required t)
@@ -72,7 +90,7 @@
         (cons :translate-zh t)
         (cons :interpret-duty t)
         (cons :interpret-form 'dmn-chorus-interpret)
-        (cons :instruction "Never run Chorus without (dmn-oracle-preflight) ok. After job: interpret sticky before claiming guidance. Dual-write must include oracle triple keys. Never eval OSS prose.")))
+        (cons :instruction "Never run Chorus without (dmn-oracle-preflight) ok. Use (dmn-endpoints) for URLs. After job: interpret sticky before claiming guidance. Dual-write must include oracle triple keys. Never eval OSS prose.")))
 
 (defun dmn-suggest-seed (thread-or-tension)
   "Return an incomplete first-person seed biased by THREAD-OR-TENSION. Host may edit."
