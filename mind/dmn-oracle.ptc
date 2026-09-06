@@ -1,0 +1,59 @@
+;; MiS DMN oracle contract (P12 Phase A)
+;; Mandatory preflight before any Chorus: unfinished + sought-guidance + success-criterion.
+;; Host sets explicitly; no auto-fire from tensions.
+(setq *dmn-oracle*
+  '((:unfinished . nil)
+    (:sought-guidance . nil)
+    (:success-criterion . nil)
+    (:set-at . nil)
+    (:last-result . nil)))
+
+(defun dmn-oracle-get ()
+  "Return current oracle triple alist."
+  *dmn-oracle*)
+
+(defun dmn-oracle-set (unfinished guidance criterion)
+  "Set oracle triple for a purposeful Chorus. Returns the packed oracle."
+  (setq *dmn-oracle*
+        (list (cons :unfinished unfinished)
+              (cons :sought-guidance guidance)
+              (cons :success-criterion criterion)
+              (cons :set-at *now*)
+              (cons :last-result nil)))
+  *dmn-oracle*)
+
+(defun dmn-oracle-clear ()
+  "Clear oracle triple after interpret or abort. Returns cleared oracle."
+  (setq *dmn-oracle*
+        '((:unfinished . nil)
+          (:sought-guidance . nil)
+          (:success-criterion . nil)
+          (:set-at . nil)
+          (:last-result . nil)))
+  *dmn-oracle*)
+
+(defun dmn-oracle-slot (key)
+  "Return value for KEY in *dmn-oracle*, or nil."
+  (let ((p (assoc key *dmn-oracle*)))
+    (if p (cdr p) nil)))
+
+(defun dmn-oracle-preflight ()
+  "Return (ok ...) if all three gates set, else (blocked missing-gates ...)."
+  (let ((u (dmn-oracle-slot :unfinished))
+        (g (dmn-oracle-slot :sought-guidance))
+        (c (dmn-oracle-slot :success-criterion))
+        (missing nil))
+    (unless u (setq missing (cons :unfinished missing)))
+    (unless g (setq missing (cons :sought-guidance missing)))
+    (unless c (setq missing (cons :success-criterion missing)))
+    (if missing
+        (list 'blocked
+              (cons :missing (nreverse missing))
+              (cons :oracle *dmn-oracle*)
+              (cons :instruction "Call (dmn-oracle-set unfinished guidance criterion) before Chorus."))
+      (list 'ok
+            (cons :unfinished u)
+            (cons :sought-guidance g)
+            (cons :success-criterion c)
+            (cons :set-at (dmn-oracle-slot :set-at))
+            (cons :instruction "Preflight ok. Run Chorus; then interpret sticky before claiming guidance.")))))

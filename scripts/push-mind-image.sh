@@ -14,6 +14,7 @@ if command -v git >/dev/null 2>&1 && [[ -d "$REPO_ROOT/.git" ]]; then
     mind/episodes.ptc \
     mind/autobiography.ptc \
     mind/arithmetic.ptc \
+    mind/dmn-oracle.ptc \
     mind/oss-proposals-*.ptc \
     2>/dev/null || true
   # mind-failures.log is ephemeral (*.log gitignored) — do not stage
@@ -29,7 +30,7 @@ else
 [mis] git push not available here. From Grok with GitHub connected, push:
   mind/mind-image.ptc
   mind/helpers.ptc mind/schema.ptc mind/episodes.ptc
-  mind/autobiography.ptc mind/arithmetic.ptc
+  mind/autobiography.ptc mind/arithmetic.ptc mind/dmn-oracle.ptc
 Scratch (mind-scratch.ptc) and mind-failures.log should NOT be pushed as permanent mind.
 HINT
   exit 0
