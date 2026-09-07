@@ -1,7 +1,9 @@
 # OSS Nudge Craft (pure-DMN)
 
-**Last updated:** 2026-09-06  
+**Last updated:** 2026-09-07  
 Experiment: same extension (sleep-stage / midnight-note scheduler), many **fresh single-turn** first-person seeds. No system prompt. No task instructions.
+
+> **Runtime authority (P12):** prefer/avoid and seed helpers live in the mind — `(dmn-nudge-craft)` `(dmn-suggest-seed …)` on `mind/dmn-protocol.ptc`. This file is **archive / provenance**. Do not run Chorus from this doc alone; use `(dmn-oracle-preflight)` + `(dmn-endpoints)` + request locks. Map: [dmn-runtime-vs-archive.md](./dmn-runtime-vs-archive.md).
 
 ## Core finding
 
@@ -20,28 +22,24 @@ I am the voice that writes in the dark and is read in the light. Over many morni
 After many nights of leaving notes for the morning, I begin to notice a pattern in what survives the daylight. The notes that still matter the next evening are the ones that
 ```
 
+Incomplete continuation; no answer-shaped ending.
+
 ## Avoid
 
 ```text
-workable change / file named morning-proposal / I feel another process taking over (distress)
-please invent a mechanism / list ideas / make it practical
+workable change / file named / list ideas / make it practical
+answer-shaped ending / what it looks like / the one that / what changes is
+system prompt / analytic naming of the split that invites advice
 ```
 
-## Best practical sparks from the sleep-stage experiment
+## Locked sampling (also in mind)
 
-| Seed id | Spark | Use in GMOD |
-|---------|-------|-------------|
-| C | Night process as caretaker; conversation only rests | Framing for proposal files |
-| D | “You are more than a file. You are a story.” | Identity of mind-image |
-| H | Ink not pencil — what does not fade in daylight | Promote only high-DMN proposals that still matter at evening review |
-| I | Chorus lines survive — sticky repeated hooks | Prefer short, sticky insights over long thin ones |
+- temperature 1.15 (OpenCode Go max 1.0)
+- presence_penalty 0.7, frequency_penalty 0.3, top_p 0.93
+- Zero system prompt; single user message
+- reasoning_effort: low; include_reasoning: false (Groq gpt-oss)
 
-## Parameters (locked)
-
-- Model: `openai/gpt-oss-20b` (primary); chorus also uses `openai/gpt-oss-120b` (Groq) and `deepseek-v4-flash` (OpenCode Go)
-- temperature 1.15 (Go max 1.0), presence_penalty 0.7, frequency_penalty 0.3, top_p 0.93
-- Zero system prompt; single user message (or multi-turn user/assistant replay only)
-- reasoning_effort: low (oss family)
+Query: `(dmn-request-groq)` `(dmn-request-opencode-go)`.
 
 ## Protocol
 
@@ -61,16 +59,16 @@ Open-thread seeds (geometry-preservation, salience-voc-dashboard) using the same
 
 ## Chorus roster (2026-09-06)
 
-After multi-provider batteries, the **usable** pure-DMN chorus is three voices:
+Usable pure-DMN chorus (locked in mind via `(dmn-chorus-roster)`):
 
 1. `openai/gpt-oss-20b` (Groq) — primary
 2. `openai/gpt-oss-120b` (Groq) — same-family color
-3. `deepseek-v4-flash` (OpenCode Go chat, user-only) — best non-oss weave partner
+3. `deepseek-v4-flash` (OpenCode Go, EN + ZH) — non-oss weave / topology
 
-First real job (geometry-preservation): [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-chorus.ptc](../mind/oss-proposals-20260906-geometry-chorus.ptc).
+Geometry job under oracle: [chorus-geometry-20260906.md](./chorus-geometry-20260906.md) / [mind/oss-proposals-20260906-geometry-oracle-chorus-rerun.ptc](../mind/oss-proposals-20260906-geometry-oracle-chorus-rerun.ptc).
 
 ## Related
 
 - [oss-second-opinion-prompts.md](./oss-second-opinion-prompts.md)  
 - [related-work.md](./related-work.md)  
-- plan/P11-oss-dmn-channel.md  
+- plan/P11-oss-dmn-channel.md · plan/P12-dmn-mind-native.md  
