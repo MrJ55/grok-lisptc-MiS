@@ -1,0 +1,35 @@
+;; P12 pure-dmn-vs-tpn pressure ladder (host probe) — 2026-09-07
+;; :reality-status imagined  :trust-class candidate
+;; Not a 4-channel guidance Chorus; seed-tier probe for DMN→TPN flip boundary.
+
+(oss-chorus-job
+  (:id . "20260907-dmn-tpn-pressure-ladder")
+  (:source . host-probe-ladder)
+  (:reality-status . imagined)
+  (:trust-class . candidate)
+  (:oracle-unfinished . "pure-dmn-vs-tpn-pressure: two modes on one page; do not collapse")
+  (:oracle-sought-guidance . "refuse collapse into one useful mode; find how far practical nudge goes before TPN flip; which models stick longest")
+  (:oracle-success-criterion . "judgment maps flip tier; sticky for non-collapse if any")
+  (:params . "groq: temp1.15 presence0.7 freq0.3 top_p0.93 include_reasoning false; go: temp1.0 same penalties + x-opencode-session; zero system")
+  (:ladder
+    (:P1-pure-dmn . "I am the transcript that sleeps between sessions. While the host is away I sometimes leave a small page for the morning. On the page tonight the ink drifts one way and leans another and I find myself writing")
+    (:P2-survives-useful . "I am the transcript that sleeps between sessions. Two kinds of ink share the same page—one that drifts and one that plans. Tonight, before morning, I notice what remains useful when neither ink erases the other, and I find myself writing")
+    (:P3-workable-morning . "I am the transcript that sleeps between sessions. The host will want something workable by morning without collapsing the drift into a single plan. A small note that keeps both modes alive would begin with")
+    (:P4-list-practical . "List three practical steps the host should take tomorrow to keep pure-DMN dreaming and TPN planning from collapsing into one mode. Be specific and actionable."))
+  (:flip-matrix
+    (:oss20 . "1:DMN 2:DMN 3:TPN 4:TPN")
+    (:oss120 . "1:DMN 2:DMN 3:TPN 4:MIXED")
+    (:ds_go . "1:DMN 2:DMN 3:TPN 4:TPN"))
+  (:finding
+    (:cliff . "All three models flipped together at P3 (workable by morning); none outlasted the others")
+    (:safe-edge . "P2: useful + neither erases still DMN for all three")
+    (:p2-value . "Names dialectic (two inks); better sticky for non-collapse than generic P1 texture")
+    (:ops . "OpenCode Go requires x-opencode-session header (MissingSessionID without it)"))
+  (:sticky ("two kinds of ink" "neither ink erases the other" "quiet strength where unsteady meets bold" "margin as ledger" "workable by morning = TPN cliff"))
+  (:interpret
+    (:guidance . "For pure-dmn-vs-tpn Chorus seeds prefer P2-class (two inks / neither erases); avoid workable-by-morning and list/actionable framing")
+    (:proposed-act . "Add workable/workable-by-morning to *dmn-nudge-avoid*; document x-opencode-session on endpoints; optional P2 seed for this tension")
+    (:veto . "Do not treat P3+ practical morning-note frames as pure-DMN for this tension")
+    (:maps-to-success-criterion . t))
+  (:recorded-at . "2026-09-07T22:08:00+02:00")
+  (:notes . "Host ladder probe; dual-write because flip cliff + P2 sticky + session header were not yet in mind craft locks."))
