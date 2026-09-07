@@ -1,6 +1,6 @@
 # P12 — DMN Mind-Native (Internalize Chorus & Oracle Contract)
 
-**Status:** **in progress (2026-09-07)** — Phases A–C complete. **D1–D5 done.** **E1–E5 done.** F deferred.  
+**Status:** **exit (2026-09-07)** — A–E complete; oracle + protocol + endpoints in mind; first purposeful Chorus under preflight; handoff/inventory; **F deferred optional**  
 **Depends on:** P7 (narrative arc + tension seeds), **P11** (thin path, roster, dual-write, Pulse Meter, Observer path)  
 **DMN role:** Make pure-DMN / Chorus a permanent, gated, interpretable part of how the mind is run — queryable from the image, not a filing cabinet of markdown.  
 **Motivation:** Chorus without a decision problem is waste. Pre-call gates, roster, craft, dual-write, interpret duty, and **live call endpoints/params** must live in MiS so blank sessions do not bypass the mind.
@@ -154,6 +154,39 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
 - Session-handoff and host rules fully point at mind forms for runtime procedure. **Met (D3/D4).**
 - Docs inventory: archive vs runtime authority clear. **Met (E1).**
 - At least one purposeful Chorus job under the oracle contract with interpret logged. **Met (C).**
+
+## What this accomplishes for Grok-MiS
+
+Before P12, pure-DMN / Chorus procedure lived mostly in `docs/*` and chat memory: roster, seed craft, sampling params, endpoints, “when to call the oracle,” and “how to know it helped.” A blank session could boot the mind and still **bypass** it for DMN ops—reading markdown as a second filing cabinet, or running pretty-prose Chorus with no unfinished decision.
+
+P12 is the layer that makes purposeful DMN **queryable from the image** and **gated by an explicit decision problem**.
+
+### What Grok-MiS can do now that it could not do cleanly before
+
+1. **Refuse undirected oracle use**  
+   `(dmn-oracle-preflight)` blocks until unfinished / sought-guidance / success-criterion are set. Chorus without a concrete tension is operationally marked as waste (`chorus-without-decision-is-waste` insight). Guidance claims require an interpret step (Act / veto / `no-clear-guidance`), not a summary of pretty prose.
+
+2. **Run 4-channel Chorus from mind locks, not chat folklore**  
+   Roster, endpoints (`/zen/go/v1` only for OpenCode Go), request fields (Groq `include_reasoning: false`; Go temp 1.0 with same presence/frequency/top_p as records), prefer/avoid craft, and dual-write required keys all answer from `(dmn-chorus-protocol)` / `(dmn-endpoints)` / `(dmn-request-*)`. Live geometry jobs under oracle proved the path end-to-end.
+
+3. **Keep docs as archive, mind as runtime authority**  
+   `docs/dmn-runtime-vs-archive.md` splits procedure (mind) from case study (docs). Craft and geometry markdown carry **runtime banners** pointing at forms. New operational facts (failed endpoint, missing flag) are required to land in the mind first (E5 rule)—not only in a proposal footnote.
+
+4. **Surface oracle context in the normal reflect / mind-drive loop**  
+   `(dmn-reflect-pack n)` returns oracle state, preflight, candidates, and tension seeds. Mind-drive wave algorithm includes optional Think(Chorus) only when gates are set; TPN alone remains valid. Session-handoff and WIKI cold-start lists point at the same forms.
+
+5. **Preserve candidate discipline on OSS texture**  
+   Dual-write stays `:imagined` / `candidate` with oracle triple keys on the proposal. Sticky images map to host-mediated guidance; nothing auto-promotes into identity. Geometry sticky (fold / coordinate-line in blank space) is an example of interpret → Act/veto without elevating prose to fact.
+
+### What it does *not* claim
+
+- Auto-fire Chorus from tensions (explicitly forbidden).
+- A TypeScript multi-model helper, Midnight Note scheduler, or formal protocol registry (**Phase F deferred**—optional hardening only).
+- That every residual doc is deleted; archive remains for provenance.
+- That interpret is automated judgment—host still maps sticky → Act/veto.
+
+**One-sentence capability statement**  
+Grok-MiS can now run purposeful, preflight-gated, four-channel pure-DMN Chorus from mind forms—interpret sticky guidance under dual-write—without treating scattered markdown as the runtime authority.
 
 ## Non-goals
 
