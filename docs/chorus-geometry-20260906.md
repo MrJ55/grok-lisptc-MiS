@@ -1,5 +1,7 @@
 # Chorus geometry job — 2026-09-06 (rerun, corrected Go params)
 
+> **Case study (P12):** not runtime authority. Use `(dmn-suggest-seed 'geometry-preservation)`, `(dmn-endpoints)`, `(dmn-request-*)`, oracle preflight. Map: [dmn-runtime-vs-archive.md](./dmn-runtime-vs-archive.md). Dual-write: `mind/oss-proposals-20260906-geometry-oracle-chorus-rerun.ptc`.
+
 **Open issue:** thread `geometry-preservation`  
 **Oracle (P12):** unfinished = geometry-preservation; guidance = protect lattice/crease across rewrite; success = sticky maps to Act/veto  
 

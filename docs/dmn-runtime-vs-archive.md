@@ -22,10 +22,10 @@
 
 | Doc | Role |
 |-----|------|
-| `docs/oss-nudge-craft.md` | Craft history; prefer/avoid **distilled** into `(dmn-nudge-craft)` |
+| `docs/oss-nudge-craft.md` | Craft history; prefer/avoid **distilled** into `(dmn-nudge-craft)`; file marked archive with runtime banner |
 | `docs/DMN-gpt-oss-20b-probe.md` | Probe provenance for sampling params |
 | `docs/chorus-probe-20260905.md` | Early multi-model probe |
-| `docs/chorus-geometry-20260906.md` | Geometry Chorus case study + corrected-param rerun |
+| `docs/chorus-geometry-20260906.md` | Geometry Chorus **case study** only; params/endpoints in mind; banner points to forms |
 | `docs/observer-salience.md` | Observer design notes; field shapes also on protocol |
 | `docs/page-passer.md` | Page Passer design |
 | `docs/mind-drive-protocol.md` | Mind-drive wave algorithm (includes optional Think(Chorus)) |
