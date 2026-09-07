@@ -29,7 +29,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 **Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(dmn-request-groq)` `(dmn-request-opencode-go)` `(dmn-nudge-craft)` `(dmn-reflect-pack n)`  
 **Map:** [docs/dmn-runtime-vs-archive.md](docs/dmn-runtime-vs-archive.md) · **Handoff:** [docs/session-handoff.md](docs/session-handoff.md)
 
-* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — oracle + protocol in mind; checklist is source of truth for remaining items
+* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **exit (2026-09-07)** A–E; oracle/protocol/endpoints in mind; F deferred optional
 * [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md) — thin path + 4-channel (prerequisite, live)
 * [docs/mind-api.md](docs/mind-api.md) — form index
 * [docs/mind-drive-protocol.md](docs/mind-drive-protocol.md) — optional Think(Chorus) step
