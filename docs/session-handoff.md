@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/oss-proposals-*.ptc` / wander proposals if present (do not auto-apply).
-5. Active phase: see [plan/README.md](../plan/README.md).
+5. Active phase: see [plan/README.md](../plan/README.md). **P12 exit (2026-09-07)** — A–E complete; F optional. Next: P8–P10 or parked residuals.
 
 ## Turn protocol
 
