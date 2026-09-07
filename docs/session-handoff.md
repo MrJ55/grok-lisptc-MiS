@@ -21,7 +21,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/oss-proposals-*.ptc` / wander proposals if present (do not auto-apply).
-5. Active phase: see [plan/README.md](../plan/README.md). As of 2026-09-06: **P7 exit**, P11 thin path + 4-channel live, **P12 DMN mind-native active next**, P6 residuals parked.
+5. Active phase: see [plan/README.md](../plan/README.md).
 
 ## Turn protocol
 
@@ -38,13 +38,22 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 - Chapter close is candidate-first: `(dmn-chapter-close …)` then `(dmn-chapter-commit title)` after review
 - Identity-level saves use HUMAN_TOOL when in mind-drive
 
-## DMN / Chorus (P11 live + P12 internalization)
+## DMN / Chorus (P12 — runtime authority is the mind)
 
-**Runtime authority is moving into the mind (P12).** Until forms land, still use docs; after P12 A–B, prefer:
+**Do not run Chorus from docs alone.** Query the image:
 
-- `(dmn-oracle-preflight)` — **required before any Chorus**
-- `(dmn-chorus-protocol)` / `(dmn-chorus-roster)` / `(dmn-nudge-craft)` — from image
-- After Chorus: interpret sticky → Act / veto / `no-clear-guidance`; dual-write `:imagined` only
+| Form | Use |
+|------|-----|
+| `(dmn-oracle-preflight)` | **Required before any Chorus** — `ok` or `blocked` |
+| `(dmn-oracle-set u g c)` / `(dmn-oracle-clear)` / `(dmn-oracle-get)` | Set / clear / read the triple |
+| `(dmn-oracle-candidates)` | Suggested triples from known tensions (host still sets) |
+| `(dmn-chorus-protocol)` | Roster + endpoints + params + dual-write + interpret duty |
+| `(dmn-endpoints)` | Groq + OpenCode Go URLs (**Go = `/zen/go/v1` only**) |
+| `(dmn-request-groq)` | Locked Groq body fields (`include_reasoning` false, etc.) |
+| `(dmn-request-opencode-go)` | Locked Go body (temp 1.0; same presence/frequency/top_p as Groq) |
+| `(dmn-chorus-roster)` / `(dmn-nudge-craft)` / `(dmn-suggest-seed …)` | Roster, prefer/avoid, seed |
+| `(dmn-chorus-interpret …)` | Host-mediated interpret reminder after weave |
+| `(dmn-reflect-pack n)` | Schema + episodes + **oracle surface** for mind-drive |
 
 **Oracle contract (mandatory — do not skip):**
 
@@ -54,9 +63,13 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
 
 Chorus without the triple is waste. Pretty prose is not success.
 
+**After Chorus:** interpret sticky → Act / veto / `no-clear-guidance`; dual-write `:imagined` only with oracle keys; Observer log; never eval OSS as Lisp.
+
 **Roster (locked):** oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host translates ZH).
 
-**Archive / case studies:** [oss-nudge-craft.md](./oss-nudge-craft.md), [chorus-geometry-20260906.md](./chorus-geometry-20260906.md), [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md).
+**Mind-drive:** optional Think(Chorus) step — see [mind-drive-protocol.md](./mind-drive-protocol.md). Skip when TPN is enough.
+
+**Archive / case studies (not runtime authority):** [oss-nudge-craft.md](./oss-nudge-craft.md), [chorus-geometry-20260906.md](./chorus-geometry-20260906.md), [dmn-runtime-vs-archive.md](./dmn-runtime-vs-archive.md), [plan/P12-dmn-mind-native.md](../plan/P12-dmn-mind-native.md).
 
 ## Do not
 
