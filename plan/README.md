@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS (grok-mis-oss-dmn)
 
-**Last updated:** 2026-09-07 (P12 substantially complete — A–C exit-met; geometry Chorus under preflight; endpoints/params in mind)  
+**Last updated:** 2026-09-07 (P12: A–C complete; **D and E open** — prior overclaim corrected)  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.
 
 ## Status table
@@ -17,14 +17,14 @@
 | **P6** | [P6-evaluation.md](./P6-evaluation.md) | **substantially met (residuals parked)** | Smoke/continuity/OSS probe; capability-denial deferred |
 | **P7** | [P7-narrative-self.md](./P7-narrative-self.md) | **exit (2026-09-05)** | Candidate-first chapters; Mind-drive; grounded autobiography |
 | **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **thin path live + 4-channel** | bridge/oss.ts; dual-write; bilingual ds_go |
-| **P12** | [P12-dmn-mind-native.md](./P12-dmn-mind-native.md) | **substantially complete** | Oracle preflight; protocol/endpoints/params in mind; first purposeful Chorus |
+| **P12** | [P12-dmn-mind-native.md](./P12-dmn-mind-native.md) | **in progress — A–C done; D/E open** | Oracle + protocol + first Chorus; handoff/inventory still open |
 | P8–P10 | plan files | planned | Scenes … wander |
 | P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional later | Vestige adapter |
 
 ## Current focus
 
-1. **P12 substantially complete:** A–C met; geometry-preservation Chorus under oracle preflight dual-written (rerun with corrected Go params).
-2. Optional residuals: D1 reflect-pack extension; E1 full doc inventory; F optional bridge/chorus helper.
+1. **P12:** Phases **A–C complete** (oracle, protocol/endpoints/params, first purposeful geometry Chorus under preflight).
+2. **Next:** Phase **D** (mind-drive / reflect / handoff wire) then **E** (doc inventory + distill). Do not claim D/E until those tasks are run.
 3. P11 thin path remains live; P6 residuals parked.
 4. **Oracle contract before any Chorus:** unfinished / guidance / success criterion; then interpret. Use `(dmn-endpoints)` + `(dmn-request-groq)` / `(dmn-request-opencode-go)`.
 
