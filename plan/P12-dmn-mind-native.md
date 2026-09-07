@@ -1,6 +1,6 @@
 # P12 — DMN Mind-Native (Internalize Chorus & Oracle Contract)
 
-**Status:** **in progress (2026-09-07)** — Phases A–C complete. **D1–D4 done** this session; **E1+E5 done**; E2–E4 residual; D5 WIKI residual. F deferred.  
+**Status:** **in progress (2026-09-07)** — Phases A–C complete. **D1–D5 done.** **E1–E5 done.** F deferred.  
 **Depends on:** P7 (narrative arc + tension seeds), **P11** (thin path, roster, dual-write, Pulse Meter, Observer path)  
 **DMN role:** Make pure-DMN / Chorus a permanent, gated, interpretable part of how the mind is run — queryable from the image, not a filing cabinet of markdown.  
 **Motivation:** Chorus without a decision problem is waste. Pre-call gates, roster, craft, dual-write, interpret duty, and **live call endpoints/params** must live in MiS so blank sessions do not bypass the mind.
@@ -23,8 +23,8 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
    3. How will we know the oracle helped? (sticky image maps to a next Act or a veto)
 2. **Mind-native protocol** — roster, endpoints, params, zero-system invariant, nudge craft, dual-write contract, translate-ZH rule queryable via Lisp forms.
 3. **Interpret duty** — Chorus is not complete until sticky images are mapped to proposed Act, veto, or explicit `no-clear-guidance`.
-4. **Wire into mind-drive / reflect / handoff** — DMN is part of the run loop, not a side hobby. (**Phase D — D1–D4 done; D5 residual**)
-5. **Anti-filing-cabinet** — runtime authority in mind modules; docs distilled, not duplicated as parallel procedure trees. (**Phase E — E1+E4+E5 done; E2–E3 residual**)
+4. **Wire into mind-drive / reflect / handoff** — DMN is part of the run loop, not a side hobby. (**Phase D — complete**)
+5. **Anti-filing-cabinet** — runtime authority in mind modules; docs distilled, not duplicated as parallel procedure trees. (**Phase E — complete**)
 
 ## Core constraints (non-negotiable)
 
@@ -87,7 +87,7 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
 
 **Exit C:** Chorus end state = dual-write **plus** interpret record. **Met** on geometry-preservation under preflight.
 
-### Phase D — Wire into mind-drive / reflect / handoff — **D1–D4 done; D5 residual**
+### Phase D — Wire into mind-drive / reflect / handoff — **COMPLETE**
 
 | ID | Task | Deliverable | Status |
 |----|------|-------------|--------|
@@ -95,21 +95,21 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
 | D2 | Mind-drive optional Think(Chorus) step | Explicit step 4 in `docs/mind-drive-protocol.md` wave algorithm | **done** 2026-09-07 |
 | D3 | Session-handoff full pointer set | Form table: preflight, endpoints, request-*, interpret, reflect-pack | **done** 2026-09-07 `docs/session-handoff.md` |
 | D4 | Host rule codified | Handoff Do-not + oracle contract + after-Chorus interpret rule | **done** 2026-09-07 |
-| D5 | WIKI / plan status | Point at live forms after D polish | **open** (plan checklist updated; WIKI not yet refreshed) |
+| D5 | WIKI / plan status | Point at live forms after D polish | **done** 2026-09-07 `WIKI.md` |
 
-**Exit D:** Mostly met; D5 WIKI residual.
+**Exit D:** **Met.**
 
-### Phase E — Cleanup / anti-filing-cabinet — **E1+E4+E5 done; E2–E3 residual**
+### Phase E — Cleanup / anti-filing-cabinet — **COMPLETE**
 
 | ID | Task | Deliverable | Status |
 |----|------|-------------|--------|
 | E1 | Inventory DMN-related docs | `docs/dmn-runtime-vs-archive.md` | **done** 2026-09-07 |
-| E2 | Distill craft into mind | Prefer/avoid already in protocol (B3); inventory points archive → mind | **residual** |
-| E3 | Distill geometry / bilingual learnings | Case study remains archive; inventory lists it | **residual** |
+| E2 | Distill craft into mind | Prefer/avoid in protocol; archive banner on `oss-nudge-craft.md`; avoid list includes `what changes is` | **done** 2026-09-07 |
+| E3 | Distill geometry / bilingual learnings | Case-study banner on geometry doc; params/endpoints in mind; inventory points to forms | **done** 2026-09-07 |
 | E4 | Proposal files stay side-channel | Noted in inventory as candidates-only | **done** via inventory |
 | E5 | Rule: new operational rule → mind first | Process rule in `dmn-runtime-vs-archive.md` | **done** 2026-09-07 |
 
-**Exit E:** Advanced; E2/E3 residual optional.
+**Exit E:** **Met.**
 
 ### Phase F — Optional hardening — **DEFERRED**
 
@@ -138,10 +138,10 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
 - [x] D2 mind-drive Think(Chorus) step
 - [x] D3 session-handoff form table
 - [x] D4 host rules in handoff
-- [ ] D5 WIKI refresh
+- [x] D5 WIKI refresh
 - [x] E1 runtime-vs-archive inventory
-- [ ] E2 craft distill residual
-- [ ] E3 geometry distill residual
+- [x] E2 craft distill (archive banner + avoid list)
+- [x] E3 geometry distill (case-study banner)
 - [x] E4 proposals side-channel noted in inventory
 - [x] E5 mind-first process rule
 - [ ] F1–F3 optional hardening
