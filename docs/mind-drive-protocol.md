@@ -1,7 +1,8 @@
-# Mind-drive protocol (Human Tool–shaped)
+# Mind-drive protocol
 
-**Status:** adopted 2026-09-05 (minimal path)  
-**Related:** [goal-drift-scenario.md](./goal-drift-scenario.md), [P7-narrative-self.md](../plan/P7-narrative-self.md), Human Tool idea (tcz.hu/blog/2026/09/03/human-tool/)
+**Adopted:** 2026-09-05  
+**Updated:** 2026-09-07 — optional Think(Chorus) step (P12 D2)  
+**Related:** Human Tool idea (tcz.hu/blog/2026/09/03/human-tool/)
 
 ## Purpose
 
@@ -28,13 +29,18 @@ Schema keys (on `*self-schema*`):
 ## Wave algorithm (one wave)
 
 1. Load mind image (bootstrap if needed).  
-2. `(dmn-reflect-pack n)` — host reads schema + recent episodes.  
+2. `(dmn-reflect-pack n)` — host reads schema, episodes, **oracle surface** (`:oracle-preflight`, `:oracle-candidates`, `:tension-seeds`).  
 3. Pick **one** open-thread or tension from pack / `*narrative-arc*`.  
-4. **Act** (TPN): Lisp, docs, tests, or dual-write candidate — scoped to that thread.  
-5. **Narrative duty:** draft chapter line or update episodic-summary; prefer `:episode-refs` when closing.  
-6. If identity-level save / promote / ambiguous goal → emit `HUMAN_TOOL` and **stop**.  
-7. On tool return: apply choice; optional `--save`; loop or exit wave.  
-8. `DIR:` or `/user` anytime → switch to `user-drive` for that turn onward until mode restored.
+4. **Optional Think(Chorus)** — only if the thread needs imaginative / non-analytic guidance:
+   - Require `(dmn-oracle-preflight)` → `ok` (else `(dmn-oracle-set …)` from a candidate or explicit triple).
+   - Seed via `(dmn-suggest-seed …)`; call roster using `(dmn-endpoints)` + `(dmn-request-groq)` / `(dmn-request-opencode-go)`.
+   - Dual-write `:imagined`; **interpret** sticky → Act / veto / `no-clear-guidance`; log Observer; `(dmn-oracle-clear)` when done.
+   - Skip this step when TPN action is enough. Never auto-fire Chorus from tensions alone.
+5. **Act** (TPN): Lisp, docs, tests, or dual-write candidate — scoped to that thread (may implement interpret's proposed Act).  
+6. **Narrative duty:** draft chapter line or update episodic-summary; prefer `:episode-refs` when closing.  
+7. If identity-level save / promote / ambiguous goal → emit `HUMAN_TOOL` and **stop**.  
+8. On tool return: apply choice; optional `--save`; loop or exit wave.  
+9. `DIR:` or `/user` anytime → switch to `user-drive` for that turn onward until mode restored.
 
 ## HUMAN_TOOL block format
 
@@ -58,19 +64,3 @@ Before ending a mind-drive wave that changed durable meaning:
 
 - Draft or close a chapter **or** log an observed episode explaining why not.  
 - Prefer `(dmn-chapter-close title summary refs)` with real episode ids when claiming observed history.  
-- OSS pure-DMN may supply **imagined** texture only; host grounds text before promote.
-
-## Non-goals
-
-- Always-on daemon or background process outside explicit waves  
-- OSS eliciting the human  
-- Removing user veto or burying it in friction  
-- Treating tool returns as unlimited new missions (unless `DIR:`)
-
-## First live wave (template)
-
-1. Set `:session-mode` → `mind-drive` (host records).  
-2. Reflect-pack → choose thread.  
-3. Act once.  
-4. Draft chapter candidate.  
-5. `HUMAN_TOOL` for approve/defer/reject.  
