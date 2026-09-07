@@ -1,6 +1,6 @@
 # P12 — DMN Mind-Native (Internalize Chorus & Oracle Contract)
 
-**Status:** **in progress (2026-09-07)** — **Phases A–C complete** (including first purposeful Chorus under preflight). **D and E not done.** F deferred.  
+**Status:** **in progress (2026-09-07)** — Phases A–C complete. **D1–D4 done** this session; **E1+E5 done**; E2–E4 residual; D5 WIKI residual. F deferred.  
 **Depends on:** P7 (narrative arc + tension seeds), **P11** (thin path, roster, dual-write, Pulse Meter, Observer path)  
 **DMN role:** Make pure-DMN / Chorus a permanent, gated, interpretable part of how the mind is run — queryable from the image, not a filing cabinet of markdown.  
 **Motivation:** Chorus without a decision problem is waste. Pre-call gates, roster, craft, dual-write, interpret duty, and **live call endpoints/params** must live in MiS so blank sessions do not bypass the mind.
@@ -23,8 +23,8 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
    3. How will we know the oracle helped? (sticky image maps to a next Act or a veto)
 2. **Mind-native protocol** — roster, endpoints, params, zero-system invariant, nudge craft, dual-write contract, translate-ZH rule queryable via Lisp forms.
 3. **Interpret duty** — Chorus is not complete until sticky images are mapped to proposed Act, veto, or explicit `no-clear-guidance`.
-4. **Wire into mind-drive / reflect / handoff** — DMN is part of the run loop, not a side hobby. (**Phase D — open**)
-5. **Anti-filing-cabinet** — runtime authority in mind modules; docs distilled, not duplicated as parallel procedure trees. (**Phase E — open**)
+4. **Wire into mind-drive / reflect / handoff** — DMN is part of the run loop, not a side hobby. (**Phase D — D1–D4 done; D5 residual**)
+5. **Anti-filing-cabinet** — runtime authority in mind modules; docs distilled, not duplicated as parallel procedure trees. (**Phase E — E1+E4+E5 done; E2–E3 residual**)
 
 ## Core constraints (non-negotiable)
 
@@ -87,33 +87,29 @@ Codify DMN/Chorus operations into the mind image so Grok can cold-start, preflig
 
 **Exit C:** Chorus end state = dual-write **plus** interpret record. **Met** on geometry-preservation under preflight.
 
-### Phase D — Wire into mind-drive / reflect / handoff — **OPEN (not done)**
-
-Incidental mentions in session-handoff do **not** count as D exit. Work remains:
+### Phase D — Wire into mind-drive / reflect / handoff — **D1–D4 done; D5 residual**
 
 | ID | Task | Deliverable | Status |
 |----|------|-------------|--------|
-| D1 | Reflect-pack surfaces oracle-relevant tensions | Optional block in `(dmn-reflect-pack)` pointing at unfinished + candidates | **not done** |
-| D2 | Mind-drive optional Think(Chorus) step | Explicit step in mind-drive protocol when gates are set | **not done** (practice only, no formal wire) |
-| D3 | Session-handoff full pointer set | Cold-start: preflight, endpoints, request-*, interpret duty, Observer path — complete, not partial | **not done** (partial text exists; not treated as complete) |
-| D4 | Host rule codified | Never Chorus without preflight; always interpret before claiming guidance — formalized in handoff + mind instruction consistently | **not done** as D deliverable |
-| D5 | WIKI / plan status | Point at live forms after D polish | **pending D** |
+| D1 | Reflect-pack surfaces oracle-relevant tensions | `(dmn-reflect-pack n)` returns `:oracle` `:oracle-preflight` `:oracle-candidates` `:tension-seeds` | **done** 2026-09-07 (smoke ok; `mind/episodes.ptc`) |
+| D2 | Mind-drive optional Think(Chorus) step | Explicit step 4 in `docs/mind-drive-protocol.md` wave algorithm | **done** 2026-09-07 |
+| D3 | Session-handoff full pointer set | Form table: preflight, endpoints, request-*, interpret, reflect-pack | **done** 2026-09-07 `docs/session-handoff.md` |
+| D4 | Host rule codified | Handoff Do-not + oracle contract + after-Chorus interpret rule | **done** 2026-09-07 |
+| D5 | WIKI / plan status | Point at live forms after D polish | **open** (plan checklist updated; WIKI not yet refreshed) |
 
-**Exit D:** Blank session can follow mind-drive → optional Chorus path without reading scattered docs. **Not met.**
+**Exit D:** Mostly met; D5 WIKI residual.
 
-### Phase E — Cleanup / anti-filing-cabinet — **OPEN (not done)**
-
-Endpoints/params were moved into the mind under B/C ops pressure; that is **not** a completed E inventory/distill pass.
+### Phase E — Cleanup / anti-filing-cabinet — **E1+E4+E5 done; E2–E3 residual**
 
 | ID | Task | Deliverable | Status |
 |----|------|-------------|--------|
-| E1 | Inventory DMN-related docs | Table: runtime authority (mind) vs archive (docs) for each procedure file | **not done** |
-| E2 | Distill craft into mind | Prefer/avoid already in protocol (B3); verify no competing craft trees | **partial at best — E exit not claimed** |
-| E3 | Distill geometry / bilingual learnings | Best-practice single place; docs case-study only | **partial at best — E exit not claimed** |
-| E4 | Proposal files stay side-channel | Confirm; no change required if true | **not reviewed as E task** |
-| E5 | Rule: new operational rule → mind first | Process rule + one worked example | **not done** as formal E task |
+| E1 | Inventory DMN-related docs | `docs/dmn-runtime-vs-archive.md` | **done** 2026-09-07 |
+| E2 | Distill craft into mind | Prefer/avoid already in protocol (B3); inventory points archive → mind | **residual** |
+| E3 | Distill geometry / bilingual learnings | Case study remains archive; inventory lists it | **residual** |
+| E4 | Proposal files stay side-channel | Noted in inventory as candidates-only | **done** via inventory |
+| E5 | Rule: new operational rule → mind first | Process rule in `dmn-runtime-vs-archive.md` | **done** 2026-09-07 |
 
-**Exit E:** New Grok session does not need a pile of markdown to run a purposeful Chorus. **Not met.**
+**Exit E:** Advanced; E2/E3 residual optional.
 
 ### Phase F — Optional hardening — **DEFERRED**
 
@@ -138,18 +134,25 @@ Endpoints/params were moved into the mind under B/C ops pressure; that is **not*
 - [x] C2 dual-write oracle keys in protocol
 - [x] C3 Observer field shapes + live salience log lines
 - [x] **First live Chorus under P12 preflight + interpret + dual-write with keys** (geometry-preservation; rerun with corrected Go params) — **C exit**
-- [ ] **D1–D5** handoff / mind-drive / reflect wire — **OPEN**
-- [ ] **E1–E5** inventory + distill pass — **OPEN**
+- [x] D1 reflect-pack oracle surface
+- [x] D2 mind-drive Think(Chorus) step
+- [x] D3 session-handoff form table
+- [x] D4 host rules in handoff
+- [ ] D5 WIKI refresh
+- [x] E1 runtime-vs-archive inventory
+- [ ] E2 craft distill residual
+- [ ] E3 geometry distill residual
+- [x] E4 proposals side-channel noted in inventory
+- [x] E5 mind-first process rule
 - [ ] F1–F3 optional hardening
-- [x] plan file restored with full A–C detail; status honest
 
 ## Exit criteria
 
 - Cold start → `(dmn-oracle-preflight)` / `(dmn-chorus-protocol)` / `(dmn-nudge-craft)` / `(dmn-endpoints)` / `(dmn-request-groq)` work from the image. **Met (A–B).**
-- Host cannot honestly run Chorus without the three gates set. **Operational via forms; D handoff formalization still open.**
+- Host cannot honestly run Chorus without the three gates set. **Met via forms + D3/D4 handoff.**
 - After Chorus: dual-write **and** interpret record. **Met (C proof jobs).**
-- Session-handoff and host rules fully point at mind forms for runtime procedure. **Not met (D open).**
-- Docs inventory: archive vs runtime authority clear. **Not met (E open).**
+- Session-handoff and host rules fully point at mind forms for runtime procedure. **Met (D3/D4).**
+- Docs inventory: archive vs runtime authority clear. **Met (E1).**
 - At least one purposeful Chorus job under the oracle contract with interpret logged. **Met (C).**
 
 ## Non-goals
@@ -168,6 +171,7 @@ Endpoints/params were moved into the mind under B/C ops pressure; that is **not*
 | `mind/dmn-protocol.ptc` | roster, endpoints, request-groq/go, craft, protocol, suggest-seed, interpret |
 | `mind/helpers.ptc` | **0.7** — registers P12 forms; state-summary includes oracle |
 | `mind/schema.ptc` | A6 insights; open-threads include `p12-dmn-mind-native` |
+| `mind/episodes.ptc` | reflect-pack with oracle surface (D1) |
 | `bridge/oss.ts` | Groq lock incl. `include_reasoning: false` |
 
 ## Related
@@ -177,6 +181,7 @@ Endpoints/params were moved into the mind under B/C ops pressure; that is **not*
 - [docs/narrative-tension-seeds.md](../docs/narrative-tension-seeds.md)
 - [docs/oss-nudge-craft.md](../docs/oss-nudge-craft.md) — archive; prefer/avoid distilled into mind
 - [docs/chorus-geometry-20260906.md](../docs/chorus-geometry-20260906.md) — geometry job + rerun
+- [docs/dmn-runtime-vs-archive.md](../docs/dmn-runtime-vs-archive.md) — E1 inventory
 - [docs/observer-salience.md](../docs/observer-salience.md)
 - [docs/page-passer.md](../docs/page-passer.md)
 - [docs/mind-drive-protocol.md](../docs/mind-drive-protocol.md)
