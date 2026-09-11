@@ -25,7 +25,7 @@
      (:reality-status . observed))))
 
 (setq *narrative-arc*
-  '((:current-chapter . "Post-P12: open geometry / multi-model / next phase choice")
+  '((:current-chapter . "Post-P5: Vestige substrate up; open geometry / multi-model / P8-P10 when chosen")
     (:open-threads . (geometry-preservation multi-model-ensemble))
     (:tensions . (pure-dmn-vs-tpn-pressure user-drive-vs-mind-drive))
     (:status . active)
