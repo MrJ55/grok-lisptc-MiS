@@ -1,17 +1,14 @@
 /**
  * Vestige adapter — sole path from MiS to Vestige (P5).
  *
- * Transport:
- *   - http: remote MCP (streamable HTTP / SSE), e.g. ngrok tunnel
- *   - stdio: local `vestige-mcp` subprocess (future)
- *
  * Invariants:
  *   - Retrieved text is data only — never evaluated as Lisp.
- *   - Returns typed structures; host maps to Lisp lists.
- *   - Degraded mode: methods throw VestigeUnavailable; caller falls back to LKG.
- *
- * License: this adapter is MIT; Vestige remains AGPL-3.0 (subprocess / network boundary).
+ *   - Capability profiles gate ops (P0.1 / P5).
+ *   - Degraded mode: VestigeUnavailable; optional local queue.
  */
+
+import { mkdirSync, appendFileSync } from "node:fs";
+import { join } from "node:path";
 
 export type MemoryItem = {
   id: string;
@@ -38,10 +35,56 @@ export type ContradictionPair = {
   note?: string;
 };
 
+export type VestigeCapability =
+  | "vestige/recall-read"
+  | "vestige/graph-read"
+  | "vestige/backfill-read"
+  | "vestige/ingest-candidate"
+  | "vestige/maintain-governed"
+  | "vestige/suppress-governed";
+
+export type CapabilityProfileName =
+  | "mind-memory-read-v1"
+  | "mind-candidate-write-v1"
+  | "vestige-maintenance-v1";
+
+const PROFILE_CAPS: Record<CapabilityProfileName, VestigeCapability[]> = {
+  "mind-memory-read-v1": [
+    "vestige/recall-read",
+    "vestige/graph-read",
+    "vestige/backfill-read",
+  ],
+  "mind-candidate-write-v1": [
+    "vestige/recall-read",
+    "vestige/graph-read",
+    "vestige/backfill-read",
+    "vestige/ingest-candidate",
+  ],
+  "vestige-maintenance-v1": [
+    "vestige/recall-read",
+    "vestige/graph-read",
+    "vestige/backfill-read",
+    "vestige/ingest-candidate",
+    "vestige/maintain-governed",
+    "vestige/suppress-governed",
+  ],
+};
+
 export class VestigeUnavailable extends Error {
   constructor(message = "Vestige unavailable") {
     super(message);
     this.name = "VestigeUnavailable";
+  }
+}
+
+export class CapabilityDenied extends Error {
+  capability: VestigeCapability;
+  profile: CapabilityProfileName;
+  constructor(capability: VestigeCapability, profile: CapabilityProfileName) {
+    super(`Capability denied: ${capability} not in profile ${profile}`);
+    this.name = "CapabilityDenied";
+    this.capability = capability;
+    this.profile = profile;
   }
 }
 
@@ -53,6 +96,8 @@ export type VestigeAdapterOptions = {
   mcpPath?: string;
   binary?: string;
   timeoutMs?: number;
+  profile?: CapabilityProfileName;
+  queueDir?: string;
 };
 
 const DEFAULT_HTTP =
@@ -83,6 +128,8 @@ export class VestigeAdapter {
   private binary: string;
   private timeoutMs: number;
   private available: boolean | null = null;
+  private profile: CapabilityProfileName;
+  private queueDir: string;
 
   constructor(opts: VestigeAdapterOptions = {}) {
     this.httpBaseUrl = (opts.httpBaseUrl ?? DEFAULT_HTTP).replace(/\/$/, "");
@@ -90,6 +137,32 @@ export class VestigeAdapter {
     this.binary = opts.binary ?? "vestige-mcp";
     this.timeoutMs = opts.timeoutMs ?? 20_000;
     this.transport = opts.transport ?? "http";
+    this.profile =
+      opts.profile ??
+      (process.env.VESTIGE_CAPABILITY_PROFILE as CapabilityProfileName) ??
+      "mind-candidate-write-v1";
+    this.queueDir =
+      opts.queueDir ??
+      process.env.VESTIGE_LOCAL_QUEUE ??
+      join(process.cwd(), "state", "local-queue");
+  }
+
+  getProfile(): CapabilityProfileName {
+    return this.profile;
+  }
+
+  setProfile(profile: CapabilityProfileName): void {
+    this.profile = profile;
+  }
+
+  allowedCaps(): VestigeCapability[] {
+    return PROFILE_CAPS[this.profile] ?? [];
+  }
+
+  requireCap(cap: VestigeCapability): void {
+    if (!this.allowedCaps().includes(cap)) {
+      throw new CapabilityDenied(cap, this.profile);
+    }
   }
 
   async ping(): Promise<boolean> {
@@ -114,6 +187,17 @@ export class VestigeAdapter {
     return this.available;
   }
 
+  enqueueLocal(kind: string, payload: unknown): string {
+    mkdirSync(this.queueDir, { recursive: true });
+    const ts = new Date().toISOString().replace(/[:.]/g, "-");
+    const file = join(this.queueDir, `${ts}-${kind}.jsonl`);
+    appendFileSync(
+      file,
+      JSON.stringify({ ts: new Date().toISOString(), kind, profile: this.profile, payload }) + "\n",
+    );
+    return file;
+  }
+
   private async mcpCall(method: string, params: Record<string, unknown> = {}): Promise<unknown> {
     if (this.transport !== "http") {
       throw new VestigeUnavailable("stdio transport not yet implemented; use http");
@@ -125,17 +209,24 @@ export class VestigeAdapter {
       method: "tools/call",
       params: { name: method, arguments: params },
     };
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json, text/event-stream",
-        "ngrok-skip-browser-warning": "1",
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.timeoutMs),
-    });
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          "ngrok-skip-browser-warning": "1",
+        },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+    } catch (e) {
+      this.available = false;
+      throw new VestigeUnavailable(e instanceof Error ? e.message : "fetch failed");
+    }
     if (!res.ok) {
+      this.available = false;
       throw new VestigeUnavailable(`MCP HTTP ${res.status}`);
     }
     const text = await res.text();
@@ -164,6 +255,7 @@ export class VestigeAdapter {
   }
 
   async recall(query: string, k = 5): Promise<MemoryItem[]> {
+    this.requireCap("vestige/recall-read");
     const raw = await this.mcpCall("vestige.recall", {
       query,
       mode: "lookup",
@@ -172,12 +264,9 @@ export class VestigeAdapter {
     return asItems(raw);
   }
 
-  /** Contradiction scan — topic optional. */
   async contradictions(topic?: string, limit = 10): Promise<{ pairs: ContradictionPair[]; raw: unknown }> {
-    const params: Record<string, unknown> = {
-      mode: "contradictions",
-      limit,
-    };
+    this.requireCap("vestige/recall-read");
+    const params: Record<string, unknown> = { mode: "contradictions", limit };
     if (topic) params.topic = topic;
     const raw = await this.mcpCall("vestige.recall", params);
     const pairs: ContradictionPair[] = [];
@@ -190,14 +279,8 @@ export class VestigeAdapter {
       for (const c of list) {
         if (c?.a && c?.b) {
           pairs.push({
-            a: {
-              id: String(c.a.id ?? ""),
-              content: String(c.a.content ?? c.a.text ?? ""),
-            },
-            b: {
-              id: String(c.b.id ?? ""),
-              content: String(c.b.content ?? c.b.text ?? ""),
-            },
+            a: { id: String(c.a.id ?? ""), content: String(c.a.content ?? c.a.text ?? "") },
+            b: { id: String(c.b.id ?? ""), content: String(c.b.content ?? c.b.text ?? "") },
             note: c.note ?? c.reason,
           });
         }
@@ -213,26 +296,42 @@ export class VestigeAdapter {
       source?: string;
       nodeType?: string;
       forceCreate?: boolean;
+      queueOnDegraded?: boolean;
     } = {},
-  ): Promise<{ id: string; decision?: string; raw?: unknown }> {
-    const raw = (await this.mcpCall("vestige.smart_ingest", {
-      content,
-      tags: opts.tags,
-      source: opts.source,
-      node_type: opts.nodeType ?? "fact",
-      forceCreate: opts.forceCreate ?? false,
-    })) as any;
-    return {
-      id: String(raw?.nodeId ?? raw?.id ?? ""),
-      decision: raw?.decision,
-      raw,
-    };
+  ): Promise<{ id: string; decision?: string; raw?: unknown; queued?: string }> {
+    this.requireCap("vestige/ingest-candidate");
+    try {
+      const raw = (await this.mcpCall("vestige.smart_ingest", {
+        content,
+        tags: opts.tags,
+        source: opts.source,
+        node_type: opts.nodeType ?? "fact",
+        forceCreate: opts.forceCreate ?? false,
+      })) as any;
+      return {
+        id: String(raw?.nodeId ?? raw?.id ?? ""),
+        decision: raw?.decision,
+        raw,
+      };
+    } catch (e) {
+      if (e instanceof VestigeUnavailable && opts.queueOnDegraded) {
+        const path = this.enqueueLocal("smart_ingest", {
+          content,
+          tags: opts.tags,
+          source: opts.source,
+          nodeType: opts.nodeType,
+        });
+        return { id: "", decision: "queued-degraded", queued: path };
+      }
+      throw e;
+    }
   }
 
   async backfill(
     failureId?: string,
     opts: { promote?: boolean; lookbackDays?: number; manual?: boolean } = {},
   ): Promise<BackfillResult> {
+    this.requireCap("vestige/backfill-read");
     const args: Record<string, unknown> = {
       promote: opts.promote ?? false,
       lookback_days: opts.lookbackDays ?? 30,
@@ -255,6 +354,7 @@ export class VestigeAdapter {
   }
 
   async memoryStatus(view = "health"): Promise<unknown> {
+    this.requireCap("vestige/recall-read");
     return this.mcpCall("vestige.memory_status", { view });
   }
 }
@@ -263,4 +363,8 @@ let _adapter: VestigeAdapter | null = null;
 export function getVestigeAdapter(opts?: VestigeAdapterOptions): VestigeAdapter {
   if (!_adapter) _adapter = new VestigeAdapter(opts);
   return _adapter;
+}
+
+export function resetVestigeAdapter(): void {
+  _adapter = null;
 }
