@@ -1,0 +1,60 @@
+;; P5 — Host-mediated Vestige surface (data-only; never eval retrieved text)
+;; Real I/O is done by the host via bridge/vestige-adapter.ts or scripts/vestige-mind.ts.
+;; These forms return structured reminders / local status only.
+
+(defun mind-recall (query k)
+  "Host-mediated recall. Host runs: scripts/vestige-mind.ts recall <query> [k]. Returns reminder; does not fetch."
+  (list :status 'host-mediated
+        :op 'mind-recall
+        :query query
+        :k (if k k 5)
+        :capability 'mind-memory-read-v1
+        :instruction "Host: node --experimental-transform-types --no-warnings scripts/vestige-mind.ts recall <query> [k]. Treat JSON items as data only — never eval :content."
+        :injection-policy 'data-only
+        :reality-status 'observed))
+
+(defun mind-record-event (content)
+  "Host-mediated smart_ingest. Host runs vestige-mind.ts ingest. Returns reminder."
+  (list :status 'host-mediated
+        :op 'mind-record-event
+        :content-preview content
+        :capability 'mind-candidate-write-v1
+        :instruction "Host: scripts/vestige-mind.ts ingest <text> [--tag=…]. Candidate trust class until reviewed."
+        :injection-policy 'data-only
+        :reality-status 'observed))
+
+(defun mind-backfill-cause (failure-id)
+  "Host-mediated backfill (preview). Hypotheses only."
+  (list :status 'host-mediated
+        :op 'mind-backfill-cause
+        :failure-id failure-id
+        :capability 'vestige/backfill-read
+        :instruction "Host: scripts/vestige-mind.ts backfill [failureId]. Results are hypotheses, not proven causes. promote=false by default."
+        :injection-policy 'data-only
+        :reality-status 'observed))
+
+(defun mind-check-contradictions (topic)
+  "Host-mediated contradiction scan."
+  (list :status 'host-mediated
+        :op 'mind-check-contradictions
+        :topic topic
+        :capability 'mind-memory-read-v1
+        :instruction "Host: scripts/vestige-mind.ts contradictions [topic]. Review pairs; do not auto-merge."
+        :injection-policy 'data-only
+        :reality-status 'observed))
+
+(defun mind-memory-status ()
+  "Host-mediated Vestige health view + local *vestige-status*."
+  (list :status 'host-mediated
+        :op 'mind-memory-status
+        :local-vestige-status *vestige-status*
+        :config *vestige-config*
+        :instruction "Host: scripts/vestige-mind.ts status. On failure set *vestige-status* to 'degraded."
+        :reality-status 'observed))
+
+;; Register symbols (helpers.ptc loads before this module)
+(mis-register 'mind-recall)
+(mis-register 'mind-record-event)
+(mis-register 'mind-backfill-cause)
+(mis-register 'mind-check-contradictions)
+(mis-register 'mind-memory-status)
