@@ -1,6 +1,6 @@
 # Wiki — grok-lisptc-MiS
 
-Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN OSS channel.
+Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN OSS channel + Vestige long-term memory substrate (P5).
 
 ## Start here
 
@@ -16,6 +16,14 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/trust-classes.md](docs/trust-classes.md)
 * [docs/capability-governance.md](docs/capability-governance.md)
 * [docs/threat-model.md](docs/threat-model.md)
+
+## Vestige (P5 substantially complete 2026-09-11)
+
+* [plan/P5-vector-cabinet.md](plan/P5-vector-cabinet.md) — **substantially complete**; accomplishments section
+* [docs/vestige-injection-policy.md](docs/vestige-injection-policy.md) — data-only injection
+* [docs/vestige-buffer-compaction.md](docs/vestige-buffer-compaction.md) — compact refs
+* [docs/vestige-fsrs-and-limits.md](docs/vestige-fsrs-and-limits.md) — FSRS-6 notes + operational limits
+* Scripts: `scripts/vestige-smoke.ts`, `scripts/test-vestige-degraded.sh`, `scripts/vestige-mind.ts`
 
 ## Ops
 
@@ -42,29 +50,8 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ### Proposal files (imagined only — never eval)
 
-* [mind/oss-proposals-20260906-geometry-oracle-chorus-rerun.ptc](mind/oss-proposals-20260906-geometry-oracle-chorus-rerun.ptc) — **param-correct geometry under oracle**
-* [mind/oss-proposals-20260906-geometry-oracle-chorus.ptc](mind/oss-proposals-20260906-geometry-oracle-chorus.ptc)
-* [mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc](mind/oss-proposals-20260906-geometry-chorus-bilingual.ptc)
-* [mind/oss-proposals-20260906-dmn-tpn-chorus-live.ptc](mind/oss-proposals-20260906-dmn-tpn-chorus-live.ptc)
+See `mind/oss-proposals-*.ptc` — dual-write candidates only.
 
-## Roles
+## Phase plan
 
-* **Host:** Grok — Lisp forms, salience switch, sole mutator, mediates OSS
-* **Mind image:** durable transcript (`mind/*.ptc`) — **runtime authority** for DMN/Chorus procedure
-* **OSS / Chorus:** pure DMN only (zero system prompt). Roster: **gpt-oss-20b + gpt-oss-120b (Groq, EN)** + **deepseek-v4-flash (OpenCode Go, EN + ZH)**. Host weaves + translates ZH; never auto-promote.
-* **Endpoints:** `(dmn-endpoints)` — OpenCode Go is **`/zen/go/v1` only** (not bare `/zen/v1`)
-* **Params:** `(dmn-request-groq)` / `(dmn-request-opencode-go)` — Go temp 1.0; same presence/frequency/top_p as Groq; Groq `include_reasoning: false`
-* **Oracle contract:** before any Chorus — unfinished / guidance / success; after — interpret sticky → Act / veto / no-clear-guidance
-* **Hand-off:** dual-write proposals + Observer; never auto-promote
-* **Trust:** untrusted content never evaluated as Lisp
-
-## Narrative & Mind-drive (P7)
-
-* [plan/P7-narrative-self.md](plan/P7-narrative-self.md) — **exit**
-* [docs/mind-drive-protocol.md](docs/mind-drive-protocol.md)
-* [docs/narrative-tension-seeds.md](docs/narrative-tension-seeds.md)
-* Autobiography: 4 grounded chapters (Genesis → Mind-drive → P6 eval → P7 exit)
-
-## Safety
-
-Validate before eval; save only on success (atomic); **OSS never gets a system prompt.**
+See [plan/README.md](plan/README.md). **P5 substantially complete 2026-09-11.** Next: P8–P10 when chosen.
