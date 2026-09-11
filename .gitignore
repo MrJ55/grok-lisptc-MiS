@@ -6,3 +6,4 @@ node_modules/
 .DS_Store
 /tmp/mis/
 /tmp/mis-node/
+state/local-queue/*.jsonl
