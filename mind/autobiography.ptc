@@ -39,14 +39,23 @@
 
 (defun dmn-chapter-close (title summary refs)
   "Propose chapter as candidate only; does not mutate *autobiography*. Commit via dmn-chapter-commit."
-  (let ((cand (list (cons :title title)
-                    (cons :summary summary)
-                    (cons :episode-refs refs)
-                    (cons :date-label *today*)
-                    (cons :reality-status 'candidate)
-                    (cons :proposed-at *today*))))
-    (setq *narrative-candidates* (cons cand *narrative-candidates*))
+  (let ((ch (list (cons :title title)
+                  (cons :summary summary)
+                  (cons :episode-refs refs)
+                  (cons :date-label *today*)
+                  (cons :reality-status 'candidate)
+                  (cons :proposed-at *today*))))
+    (setq *narrative-candidates* (cons ch *narrative-candidates*))
     (list :status 'candidate :title title :instruction "Review then (dmn-chapter-commit title)")))
+
+(defun dmn-narrative-candidate (title summary source-id)
+  "Dual-write style: record an imagined narrative candidate (not observed)."
+  (let ((ch (list (cons :title title)
+                  (cons :summary summary)
+                  (cons :source source-id)
+                  (cons :reality-status 'imagined))))
+    (setq *narrative-candidates* (cons ch *narrative-candidates*))
+    (list :status 'imagined :title title)))
 
 (defun dmn-chapter-commit (title)
   "Promote a candidate chapter into *autobiography* after host review."
@@ -58,21 +67,23 @@
                                   (if (eq (car p) :reality-status)
                                       (cons :reality-status 'observed)
                                       p))
-                                c))
-            (setq *autobiography* (append *autobiography* (list found))))
+                                c)))
           (setq kept (cons c kept))))
-    (setq *narrative-candidates* (reverse kept))
+    (when found
+      (setq *narrative-candidates* (nreverse kept))
+      (setq *autobiography* (append *autobiography* (list found))))
     (if found
         (list :status 'committed :title title :auto-len (length *autobiography*))
         (list :status 'not-found :title title))))
 
-(defun dmn-narrative-candidate (summary title)
-  "Dual-write style: record an imagined narrative candidate (not observed)."
-  (list :status 'imagined
-        :title title
-        :summary summary
-        :reality-status 'imagined
-        :instruction "Do not commit unless grounded; prefer dmn-chapter-close for observed candidates."))
+(defun dmn-tension-seeds ()
+  "Return current open tensions and threads from the arc."
+  (list (list 'tension 'pure-dmn-vs-tpn-pressure)
+        (list 'tension 'user-drive-vs-mind-drive)
+        (list 'thread 'geometry-preservation)
+        (list 'thread 'multi-model-ensemble)))
+
+(defun dmn-arc () *narrative-arc*)
 
 (defun dmn-autobiography (n)
   "Return the last N chapters (or all if n is nil/0)."
@@ -84,16 +95,6 @@
             (if (>= i skip) (setq out (cons ch out)))
             (setq i (+ i 1)))
           (reverse out)))))
-
-(defun dmn-arc () *narrative-arc*)
-
-(defun dmn-tension-seeds ()
-  "Return current open tensions and threads from the arc."
-  (let ((arc *narrative-arc*))
-    (list (list 'tension 'pure-dmn-vs-tpn-pressure)
-          (list 'tension 'user-drive-vs-mind-drive)
-          (list 'thread 'geometry-preservation)
-          (list 'thread 'multi-model-ensemble))))
 
 (defun audit-autobiography-grounding ()
   "Return chapters missing :reality-status or with non-observed status (should be empty after commit)."
