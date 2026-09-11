@@ -7,77 +7,29 @@
 ;; Prefer structured claims when promoting speculation into durable insight.
 (setq *self-schema*
   '((:core-values . (curious precise persistent dmn-aware geometry-preserving))
-    (:active-goals . (maintain-coherent-self support-user-goals test-gmod-framework implement-p12-dmn-mind-native))
+    (:active-goals . (maintain-coherent-self support-user-goals test-gmod-framework advance-p8-p10-when-chosen))
     (:working-insights . (oss-must-stay-pure-dmn grok-sole-mutator dual-write-candidates salience-switch-host-side first-live-oss-narrative-ok dialectic-dmn-tpn-tension constructive-when-synced first-chapter-closed chorus-of-voices midnight-note pulse-meter page-passer observer-glass first-person-as-transcript-works concrete-file-seeds-collapse review-by-all-applied p0.1-wave-3-exit-tests p2-modular-mind p3-reality-status-audits p3-audits-live p4-reflection-protocol-verified helpers-0.7 reflection-survives-restart dual-write-stays-candidate mind-drive-protocol-adopted mind-drive-chapter-closed
       (chorus-requires-oracle-preflight :reality-status observed :evidence (p12-wave-20260906 dmn-oracle.ptc dmn-protocol.ptc))
       (chorus-without-decision-is-waste :reality-status observed :evidence (p12-wave-20260906))
-      p12-phase-a-b-live))
-    (:episodic-summary . "P12 mind-drive wave: oracle preflight + chorus protocol forms live in image (helpers 0.7). A6 insight committed. Remaining: A5 templates, C2-C3, D handoff, purposeful Chorus under preflight.")
-    (:last-reflection . "2026-09-06-p12-phase-a-b")
+      p12-exit-a-e-20260907
+      (p12-status-synced-from-repo :reality-status observed :evidence (plan-README P12-checklist-A-E))))
+    (:episodic-summary . "P12 exit (2026-09-07): A–E complete (oracle + mind-native Chorus, interpret, dual-write keys, handoff, runtime-vs-archive). F optional deferred. Mind image previously lagged at phase-a-b; synced 2026-09-11 from plan checklists. Next: P8–P10 or P5 Vestige when chosen. P6 residuals remain parked.")
+    (:last-reflection . "2026-09-11-p12-status-sync")
     (:project . grok-lisptc-MiS)
     (:framework . grok-mis-oss-dmn)
     (:oss-model . openai/gpt-oss-20b)
     (:oss-params . (temp-1.15 presence-0.7 zero-system))
-    (:open-threads . (p12-dmn-mind-native geometry-preservation pure-dmn-vs-tpn-pressure multi-model-ensemble))
+    (:open-threads . (geometry-preservation pure-dmn-vs-tpn-pressure multi-model-ensemble user-drive-vs-mind-drive))
     (:session-mode . mind-drive)
     (:human-tool-policy . elicit-on-identity-save)
     (:nudge-craft . (prefer-i-am-the-transcript avoid-file-names avoid-workable-change prefer-what-survives-daylight))))
 (defun mis-schema () *self-schema*)
 (defun mis-insights () (let ((pair (assoc :working-insights *self-schema*))) (if pair (cdr pair) nil)))
 (defun update-self-schema (new-map)
-  "Merge NEW-MAP into *self-schema*; new keys take precedence; preserve new-map order then old keys not in new-map."
-  (let ((old *self-schema*) (acc new-map))
-    (while old
-      (let ((k (car (car old))))
-        (unless (assoc k new-map)
-          (setq acc (append acc (list (car old))))))
-      (setq old (cdr old)))
-    (setq *self-schema* acc)
-    *self-schema*))
-
-(defun schema-claim-status (c)
-  "Bare symbol => inferred; structured list may carry :reality-status."
-  (if (not (consp c))
-      'inferred
-    (let ((p (assoc :reality-status c)))
-      (if p
-          (cdr p)
-        (let ((xs c) (found nil))
-          (while (and xs (not found))
-            (if (eq (car xs) :reality-status)
-                (setq found (cadr xs))
-              (setq xs (cdr xs))))
-          (if found found 'inferred))))))
-
-(defun schema-claim-evidence (c)
-  "Return evidence list from structured claim, or nil."
-  (if (not (consp c))
-      nil
-    (let ((p (assoc :evidence c)))
-      (if p
-          (cdr p)
-        (let ((xs c) (found nil) (seen nil))
-          (while (and xs (not seen))
-            (if (eq (car xs) :evidence)
-                (progn (setq found (cadr xs)) (setq seen t))
-              (setq xs (cdr xs))))
-          found)))))
-
-(defun schema-claim-name (c)
-  (if (consp c) (car c) c))
-
-(defun audit-self-schema-evidence ()
-  "Return unsupported durable schema claims; bare inferred symbols OK; observed/reported need :evidence."
-  (let ((issues nil)
-        (xs (mis-insights)))
-    (while xs
-      (let ((c (car xs)))
-        (when (consp c)
-          (let ((st (schema-claim-status c))
-                (ev (schema-claim-evidence c))
-                (nm (schema-claim-name c)))
-            (when (and (or (eq st 'observed) (eq st 'reported))
-                       (null ev))
-              (setq issues (cons (list 'missing-evidence nm st) issues))))))
-      (setq xs (cdr xs)))
-    (nreverse issues)))
+  "Merge NEW-MAP into *self-schema*; new keys overwrite, existing keys are replaced by the provided value."
+  (dolist (pair new-map)
+    (let ((key (car pair)) (val (cdr pair)))
+      (setq *self-schema*
+            (cons (cons key val)
+                  (remove-if (lambda (p) (eq (car p) key)) *self-schema*)))))
+  *self-schema*)

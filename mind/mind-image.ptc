@@ -1,6 +1,5 @@
-;; MiS mind image — thin loader (P2 modularization)
-;; First form is *mind-manifest* (compatibility / trust base). Bridge validates it on load.
-;; Modules are imported relative to this file's directory (bridge chdirs during load).
+;; MiS mind image — thin loader + compatibility manifest (P0.1 / P2)
+;; Forms after the setq are loaded relative to this file's directory (bridge chdirs during load).
 (setq *mind-manifest*
   '((:gmod-schema . "0.1.0")
     (:helpers-version . "0.7")
@@ -11,7 +10,10 @@
     (:p2-status . "modular")
     (:p3-status . "exit")
     (:p4-status . "exit")
-    (:p12-status . "phase-a-b")))
+    (:p6-status . "substantially-met")
+    (:p7-status . "exit")
+    (:p11-status . "live-4channel")
+    (:p12-status . "exit")))
 (import "helpers.ptc")
 (import "schema.ptc")
 (import "episodes.ptc")
