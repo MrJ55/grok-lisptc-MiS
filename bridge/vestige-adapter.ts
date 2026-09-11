@@ -68,11 +68,12 @@ export class VestigeAdapter {
   private available: boolean | null = null;
 
   constructor(opts: VestigeAdapterOptions = {}) {
-    this.transport = opts.transport ?? (opts.httpBaseUrl || process.env.VESTIGE_MCP_URL ? "http" : "stdio");
     this.httpBaseUrl = (opts.httpBaseUrl ?? DEFAULT_HTTP).replace(/\/$/, "");
     this.mcpPath = opts.mcpPath ?? "/mcp";
     this.binary = opts.binary ?? "vestige-mcp";
     this.timeoutMs = opts.timeoutMs ?? 15_000;
+    // Prefer HTTP whenever a base URL is configured (default includes remote MCP).
+    this.transport = opts.transport ?? "http";
   }
 
   /** Health probe — does not throw. */
@@ -80,6 +81,7 @@ export class VestigeAdapter {
     try {
       if (this.transport === "http") {
         const res = await fetch(`${this.httpBaseUrl}/health`, {
+          headers: { "ngrok-skip-browser-warning": "1" },
           signal: AbortSignal.timeout(5_000),
         });
         this.available = res.ok;
@@ -113,6 +115,7 @@ export class VestigeAdapter {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
+        "ngrok-skip-browser-warning": "1",
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(this.timeoutMs),
