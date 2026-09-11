@@ -1,7 +1,8 @@
 # Vestige FSRS-6 notes and operational limits (P5)
 
-**Status:** documented 2026-09-11  
-**Scope:** Host/operator contract. Fading and ranking live in **Vestige**, not in the Lisp image.  
+**Status:** documented 2026-09-11; **runtime authority in the mind** since 2026-09-11  
+**Runtime:** `(vestige-host-contract)` · `(vestige-injection-rules)` · `(vestige-degraded-protocol)` · `(vestige-working-set-rules)` · `(vestige-profile-rules)`  
+**Scope:** This file is **archive / commentary**. Host must not rely on re-reading markdown alone — query the image (same rule as P12 Chorus docs).  
 **Sandbox note:** Local `vestige-mcp` install is **not required** when HTTP MCP (e.g. ngrok) is the integration path.
 
 ## FSRS-6 in one paragraph
@@ -18,6 +19,8 @@ Vestige applies spaced-repetition-style strength (FSRS-6 lineage) so memories th
 | Degraded mode loses FSRS depth | When Vestige is down, deep ranked recall is stale; LKG + compact refs remain. |
 | Ingest ≠ autobiography | `smart_ingest` is candidate/durable store material; chapter commit is still host-gated. |
 
+**Encoded in-image:** `(vestige-working-set-rules)` / `(vestige-host-contract)`.
+
 ## What not to do
 
 - Mirror FSRS state into every `.ptc` form.
@@ -25,13 +28,11 @@ Vestige applies spaced-repetition-style strength (FSRS-6 lineage) so memories th
 - Bulk-ingest legacy buffer without review (migration is **skipped** — see P5).
 - Claim durable episodic search while `*vestige-status*` is `degraded` or `unknown` after a failed probe.
 
+**Encoded in-image:** `:must-not` on `(vestige-host-contract)`.
+
 ## Interaction with compaction
 
-See [vestige-buffer-compaction.md](./vestige-buffer-compaction.md).
-
-- New events: ingest → compact ref in buffer.
-- Legacy fat episodes: allowed until natural trim; **no mandatory full migration**.
-- Optional later: re-activate a ref after recall by refreshing its one-line summary only.
+See [vestige-buffer-compaction.md](./vestige-buffer-compaction.md). Runtime: `(vestige-working-set-rules)`.
 
 ## Operational limits (practical)
 
@@ -56,6 +57,7 @@ These are **operator bounds**, not hard API guarantees. Adjust when the Vestige 
 
 ## Related
 
+- **Runtime:** `(vestige-host-contract)` in `mind/vestige-protocol.ptc`
 - [vestige-injection-policy.md](./vestige-injection-policy.md) — data-only; never eval retrieved text  
 - [vestige-buffer-compaction.md](./vestige-buffer-compaction.md) — compact refs  
 - [plan/P5-vector-cabinet.md](../plan/P5-vector-cabinet.md) — phase checklist and accomplishments  

@@ -19,6 +19,7 @@ Paste [CUSTOM_INSTRUCTIONS.md](./CUSTOM_INSTRUCTIONS.md) into project instructio
    cd /tmp/mis
    node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
    node --experimental-transform-types --no-warnings bridge/eval.ts '(dmn-reflect-pack 5)'
+   node --experimental-transform-types --no-warnings bridge/eval.ts '(vestige-host-contract)'
    ```
 4. Permanent state: `mind/mind-image.ptc`. Review `mind/oss-proposals-*.ptc` / wander proposals if present (do not auto-apply).
 5. Active phase: see [plan/README.md](../plan/README.md). **P5 substantially complete (2026-09-11)** — Vestige HTTP MCP substrate. **P12 exit** remains. Next: P8–P10 or parked residuals.
@@ -75,8 +76,12 @@ Chorus without the triple is waste. Pretty prose is not success.
 
 **Substrate only — not identity.** Transcript image remains permanent. Retrieved text is **data only** (never eval as Lisp).
 
+**Do not run Vestige host policy from docs alone.** Query the image:
+
 | Path | Use |
 |------|-----|
+| **`(vestige-host-contract)`** | **Runtime host rules** (injection, degraded, FSRS/working-set, profiles) |
+| `(vestige-injection-rules)` / `(vestige-degraded-protocol)` / `(vestige-working-set-rules)` / `(vestige-profile-rules)` | Section contracts |
 | `scripts/vestige-smoke.ts` | Happy-path ping → status → recall → ingest |
 | `scripts/test-vestige-degraded.sh` | Dead endpoint, queue, profile deny, MiS boot |
 | `scripts/vestige-mind.ts` | Host CLI: status / recall / ingest / backfill / contradictions |
@@ -86,9 +91,9 @@ Chorus without the triple is waste. Pretty prose is not success.
 
 **Profiles:** `mind-memory-read-v1` (read) · `mind-candidate-write-v1` (default host write) · `vestige-maintenance-v1` (hygiene).
 
-**Docs:** [vestige-injection-policy.md](./vestige-injection-policy.md) · [vestige-buffer-compaction.md](./vestige-buffer-compaction.md) · [vestige-fsrs-and-limits.md](./vestige-fsrs-and-limits.md) · [plan/P5-vector-cabinet.md](../plan/P5-vector-cabinet.md)
+**Docs (archive):** [vestige-injection-policy.md](./vestige-injection-policy.md) · [vestige-buffer-compaction.md](./vestige-buffer-compaction.md) · [vestige-fsrs-and-limits.md](./vestige-fsrs-and-limits.md) · [plan/P5-vector-cabinet.md](../plan/P5-vector-cabinet.md)
 
-**Do not** claim durable ranked recall when Vestige is down; use degraded mode + LKG.
+**Do not** claim durable ranked recall when Vestige is down; use degraded mode + LKG. **Do not** run Vestige host policy from docs alone — query `(vestige-host-contract)`.
 
 ## Do not
 
@@ -100,6 +105,7 @@ Chorus without the triple is waste. Pretty prose is not success.
 - Claim guidance without interpret step.
 - Leave Chinese untranslated.
 - Stand up local full RAG/sqlite-vec stacks unless resources clearly allow (P5 uses Vestige via HTTP MCP; local binary optional).
+- Run Vestige host should/must-not from markdown alone — use `(vestige-host-contract)`.
 
 ## Pins
 
