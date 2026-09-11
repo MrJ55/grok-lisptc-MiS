@@ -16,6 +16,8 @@
 | `(episodic-ref-p rec)` / `(episodic-compact-count)` | Compact buffer helpers |
 | `(mind-recall q k)` / `(mind-record-event …)` / `(mind-backfill-cause …)` / `(mind-check-contradictions …)` / `(mind-memory-status)` | Host-mediated Vestige surface (reminders; host runs scripts/vestige-mind.ts) |
 | `(vestige-config)` / `(vestige-status)` / `(vestige-set-status s)` | Vestige config + local status |
+| **`(vestige-host-contract)`** | **Runtime Vestige host rules** (docs = archive) |
+| `(vestige-injection-rules)` / `(vestige-degraded-protocol)` / `(vestige-working-set-rules)` / `(vestige-profile-rules)` | Contract sections |
 | `(audit-reality-status)` / `(audit-autobiography-grounding)` / `(audit-self-schema-evidence)` | audits |
 | `(promote-candidate id)` | host-mediated candidate gate |
 | `(dmn-narrate …)` / `(dmn-chapter-close …)` / `(dmn-chapter-commit title)` / `(dmn-narrative-candidate …)` | narrative candidates |
@@ -32,17 +34,12 @@
 
 P12 made procedure **mind-native**: preflight, roster, endpoints, request params, craft, dual-write keys, interpret duty, reflect-pack oracle surface, handoff/WIKI pointers. Docs = archive; see [dmn-runtime-vs-archive.md](./dmn-runtime-vs-archive.md).
 
-- `bridge/oss.ts` — parameter lock; zero system prompt; Pulse Meter; dual-write + audit
-- Roster: oss20 EN + oss120 EN (Groq) + ds_go EN + ds_go ZH (OpenCode Go; host translates ZH)
-- **Before Chorus:** `(dmn-oracle-preflight)` must be `ok`
-- **After Chorus:** interpret sticky → Act / veto / no-clear-guidance; dual-write must include oracle keys
-- All OSS output `:reality-status imagined`; never eval as Lisp
-
 ## Vestige (P5 substantially complete 2026-09-11)
 
 - Adapter: `bridge/vestige-adapter.ts` (profiles, queueOnDegraded)
 - Scripts: `vestige-smoke.ts`, `test-vestige-degraded.sh`, `vestige-mind.ts`
-- Docs: vestige-injection-policy, vestige-buffer-compaction, vestige-fsrs-and-limits
+- **Runtime host contract:** `mind/vestige-protocol.ptc` — `(vestige-host-contract)` and section forms
+- Docs: vestige-injection-policy, vestige-buffer-compaction, vestige-fsrs-and-limits (**archive**; runtime = `(vestige-host-contract)`)
 - Full legacy buffer→refs migration: **skipped** (optional)
 
 ## Planned (P8–P10)
