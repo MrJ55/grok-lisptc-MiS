@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS (grok-mis-oss-dmn)
 
-**Last updated:** 2026-09-07 (P12 **exit** — A–E complete; F deferred optional)  
+**Last updated:** 2026-09-11 (P12 exit synced to mind image; **P5 started**)  
 **Blank session:** start [P00-cold-start.md](./P00-cold-start.md) → this table → active phase file.
 
 ## Status table
@@ -19,12 +19,13 @@
 | **P11** | [P11-oss-dmn-channel.md](./P11-oss-dmn-channel.md) | **thin path live + 4-channel** | bridge/oss.ts; dual-write; bilingual ds_go |
 | **P12** | [P12-dmn-mind-native.md](./P12-dmn-mind-native.md) | **exit (2026-09-07)** | Oracle + mind-native Chorus; A–E; F deferred |
 | P8–P10 | plan files | planned | Scenes … wander |
-| P5 | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | optional later | Vestige adapter |
+| **P5** | [P5-vector-cabinet.md](./P5-vector-cabinet.md) | **in progress (2026-09-11)** | Vestige adapter + HTTP MCP |
 
 ## Current focus
 
-1. **P12 exit.** Optional **F** only if needed (chorus helper, Midnight Note gate, protocol registry).
-2. Next planned narrative/DMN work: **P8–P10** (scenes, prospection, wander) when chosen; P6 residuals parked.
-3. **Oracle contract before any Chorus:** unfinished / guidance / success criterion; then interpret. Use `(dmn-endpoints)` + `(dmn-request-groq)` / `(dmn-request-opencode-go)`.
+1. **P5 Vestige integration (active).** Adapter skeleton + HTTP MCP path; injection policy; config module.
+2. P12 exit complete (A–E); optional F only if needed. Mind image synced 2026-09-11.
+3. Next narrative/DMN work: **P8–P10** when chosen; P6 residuals parked.
+4. **Oracle contract before any Chorus:** unfinished / guidance / success criterion; then interpret.
 
 Cold-start forms: `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(dmn-request-groq)` `(dmn-nudge-craft)` `(dmn-chorus-roster)` `(dmn-reflect-pack n)`.

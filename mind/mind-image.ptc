@@ -21,3 +21,4 @@
 (import "dmn-oracle.ptc")
 (import "dmn-protocol.ptc")
 (import "arithmetic.ptc")
+(import "vestige-config.ptc")

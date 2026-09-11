@@ -1,0 +1,15 @@
+;; P5 — Vestige config (data only; adapter lives in bridge/)
+;; Retrieved Vestige text is NEVER evaluated as Lisp.
+(setq *vestige-config*
+  '((:enabled . t)
+    (:transport . http)
+    (:http-base . "https://diner-dreadlock-zoologist.ngrok-free.dev")
+    (:mcp-path . "/mcp")
+    (:binary . "vestige-mcp")
+    (:data-dir . "~/.vestige/grok-lisptc-mis")
+    (:capability-profile . mind-memory-read-v1)
+    (:degraded-mode . t)
+    (:injection-policy . data-only)))
+(setq *vestige-status* 'unknown)
+(defun vestige-config () *vestige-config*)
+(defun vestige-status () *vestige-status*)
