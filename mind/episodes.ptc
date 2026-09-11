@@ -58,6 +58,33 @@
             (setq *episodic-buffer* (nreverse acc))))
       rec)))
 
+;; --- P5 buffer compaction -------------------------------------------------
+;; Prefer compact Vestige refs in the working set; full text lives in Vestige.
+;; Shape: ("vestige-ref" summary (:vestige-id ID :reality-status ... ))
+(setq *episodic-prefer-compact* t)
+
+(defun episodic-ref-p (rec)
+  "True if REC looks like a compact Vestige reference episode."
+  (and (consp rec) (equal (car rec) "vestige-ref")))
+
+(defun dmn-log-vestige-ref (vestige-id summary meta)
+  "Append a compact Vestige reference; full text stays in Vestige only."
+  (let ((m meta))
+    (unless (has-reality-status m)
+      (setq m (cons :reality-status (cons (quote observed) m))))
+    (unless (member :recorded-at m)
+      (setq m (cons :recorded-at (cons *now* m))))
+    (setq m (cons :vestige-id (cons vestige-id m)))
+    (dmn-log-episode "vestige-ref" summary m)))
+
+(defun episodic-compact-count ()
+  "Number of compact vestige-ref entries in the buffer."
+  (let ((xs *episodic-buffer*) (n 0))
+    (while xs
+      (if (episodic-ref-p (car xs)) (setq n (+ n 1)))
+      (setq xs (cdr xs)))
+    n))
+
 (defun dmn-fetch-unreflected (n)
   "Return up to N most recent episodes (buffer is newest-first)."
   (if (or (null n) (<= n 0))
@@ -148,9 +175,9 @@
                    (xs *episodic-buffer*))
                (while (and xs (not ok))
                  (let ((eid (episode-id-of (car xs))))
-                   (when (and eid (member eid ref-list) (episode-grounded-p (car xs)))
-                     (setq ok t)))
-                 (setq xs (cdr xs)))
+                   (if (and eid (member eid ref-list) (episode-grounded-p (car xs)))
+                       (setq ok t))
+                   (setq xs (cdr xs))))
                (unless ok
                  (setq issues (cons (list (quote ungrounded) title) issues))))))))
       (setq chs (cdr chs)))
