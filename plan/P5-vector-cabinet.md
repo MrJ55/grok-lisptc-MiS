@@ -1,6 +1,6 @@
 # P5 — Vestige Integration (Local-First Memory Substrate)
 
-**Status:** reframed 2026-09-04 (GLM+Terra synthesis) — was "Vector Cabinet (optional)"; now "Vestige Integration" per Terra recommendation
+**Status:** in progress 2026-09-11 — adapter skeleton + HTTP MCP; was reframed 2026-09-04 (GLM+Terra)
 **Depends on:** P0.1 complete (trust base); P4 useful; ideally after P6 (evaluation) proves the in-image buffer is insufficient
 **DMN role:** scalable episodic search + causal backfill + contradiction detection behind symbolic self (not identity itself)
 **External project:** [`samvallad33/vestige`](https://github.com/samvallad33/vestige) — AGPL-3.0, 25MB Rust binary, 36 MCP tools, 1961 passing tests
@@ -36,8 +36,9 @@ Vestige directly serves P8 (Replay/Scenes — temporal sequence), P9 (Prospectio
 | MCP subprocess (`vestige-mcp` as separate process, communicate via stdio) | **Yes** | Separate programs communicating via protocol; fork remains MIT. Analogous to MIT app calling GPL CLI tool. |
 | Direct code linking (Rust FFI or TypeScript `import`) | **No** | AGPL copyleft would apply to combined work; fork must become AGPL. |
 | Terra's adapter pattern (`bridge/vestige-adapter.ts` calls MCP) | **Yes** | Adapter is MIT; Vestige is AGPL; they communicate via MCP. |
+| HTTP MCP (remote tunnel / local server) | **Yes** | Same boundary as subprocess; network protocol instead of stdio. |
 
-**Decision:** Use MCP subprocess integration via `bridge/vestige-adapter.ts`. Never directly import Vestige code.
+**Decision:** Use MCP integration via `bridge/vestige-adapter.ts` (HTTP first; stdio later). Never directly import Vestige code.
 
 ## Objective
 - External store for embeddings + metadata + causal graph + contradictions.
@@ -53,40 +54,7 @@ Vestige directly serves P8 (Replay/Scenes — temporal sequence), P9 (Prospectio
 
 Create `bridge/vestige-adapter.ts` — the **only** path to Vestige operations. PTC code calls typed mind operations, never raw MCP tools.
 
-```typescript
-// bridge/vestige-adapter.ts
-import { spawn, ChildProcess } from "node:child_process";
-
-export class VestigeAdapter {
-  private proc: ChildProcess | null = null;
-
-  async start() {
-    this.proc = spawn("vestige-mcp", [], { stdio: ["pipe", "pipe", "pipe"] });
-    // MCP protocol handshake
-  }
-
-  async recall(query: string, k: number = 5): Promise<MemoryItem[]> {
-    // Call vestige recall tool via MCP
-    // Return typed MemoryItem[]
-  }
-
-  async backfill(failureId: string): Promise<BackfillResult> {
-    // Call vestige backfill tool
-    // Return typed BackfillResult with receipt
-  }
-
-  async smartIngest(item: MemoryItem): Promise<string> {
-    // Call vestige smart_ingest tool
-    // Return vestige memory ID
-  }
-
-  async contradictions(topic?: string): Promise<ContradictionPair[]> {
-    // Call vestige recall mode=contradictions
-  }
-
-  // ... etc for graph, maintain, dedup, suppress
-}
-```
+HTTP MCP transport is implemented (2026-09-11). Stdio subprocess remains a future option for fully local installs.
 
 ### B. Lisp-level operations (Terra names → Vestige tools)
 
@@ -129,26 +97,30 @@ If Vestige is unavailable:
 
 ### F. Schema
 
-`mind-image.ptc` (or `mind/vestige-config.ptc` after modularization) holds:
+`mind/vestige-config.ptc` (imported from mind-image):
 ```lisp
 (setq *vestige-config*
   '((:enabled . t)
+    (:transport . http)
+    (:http-base . "https://…")
+    (:mcp-path . "/mcp")
     (:binary . "vestige-mcp")
     (:data-dir . "~/.vestige/grok-lisptc-mis")
     (:capability-profile . mind-memory-read-v1)
-    (:degraded-mode . t)))
+    (:degraded-mode . t)
+    (:injection-policy . data-only)))
 ```
 
 ## Checklist
-- [ ] License compatibility reviewed (AGPL-3.0 vs MIT; MCP subprocess model confirmed safe)
+- [x] License compatibility reviewed (AGPL-3.0 vs MIT; MCP subprocess/network model confirmed safe) — 2026-09-11
 - [ ] Vestige installed and running locally (`npm install -g vestige-mcp-server`)
-- [ ] `bridge/vestige-adapter.ts` implemented with MCP subprocess communication
+- [x] `bridge/vestige-adapter.ts` implemented with **HTTP MCP** (remote); stdio subprocess deferred — 2026-09-11
 - [ ] Adapter tested: `recall`, `smart_ingest`, `backfill`, `contradictions` all work
 - [ ] Lisp-level operations `(mind-recall ...)`, `(mind-backfill-cause ...)` etc. implemented
 - [ ] Capability profile `mind-memory-read-v1` enforced (P0.1 dependency)
 - [ ] API keys outside the image (never commit)
-- [ ] Injection policy documented (data only — never `eval` retrieved text)
-- [ ] No eval of retrieved text (enforced by adapter returning typed `MemoryItem`, not raw strings)
+- [x] Injection policy documented (data only — never `eval` retrieved text) — docs/vestige-injection-policy.md
+- [x] No eval of retrieved text (enforced by adapter returning typed `MemoryItem`, not raw strings)
 - [ ] Degraded mode tested: kill Vestige process, verify MiS boots from last-known-good
 - [ ] In-image `*episodic-buffer*` reduced to compact references (Vestige ID + 1-line summary)
 - [ ] FSRS-6 fading replaces `*episodic-max*` trim for long-term memories
