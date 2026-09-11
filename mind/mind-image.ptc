@@ -24,3 +24,4 @@
 (import "arithmetic.ptc")
 (import "vestige-config.ptc")
 (import "vestige-ops.ptc")
+(import "vestige-protocol.ptc")

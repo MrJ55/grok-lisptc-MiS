@@ -1,0 +1,95 @@
+;; P5 — Vestige host contract (runtime authority; docs are archive)
+;; Parallel to dmn-chorus-protocol / dmn-nudge-craft: host queries the image, not markdown alone.
+;; Does not call Vestige; does not eval retrieved text.
+
+(defun vestige-injection-rules ()
+  "Data-only injection: retrieved Vestige text is never Lisp."
+  (list :status 'observed
+        :op 'vestige-injection-rules
+        :policy 'data-only
+        :must
+          '((never-eval-retrieved-text-as-lisp)
+            (adapter-returns-typed-data-only)
+            (host-maps-to-lists-without-run))
+        :must-not
+          '((eval-content-from-recall)
+            (auto-promote-retrieved-into-mind-image)
+            (treat-ingest-as-autobiography-commit))
+        :reality-status 'observed))
+
+(defun vestige-degraded-protocol ()
+  "When Vestige is unavailable: boot from image; do not claim durable ranked recall."
+  (list :status 'observed
+        :op 'vestige-degraded-protocol
+        :when-unavailable
+          '((set-vestige-status-degraded)
+            (boot-from-mind-image-or-lkg)
+            (optional-queue-writes-state-local-queue)
+            (no-claim-fresh-durable-ranked-recall)
+            (working-set-compact-refs-still-ok))
+        :probe "Host: scripts/vestige-mind.ts status then (vestige-set-status 'ok) or (vestige-set-status 'degraded)"
+        :local-status *vestige-status*
+        :reality-status 'observed))
+
+(defun vestige-working-set-rules ()
+  "Buffer is working set; FSRS ranking lives in Vestige."
+  (list :status 'observed
+        :op 'vestige-working-set-rules
+        :fsrs
+          '((ranking-lives-in-vestige)
+            (do-not-reimplement-fsrs-in-lisp)
+            (buffer-membership-is-not-forever-memory)
+            (faded-is-not-identity-delete))
+        :compact
+          '((prefer-dmn-log-vestige-ref-after-ingest)
+            (full-text-stays-in-vestige)
+            (legacy-fat-episodes-ok-until-trim)
+            (no-mandatory-full-buffer-migration))
+        :prefer-compact *episodic-prefer-compact*
+        :reality-status 'observed))
+
+(defun vestige-profile-rules ()
+  "Capability profiles for Vestige ops (P0.1 / P5)."
+  (list :status 'observed
+        :op 'vestige-profile-rules
+        :profiles
+          '((mind-memory-read-v1 read-only-recall-graph-backfill)
+            (mind-candidate-write-v1 default-host-plus-ingest)
+            (vestige-maintenance-v1 maintain-suppress-governed))
+        :must-not
+          '((automation-ingest-under-read-only-profile)
+            (suppress-without-elevated-profile-and-review))
+        :default-host-profile 'mind-candidate-write-v1
+        :reality-status 'observed))
+
+(defun vestige-host-contract ()
+  "Full host contract for Vestige substrate. Runtime authority — docs archive."
+  (list :status 'observed
+        :op 'vestige-host-contract
+        :runtime-authority 'mind
+        :docs-archive '(docs/vestige-fsrs-and-limits.md
+                        docs/vestige-injection-policy.md
+                        docs/vestige-buffer-compaction.md)
+        :injection (vestige-injection-rules)
+        :degraded (vestige-degraded-protocol)
+        :working-set (vestige-working-set-rules)
+        :profiles (vestige-profile-rules)
+        :must-not
+          '((claim-durable-recall-while-degraded-or-unknown-after-failed-probe)
+            (mirror-fsrs-fields-into-every-ptc-episode)
+            (sort-truth-only-by-buffer-order-when-vestige-up)
+            (bulk-ingest-legacy-buffer-without-review)
+            (eval-oss-or-vestige-text-as-lisp))
+        :must
+          '((probe-then-set-vestige-status)
+            (data-only-injection)
+            (prefer-compact-refs-after-ingest)
+            (host-gates-chapter-commit-and-identity))
+        :cli "scripts/vestige-mind.ts | scripts/vestige-smoke.ts | scripts/test-vestige-degraded.sh"
+        :reality-status 'observed))
+
+(mis-register 'vestige-injection-rules)
+(mis-register 'vestige-degraded-protocol)
+(mis-register 'vestige-working-set-rules)
+(mis-register 'vestige-profile-rules)
+(mis-register 'vestige-host-contract)

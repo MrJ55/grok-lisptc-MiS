@@ -1,5 +1,6 @@
 ;; P5 — Host-mediated Vestige surface (data-only; never eval retrieved text)
 ;; Real I/O: bridge/vestige-adapter.ts or scripts/vestige-mind.ts
+;; Host rules runtime: (vestige-host-contract) in vestige-protocol.ptc
 
 (defun mind-recall (query k)
   "Host-mediated recall. Returns reminder; does not fetch."
@@ -46,13 +47,14 @@
         :reality-status 'observed))
 
 (defun mind-memory-status ()
-  "Local Vestige status + config; host probes live health via CLI."
+  "Local Vestige status + config; host probes live health via CLI. See also (vestige-host-contract)."
   (list :status 'host-mediated
         :op 'mind-memory-status
         :local-vestige-status *vestige-status*
         :config *vestige-config*
         :compact-prefer *episodic-prefer-compact*
-        :instruction "Host: scripts/vestige-mind.ts status. On failure (vestige-set-status 'degraded)."
+        :contract-hint 'vestige-host-contract
+        :instruction "Host: scripts/vestige-mind.ts status. On failure (vestige-set-status 'degraded). Runtime rules: (vestige-host-contract)."
         :reality-status 'observed))
 
 (mis-register 'mind-recall)
