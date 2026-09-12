@@ -1,0 +1,163 @@
+;; Mind duty surface — host must poll; Lisp does not push to Grok.
+;; Runtime authority for narrative / reflection obligations.
+;; Bridge may print HOST_DUTY trailer after successful eval (bridge/eval.ts).
+
+(setq *reflection-unreflected-threshold* 5)
+
+(defun duty-assoc (key alist)
+  "Return cdr of KEY in alist, or nil."
+  (let ((p (assoc key alist)))
+    (if p (cdr p) nil)))
+
+(defun duty-plist-get (key pl)
+  "Get KEY from a flat plist (list :k v :k2 v2)."
+  (cond
+    ((null pl) nil)
+    ((not (consp pl)) nil)
+    ((eq (car pl) key) (cadr pl))
+    (t (duty-plist-get key (cddr pl)))))
+
+(defun duty-last-chapter-title ()
+  "Title of the last autobiography chapter, or nil."
+  (let ((all *autobiography*) (last nil))
+    (while all
+      (setq last (car all))
+      (setq all (cdr all)))
+    (if last (duty-assoc :title last) nil)))
+
+(defun duty-mentions-p5 (s)
+  "True if S is a known Post-P5 / P5-complete marker."
+  (if (null s)
+      nil
+    (or (equal s "Post-P5: Vestige substrate up; open geometry / multi-model / P8-P10 when chosen")
+        (equal s "P5-vestige-substrate")
+        (equal s "P5 substantially complete")
+        (equal s "substantially-complete")
+        (eq s 'substantially-complete)
+        (eq s 'Post-P5))))
+
+(defun narrative-duty ()
+  "Narrative obligations: arc/phase ahead of autobiography."
+  (let ((arc *narrative-arc*)
+        (cur nil)
+        (last-closed nil)
+        (last-ch nil)
+        (duties nil)
+        (p5-status nil))
+    (setq cur (duty-assoc :current-chapter arc))
+    (setq last-closed (duty-assoc :last-closed arc))
+    (setq last-ch (duty-last-chapter-title))
+    (setq p5-status (duty-assoc :p5-status *mind-manifest*))
+    (if (and (or (duty-mentions-p5 cur)
+                 (equal p5-status "substantially-complete")
+                 (eq p5-status 'substantially-complete))
+             (not (equal last-ch "P5 substantially complete"))
+             (not (equal last-ch "P5-vestige-substrate")))
+        (setq duties
+              (cons (list :kind 'narrative
+                          :priority 'high
+                          :reason 'arc-ahead-of-autobiography-p5
+                          :current-chapter cur
+                          :last-chapter last-ch
+                          :last-closed last-closed
+                          :suggest 'dmn-chapter-close-then-commit-p5
+                          :gate 'host-review)
+                    duties)))
+    ;; Medium only if last-closed is also behind last chapter title (true lag)
+    (if (and cur last-closed last-ch
+             (not (equal last-closed last-ch))
+             (null duties))
+        (setq duties
+              (cons (list :kind 'narrative
+                          :priority 'medium
+                          :reason 'last-closed-ne-last-chapter
+                          :current-chapter cur
+                          :last-closed last-closed
+                          :last-chapter last-ch
+                          :suggest 'draft-or-close-chapter-or-log-defer-episode)
+                    duties)))
+    (list :status 'observed
+          :op 'narrative-duty
+          :duties duties
+          :last-chapter last-ch
+          :reality-status 'observed)))
+
+(defun reflection-duty ()
+  "Reflection obligations from episodic buffer size."
+  (let ((n (length *episodic-buffer*))
+        (thr *reflection-unreflected-threshold*)
+        (duties nil)
+        (last-ref (duty-assoc :last-reflection *self-schema*)))
+    (if (> n thr)
+        (setq duties
+              (cons (list :kind 'reflection
+                          :priority 'medium
+                          :reason 'buffer-above-threshold
+                          :buffer-len n
+                          :threshold thr
+                          :last-reflection last-ref
+                          :suggest 'dmn-reflect-pack)
+                    duties)))
+    (list :status 'observed
+          :op 'reflection-duty
+          :duties duties
+          :buffer-len n
+          :threshold thr
+          :reality-status 'observed)))
+
+(defun mind-drive-protocol ()
+  "Mind-drive wave steps (runtime; docs/mind-drive-protocol.md is archive)."
+  (list :status 'observed
+        :op 'mind-drive-protocol
+        :steps
+          '((load-image)
+            (dmn-reflect-pack)
+            (pick-one-open-thread-or-tension)
+            (optional-think-chorus-if-oracle-ok)
+            (act-tpn-scoped)
+            (narrative-duty-discharge-or-defer-episode)
+            (human-tool-if-identity)
+            (save-on-success-only))
+        :narrative-duty
+          "Before ending a wave that changed durable meaning: chapter-close with episode-refs OR log observed defer episode."
+        :must-not
+          '((auto-fire-chorus-without-oracle)
+            (auto-commit-chapter-without-host)
+            (eval-oss-or-vestige-as-lisp))
+        :reality-status 'observed))
+
+(defun mind-duty-check ()
+  "Full host agenda. Poll after bootstrap, after meaning-changing --save, end of mind-drive wave."
+  (let ((nd (narrative-duty))
+        (rd (reflection-duty))
+        (all nil)
+        (high 0)
+        (med 0))
+    (setq all (append (duty-plist-get :duties nd) (duty-plist-get :duties rd)))
+    (let ((xs all))
+      (while xs
+        (let ((d (car xs)))
+          (if (eq (duty-plist-get :priority d) 'high) (setq high (+ high 1)))
+          (if (eq (duty-plist-get :priority d) 'medium) (setq med (+ med 1))))
+        (setq xs (cdr xs))))
+    (list :status 'observed
+          :op 'mind-duty-check
+          :runtime-authority 'mind
+          :docs-archive '(docs/mind-drive-protocol.md docs/reflection-protocol.md)
+          :duty-count (length all)
+          :high-count high
+          :medium-count med
+          :duties all
+          :narrative nd
+          :reflection rd
+          :mind-drive (mind-drive-protocol)
+          :host-must
+            '((discharge-high-duties-or-log-defer)
+              (do-not-end-meaning-changing-turn-with-silent-skip)
+              (chapter-commit-still-host-gated))
+          :reality-status 'observed)))
+
+(mis-register 'mind-duty-check)
+(mis-register 'narrative-duty)
+(mis-register 'reflection-duty)
+(mis-register 'mind-drive-protocol)

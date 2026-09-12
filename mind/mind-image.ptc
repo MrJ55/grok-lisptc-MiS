@@ -25,3 +25,4 @@
 (import "vestige-config.ptc")
 (import "vestige-ops.ptc")
 (import "vestige-protocol.ptc")
+(import "mind-duty.ptc")
