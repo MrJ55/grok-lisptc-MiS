@@ -7,24 +7,27 @@ Deterministic **lisptc** transcript image + **Grok host** + optional pure-DMN OS
 ```
 human goals
     ↓
-Grok host (natural language, tool use, --save discipline)
+Grok host (natural language, tool use, --save policy)
     ↓
-lisptc eval bridge (validate, save-on-success, LKG)
+bridge/eval.ts (validate, load image, eval, HOST_DUTY trailer, optional save)
     ↓
-mind image (.ptc modules: schema, episodes, autobiography, oracle, vestige config/ops)
+mind image (lisptc) — schema, episodes, autobiography, oracle, vestige contract, mind-duty
     ↓
-optional: pure-DMN OSS (P11/P12) — imagined dual-write only
-optional: Vestige MCP (P5) — long-term episodic substrate
+optional substrate: Vestige HTTP MCP (ranked long-term memory; not identity)
 ```
 
 **Host owns:** when to reflect, narrate, simulate, wander; what to `--save`.  
-**Image owns:** durable symbolic state.  
-**Vestige substrate (P5, substantially complete 2026-09-11):** HTTP MCP adapter + host-mediated recall/ingest; compact episodic refs; capability profiles; degraded mode. Searchable long-term memory — **never sole identity** (image remains permanent). See plan/P5-vector-cabinet.md and docs/vestige-*.md.
+**Mind owns the agenda:** `(mind-duty-check)` computes obligations; host must poll (bridge `HOST_DUTY` trailer). See [mind-duty.md](./mind-duty.md).
 
-## Session survival
+**Runtime authority is the mind** for Chorus (P12), Vestige host rules (P5), and duty surface (2026-09-12). Docs are archive.
 
-Process RAM dies with the tool call. Durability = `mind-image.ptc` in git, optional `wander-proposals` files, external APIs / Vestige.
+## Trust
 
-## Safety
+Untrusted text (OSS, Vestige recall content, raw transcript snippets) is **never** evaluated as Lisp. See [trust-classes.md](./trust-classes.md).
 
-P0 invariants unchanged. Wander and simulate produce **candidates/data**, not automatic commits. Vestige retrieves untrusted text — never eval as Lisp.
+## Related
+
+- [mind-duty.md](./mind-duty.md)
+- [session-handoff.md](./session-handoff.md)
+- [mind-api.md](./mind-api.md)
+- [dmn-runtime-vs-archive.md](./dmn-runtime-vs-archive.md)
