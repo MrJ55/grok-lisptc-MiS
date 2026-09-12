@@ -8,6 +8,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/session-handoff.md](docs/session-handoff.md)
 * [plan/README.md](plan/README.md)
 * [docs/CUSTOM_INSTRUCTIONS.md](docs/CUSTOM_INSTRUCTIONS.md)
+* [docs/mind-duty.md](docs/mind-duty.md) — **host agenda** `(mind-duty-check)`
 
 ## Architecture & decisions
 
@@ -16,6 +17,12 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/trust-classes.md](docs/trust-classes.md)
 * [docs/capability-governance.md](docs/capability-governance.md)
 * [docs/threat-model.md](docs/threat-model.md)
+
+## Host duty surface (2026-09-12)
+
+* [docs/mind-duty.md](docs/mind-duty.md) — **runtime** `(mind-duty-check)`; Lisp does not push
+* Forms: `(narrative-duty)` `(reflection-duty)` `(mind-drive-protocol)` in `mind/mind-duty.ptc`
+* Bridge: `HOST_DUTY` trailer after successful eval (`MIS_DUTY_STRICT=1` optional)
 
 ## Vestige (P5 substantially complete 2026-09-11)
 
@@ -35,7 +42,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## DMN / OSS (P12 — runtime is the mind)
 
-**Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(dmn-request-groq)` `(dmn-request-opencode-go)` `(dmn-nudge-craft)` `(dmn-reflect-pack n)`  
+**Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(dmn-request-groq)` `(dmn-request-opencode-go)` `(dmn-nudge-craft)` `(dmn-reflect-pack n)` `(mind-duty-check)`  
 **Map:** [docs/dmn-runtime-vs-archive.md](docs/dmn-runtime-vs-archive.md) · **Handoff:** [docs/session-handoff.md](docs/session-handoff.md)
 
 * [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **exit (2026-09-07)** A–E
@@ -44,4 +51,4 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## Phase plan
 
-See [plan/README.md](plan/README.md). **P5 substantially complete 2026-09-11.** Next: P8–P10 when chosen.
+See [plan/README.md](plan/README.md). **P5 substantially complete 2026-09-11.** **mind-duty-check live 2026-09-12.** Next: P8–P10 when chosen.
