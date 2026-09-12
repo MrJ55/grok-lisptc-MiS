@@ -10,47 +10,36 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/CUSTOM_INSTRUCTIONS.md](docs/CUSTOM_INSTRUCTIONS.md)
 * [docs/mind-duty.md](docs/mind-duty.md) — **host agenda** `(mind-duty-check)`
 * [docs/p8-scenes.md](docs/p8-scenes.md) — **P8** replay and scenes
+* [docs/p9-prospection.md](docs/p9-prospection.md) — **P9** simulation packs
 
 ## Architecture & decisions
 
 * [docs/architecture.md](docs/architecture.md)
 * [docs/decisions-index.md](docs/decisions-index.md)
 * [docs/trust-classes.md](docs/trust-classes.md)
-* [docs/capability-governance.md](docs/capability-governance.md)
-* [docs/threat-model.md](docs/threat-model.md)
+
+## P9 prospection (implemented 2026-09-12)
+
+* [docs/p9-prospection.md](docs/p9-prospection.md) — `(dmn-simulate-future)` `(dmn-simulate-counterfactual)` `(dmn-log-simulation)`
+* Module: `mind/prospection.ptc` — all results `:reality-status simulated`; never auto-exec
 
 ## P8 scenes (implemented 2026-09-12)
 
 * [docs/p8-scenes.md](docs/p8-scenes.md) — `(dmn-replay)` `(dmn-scene-from)` `(dmn-tag-episode)`
-* Module: `mind/scenes.ptc` — simulated replay + as-of; host-mediated `(mind-recall-sequence)`
+* Module: `mind/scenes.ptc`
 
 ## Host duty surface (2026-09-12)
 
-* [docs/mind-duty.md](docs/mind-duty.md) — **runtime** `(mind-duty-check)`; Lisp does not push
-* Forms: `(narrative-duty)` `(reflection-duty)` `(mind-drive-protocol)` in `mind/mind-duty.ptc`
-* Bridge: `HOST_DUTY` trailer after successful eval (`MIS_DUTY_STRICT=1` optional)
+* [docs/mind-duty.md](docs/mind-duty.md) — `(mind-duty-check)`; bridge `HOST_DUTY` trailer
 
-## Vestige (P5 substantially complete 2026-09-11)
+## Vestige (P5 substantially complete)
 
-* [plan/P5-vector-cabinet.md](plan/P5-vector-cabinet.md)
-* **Runtime:** `(vestige-host-contract)` in `mind/vestige-protocol.ptc`
-* Scripts: `scripts/vestige-smoke.ts`, `scripts/test-vestige-degraded.sh`, `scripts/vestige-mind.ts`
+* Runtime: `(vestige-host-contract)` · scripts/vestige-*
 
-## Ops
+## DMN / OSS (P12 exit)
 
-* [docs/ops-playbook.md](docs/ops-playbook.md)
-* [docs/bootstrap.md](docs/bootstrap.md)
-* [docs/VERIFICATION.md](docs/VERIFICATION.md)
-* [docs/UPSTREAM.md](docs/UPSTREAM.md)
-
-## DMN / OSS (P12 — runtime is the mind)
-
-**Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(mind-duty-check)` `(dmn-replay 'error 5)`  
-**Map:** [docs/dmn-runtime-vs-archive.md](docs/dmn-runtime-vs-archive.md) · **Handoff:** [docs/session-handoff.md](docs/session-handoff.md)
-
-* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **exit**
-* [docs/mind-api.md](docs/mind-api.md) — form index
+Cold-start: `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(mind-duty-check)` `(dmn-simulate-future nil)`
 
 ## Phase plan
 
-See [plan/README.md](plan/README.md). **P8 implemented 2026-09-12.** Next: P9–P10 when chosen.
+See [plan/README.md](plan/README.md). **P8+P9 implemented 2026-09-12.** Next: **P10** when chosen.
