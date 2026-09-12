@@ -1,0 +1,178 @@
+;; P9 - Prospection: future, counterfactual, light other-mind simulation packs
+;; Lisp stores structured seeds/results; Grok is the simulator.
+;; All results :reality-status simulated. Never eval :predicted-outcomes as Lisp.
+
+(setq *simulation-results*
+  '(((:mode . counterfactual)
+     (:seed-summary . "p8-error-fixture: if error tags missing, replay empty")
+     (:predicted-outcomes always-tag-error?-on-failures bias-replay-before-reflect optional-oss-texture-before-insight)
+     (:schema-delta (working-insights . counterfactual-tag-errors))
+     (:confidence . medium)
+     (:trust-class . candidate)
+     (:reality-status . simulated)
+     (:as-of . "2026-09-12T18:37:25Z")
+     (:logged-at . "2026-09-12")
+     (:oss-texture-note . "optional pure-DMN third-voice before insight; imagined only"))
+    ((:mode . future)
+     (:seed-summary . "active-goals: maintain-coherent-self + vestige + p8-p10")
+     (:predicted-outcomes host-keeps-duty-poll vestige-up-enables-recall p9-feeds-p7-chapters)
+     (:schema-delta (p9-status . implemented))
+     (:confidence . high)
+     (:trust-class . candidate)
+     (:reality-status . simulated)
+     (:as-of . "2026-09-12T18:37:25Z")
+     (:logged-at . "2026-09-12"))))
+(setq *simulation-max* 20)
+
+(defun sim-plist-get (pl key)
+  (cond
+    ((null pl) nil)
+    ((not (consp pl)) nil)
+    ((eq (car pl) key) (cadr pl))
+    (t (sim-plist-get (cddr pl) key))))
+
+(defun dmn-active-goals ()
+  "Return :active-goals from *self-schema* or nil."
+  (let ((p (assoc :active-goals *self-schema*)))
+    (if p (cdr p) nil)))
+
+(defun dmn-sim-seed-from-error ()
+  "Build a seed ref from newest error-tagged episode, or nil."
+  (let ((pack (dmn-replay (quote error) 1)))
+    (let ((eps (sim-plist-get pack :episodes)))
+      (if (null eps)
+          nil
+        (list :kind (quote error-episode)
+              :episode (car eps)
+              :scene (dmn-scene-from (car eps)))))))
+
+(defun dmn-sim-seed-from-goals ()
+  "Seed ref from current active goals and arc."
+  (list :kind (quote active-goals)
+        :goals (dmn-active-goals)
+        :arc (dmn-arc)
+        :open-threads (let ((p (assoc :open-threads *self-schema*)))
+                        (if p (cdr p) nil))))
+
+(defun dmn-simulate-pack (mode seed-ref)
+  "Return structured simulation pack; host fills narrative; never auto-exec outcomes."
+  (let ((m mode)
+        (seed seed-ref)
+        (scene nil))
+    (if (and (consp seed) (eq (sim-plist-get seed :kind) (quote error-episode)))
+        (setq scene (sim-plist-get seed :scene)))
+    (if (and (null scene) (consp seed) (eq (sim-plist-get seed :op) (quote dmn-scene-from)))
+        (setq scene seed))
+    (list :status (quote observed)
+          :op (quote dmn-simulate-pack)
+          :mode m
+          :seed seed
+          :scene scene
+          :predicted-outcomes (quote (host-fills-list-of-outcome-symbols-or-strings))
+          :schema-delta (quote (host-fills-optional-schema-key-value-hints))
+          :goal-delta (quote (host-fills-optional-goal-shifts))
+          :confidence (quote medium)
+          :trust-class (quote candidate)
+          :reality-status (quote simulated)
+          :as-of *now*
+          :must-not (quote (eval-predicted-outcomes-as-lisp
+                            merge-into-observed-history
+                            auto-execute-predicted-actions))
+          :host-protocol
+            (quote (1-ground-seed
+                    2-optional-mind-backfill-cause-if-failure
+                    3-optional-oss-pure-dmn-texture-imagined
+                    4-fill-predicted-outcomes-schema-delta
+                    5-dmn-log-simulation-to-store
+                    6-promote-insights-only-via-reflection-or-promote-candidate))
+          :instruction "Grok narrates simulation; store via dmn-log-simulation; never eval outcomes.")))
+
+(defun dmn-simulate-future (seed-ref)
+  "Future-mode simulate pack. Default seed = active goals if seed-ref is nil."
+  (dmn-simulate-pack (quote future)
+                     (if seed-ref seed-ref (dmn-sim-seed-from-goals))))
+
+(defun dmn-simulate-counterfactual (seed-ref)
+  "Counterfactual pack. Default seed = newest error episode if seed-ref is nil."
+  (dmn-simulate-pack (quote counterfactual)
+                     (if seed-ref seed-ref (dmn-sim-seed-from-error))))
+
+(defun dmn-simulate-other-mind (seed-ref)
+  "Light other-mind pack. Seed should describe the other agent/perspective."
+  (dmn-simulate-pack (quote other-mind) seed-ref))
+
+(defun dmn-log-simulation (mode seed-summary outcomes schema-delta confidence)
+  "Append a completed simulation result to *simulation-results* (simulated only)."
+  (let ((rec (list (cons :mode mode)
+                   (cons :seed-summary seed-summary)
+                   (cons :predicted-outcomes outcomes)
+                   (cons :schema-delta schema-delta)
+                   (cons :confidence confidence)
+                   (cons :trust-class (quote candidate))
+                   (cons :reality-status (quote simulated))
+                   (cons :as-of *now*)
+                   (cons :logged-at *today*))))
+    (setq *simulation-results* (cons rec *simulation-results*))
+    (if (> (length *simulation-results*) *simulation-max*)
+        (let ((xs *simulation-results*) (acc nil) (i 0))
+          (while (and xs (< i *simulation-max*))
+            (setq acc (cons (car xs) acc))
+            (setq xs (cdr xs))
+            (setq i (+ i 1)))
+          (setq *simulation-results* (nreverse acc))))
+    (list :status (quote logged)
+          :mode mode
+          :count (length *simulation-results*)
+          :reality-status (quote simulated)
+          :must-not (quote (auto-execute)))))
+
+(defun dmn-simulation-results (n)
+  "Return up to N most recent simulation results (newest first)."
+  (if (or (null n) (<= n 0))
+      *simulation-results*
+    (let ((xs *simulation-results*) (acc nil) (i 0))
+      (while (and xs (< i n))
+        (setq acc (cons (car xs) acc))
+        (setq xs (cdr xs))
+        (setq i (+ i 1)))
+      (nreverse acc))))
+
+(defun dmn-counterfactual-curriculum (failure-id)
+  "Host-mediated counterfactual curriculum protocol after a failure."
+  (list :status (quote host-mediated)
+        :op (quote dmn-counterfactual-curriculum)
+        :failure-id failure-id
+        :steps
+          (quote ((log-error-episode-with-error?-t)
+                  (optional-mind-backfill-cause)
+                  (optional-oss-pure-dmn-texture-imagined)
+                  (dmn-simulate-counterfactual-from-error)
+                  (dmn-log-simulation)
+                  (synthesize-insight-via-dmn-apply-reflection)
+                  (never-eval-predicted-outcomes)))
+        :backfill-hint (list (quote mind-backfill-cause) failure-id)
+        :simulate-hint (quote (dmn-simulate-counterfactual nil))
+        :reality-status (quote observed)
+        :sim-reality-status (quote simulated)
+        :instruction "Host runs steps; OSS is texture only; promote only via reflection/promote-candidate."))
+
+(defun audit-simulation-leak ()
+  "Return issues if any *simulation-results* lack :reality-status simulated."
+  (let ((xs *simulation-results*) (issues nil))
+    (while xs
+      (let ((rec (car xs)))
+        (let ((st (let ((p (assoc :reality-status rec))) (if p (cdr p) nil))))
+          (unless (eq st (quote simulated))
+            (setq issues (cons (list (quote bad-sim-status) st rec) issues)))))
+      (setq xs (cdr xs)))
+    (nreverse issues)))
+
+(mis-register (quote dmn-simulate-pack))
+(mis-register (quote dmn-simulate-future))
+(mis-register (quote dmn-simulate-counterfactual))
+(mis-register (quote dmn-simulate-other-mind))
+(mis-register (quote dmn-log-simulation))
+(mis-register (quote dmn-simulation-results))
+(mis-register (quote dmn-counterfactual-curriculum))
+(mis-register (quote dmn-active-goals))
+(mis-register (quote audit-simulation-leak))
