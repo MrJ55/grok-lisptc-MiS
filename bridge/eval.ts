@@ -14,6 +14,7 @@
  *   --strict-load   treat image-load / manifest errors as fatal (exit 2)
  *
  * Env: MIS_IMAGE overrides default path; MIS_SAVE=1 enables save.
+ *       MIS_DUTY_TRAILER=0 disables duty trailer; MIS_DUTY_STRICT=1 fails on high duties.
  * Exit codes: 0 success, 1 usage/empty, 2 validation or eval failure
  */
 
@@ -83,9 +84,7 @@ function prevalidate(code: string): { ok: true } | { ok: false; reason: string }
   const s = stripFences(code);
   if (!s) return { ok: false, reason: "empty form" };
 
-  // Reject multi-word prose that is not a parenthesized form
   if (!s.trimStart().startsWith("(") && !s.trimStart().startsWith("'") && !s.trimStart().startsWith("`")) {
-    // bare atom ok (symbol, keyword, number)
     if (/\s/.test(s.trim())) {
       return { ok: false, reason: "multi-word prose (not a Lisp form)" };
     }
@@ -95,7 +94,6 @@ function prevalidate(code: string): { ok: true } | { ok: false; reason: string }
     return { ok: false, reason: "OSS-shaped prose rejected (pure-DMN discipline)" };
   }
 
-  // Paren balance (rough)
   let depth = 0;
   let inStr = false;
   let esc = false;
@@ -156,9 +154,7 @@ function extractTopLevelForms(src: string): string[] {
         start = -1;
       }
     } else if (depth === 0 && start < 0 && /[^\s]/.test(c)) {
-      // bare atom / keyword at top level
       start = i;
-      // consume until whitespace or end
       while (i + 1 < src.length && /[^\s;]/.test(src[i + 1])) i++;
       forms.push(src.slice(start, i + 1));
       start = -1;
@@ -221,11 +217,6 @@ function fullHash(buf: Buffer | string): string {
   return createHash("sha256").update(buf).digest("hex");
 }
 
-/**
- * Load image form-by-form. First form should set *mind-manifest*; we validate
- * schema/profile after it (and again after full load). Remaining forms continue
- * even if an intermediate form fails (unless --strict-load).
- */
 function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   if (!existsSync(path)) {
     console.error(`[mis] no image at ${path} — starting fresh`);
@@ -244,8 +235,6 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   let anyFail = false;
   let manifestChecked = false;
 
-  // Relative (import "foo.ptc") resolves against cwd when not nested in an import;
-  // evaluate image forms with cwd = image directory so mind/*.ptc modules resolve.
   const imageDir = dirname(path);
   const prevCwd = process.cwd();
   try {
@@ -268,13 +257,11 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
       continue;
     }
 
-    // After first successful form, require *mind-manifest*
     if (idx === 0 || !manifestChecked) {
       const m = repl.eval("*mind-manifest*");
       if (m.ok && m.output.trim() && !m.output.includes("unbound") && !m.output.includes("Unbound")) {
         manifestChecked = true;
         const text = m.output.trim();
-        // Light string checks (full alist parse is overkill in TS)
         if (!text.includes("0.1.0") && !text.includes(":gmod-schema")) {
           console.error(`[mis] warning: *mind-manifest* present but schema not recognized`);
         } else {
@@ -300,7 +287,6 @@ function injectHostGlobals(interp: Interp) {
   const today = new Date().toISOString().slice(0, 10);
   const now = new Date().toISOString();
   const session = process.env.MIS_SESSION_ID || process.env.SESSION_ID || "unknown";
-  // Bind as Lisp symbols
   try {
     run(interp, `(setq *today* "${today}")`);
     run(interp, `(setq *now* "${now}")`);
@@ -325,8 +311,6 @@ function writeLastKnownGood(path: string) {
   if (!existsSync(path)) return;
   ensureDirs();
   copyFileSync(path, LKG_IMAGE);
-  // Snapshot imported modules next to LKG so relative (import "...") resolves
-  // when --image points at checkpoints/last-known-good.ptc (cwd = checkpoints/).
   const coreModules = [
     "helpers.ptc",
     "schema.ptc",
@@ -419,7 +403,6 @@ async function main() {
   }
 
   if (!code) {
-    // nothing to eval
     process.exit(0);
   }
 
@@ -431,6 +414,45 @@ async function main() {
     console.error(`[mis] eval failed — image NOT updated`);
     logFailure("eval", code);
     process.exit(2);
+  }
+
+  // Host duty trailer: mind cannot push to Grok; surface obligations after every successful eval.
+  // MIS_DUTY_TRAILER=0 disables. MIS_DUTY_STRICT=1 exits 2 when high-priority duties remain
+  // (unless the form itself mentions duty/chapter-close/commit/reflect).
+  if (process.env.MIS_DUTY_TRAILER !== "0") {
+    try {
+      const dutyRun = repl.eval("(mind-duty-check)");
+      if (dutyRun.ok && dutyRun.output) {
+        const text = dutyRun.output.replace(/\s+/g, " ").trim();
+        const high = /:high-count\s+([1-9]\d*)/.exec(text);
+        const med = /:medium-count\s+([1-9]\d*)/.exec(text);
+        const highN = high ? Number(high[1]) : 0;
+        const medN = med ? Number(med[1]) : 0;
+        if (highN > 0 || medN > 0) {
+          console.error(
+            `[mis] HOST_DUTY: high=${highN} medium=${medN} — query (mind-duty-check); discharge or log defer`,
+          );
+          const snippet = text.slice(0, 280);
+          if (snippet) console.error(`[mis] HOST_DUTY detail: ${snippet}`);
+        } else {
+          console.error(`[mis] HOST_DUTY: clear`);
+        }
+        const strict = process.env.MIS_DUTY_STRICT === "1";
+        const discharging = /mind-duty|narrative-duty|chapter-close|chapter-commit|dmn-apply-reflection|dmn-reflect-pack/i.test(
+          code,
+        );
+        if (strict && highN > 0 && !discharging) {
+          console.error(
+            `[mis] HOST_DUTY strict: high-priority duties remain — discharge before continuing`,
+          );
+          process.exit(2);
+        }
+      }
+    } catch (e) {
+      console.error(
+        `[mis] HOST_DUTY trailer skipped: ${e instanceof Error ? e.message : e}`,
+      );
+    }
   }
 
   if (doSave) {
