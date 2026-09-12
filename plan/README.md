@@ -1,6 +1,6 @@
 # Plan — grok-lisptc-MiS
 
-**Last updated:** 2026-09-12 (P5 substantially complete; **mind-duty-check live** — Vestige HTTP MCP substrate + host duty surface)
+**Last updated:** 2026-09-12 (**P8 implemented** — scenes/replay; P5 + mind-duty)
 
 | Phase | File | Status | Notes |
 |-------|------|--------|-------|
@@ -11,10 +11,11 @@
 | P5 | P5-vector-cabinet | **substantially complete** | Vestige MCP; host contract mind-native |
 | P6 | P6-evaluation | substantially met | residuals parked |
 | P7 | P7-narrative-self | exit | candidate-first chapters; duty discharge P5 |
+| P8 | P8-replay-scenes | **implemented** | tag/replay/scene; see docs/p8-scenes.md |
 | P11 | P11-oss-dmn-channel | live 4-channel | pure-DMN path |
 | P12 | P12-dmn-mind-native | **exit** | oracle + Chorus A–E |
-| P8–P10 | plan/P8–P10 | planned | scenes, prospection, wander |
+| P9–P10 | plan/P9–P10 | planned | prospection, wander |
 
-**2026-09-12:** Host duty surface `(mind-duty-check)` live — see [docs/mind-duty.md](../docs/mind-duty.md). Bridge `HOST_DUTY` trailer. P5 autobiography chapter discharged.
+**2026-09-12:** P8 core forms live. Host duty surface `(mind-duty-check)` live. See [docs/p8-scenes.md](../docs/p8-scenes.md) and [docs/mind-duty.md](../docs/mind-duty.md).
 
-Phase files under `plan/` are the checklist source of truth. Status table above is a summary.
+Phase files under `plan/` are the checklist source of truth.

@@ -9,6 +9,7 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [plan/README.md](plan/README.md)
 * [docs/CUSTOM_INSTRUCTIONS.md](docs/CUSTOM_INSTRUCTIONS.md)
 * [docs/mind-duty.md](docs/mind-duty.md) — **host agenda** `(mind-duty-check)`
+* [docs/p8-scenes.md](docs/p8-scenes.md) — **P8** replay and scenes
 
 ## Architecture & decisions
 
@@ -18,6 +19,11 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [docs/capability-governance.md](docs/capability-governance.md)
 * [docs/threat-model.md](docs/threat-model.md)
 
+## P8 scenes (implemented 2026-09-12)
+
+* [docs/p8-scenes.md](docs/p8-scenes.md) — `(dmn-replay)` `(dmn-scene-from)` `(dmn-tag-episode)`
+* Module: `mind/scenes.ptc` — simulated replay + as-of; host-mediated `(mind-recall-sequence)`
+
 ## Host duty surface (2026-09-12)
 
 * [docs/mind-duty.md](docs/mind-duty.md) — **runtime** `(mind-duty-check)`; Lisp does not push
@@ -26,11 +32,8 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## Vestige (P5 substantially complete 2026-09-11)
 
-* [plan/P5-vector-cabinet.md](plan/P5-vector-cabinet.md) — **substantially complete**; accomplishments section
-* **Runtime:** `(vestige-host-contract)` and section forms in `mind/vestige-protocol.ptc` (docs = archive)
-* [docs/vestige-injection-policy.md](docs/vestige-injection-policy.md) — data-only injection
-* [docs/vestige-buffer-compaction.md](docs/vestige-buffer-compaction.md) — compact refs
-* [docs/vestige-fsrs-and-limits.md](docs/vestige-fsrs-and-limits.md) — FSRS-6 notes + operational limits (archive)
+* [plan/P5-vector-cabinet.md](plan/P5-vector-cabinet.md)
+* **Runtime:** `(vestige-host-contract)` in `mind/vestige-protocol.ptc`
 * Scripts: `scripts/vestige-smoke.ts`, `scripts/test-vestige-degraded.sh`, `scripts/vestige-mind.ts`
 
 ## Ops
@@ -42,13 +45,12 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## DMN / OSS (P12 — runtime is the mind)
 
-**Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(dmn-request-groq)` `(dmn-request-opencode-go)` `(dmn-nudge-craft)` `(dmn-reflect-pack n)` `(mind-duty-check)`  
+**Cold-start forms:** `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(dmn-endpoints)` `(mind-duty-check)` `(dmn-replay 'error 5)`  
 **Map:** [docs/dmn-runtime-vs-archive.md](docs/dmn-runtime-vs-archive.md) · **Handoff:** [docs/session-handoff.md](docs/session-handoff.md)
 
-* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **exit (2026-09-07)** A–E
-* [plan/P11-oss-dmn-channel.md](plan/P11-oss-dmn-channel.md) — thin path + 4-channel
+* [plan/P12-dmn-mind-native.md](plan/P12-dmn-mind-native.md) — **exit**
 * [docs/mind-api.md](docs/mind-api.md) — form index
 
 ## Phase plan
 
-See [plan/README.md](plan/README.md). **P5 substantially complete 2026-09-11.** **mind-duty-check live 2026-09-12.** Next: P8–P10 when chosen.
+See [plan/README.md](plan/README.md). **P8 implemented 2026-09-12.** Next: P9–P10 when chosen.
