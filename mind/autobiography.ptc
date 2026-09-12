@@ -22,6 +22,11 @@
      (:summary . "dmn-chapter-close proposes; dmn-chapter-commit commits after host review. OSS imagined candidates reviewed and discarded as autobiography where ungrounded.")
      (:episode-refs mind-drive-wave-3)
      (:date-label . "2026-09-05")
+     (:reality-status . observed))
+    ((:title . "P5 substantially complete")
+     (:summary . "Vestige HTTP MCP substrate: adapter, capability profiles, degraded-mode test, host-mediated ops, compact refs, FSRS/limits doc, mind-native (vestige-host-contract). Local binary and full buffer migration skipped. Duty surface (mind-duty-check) added so host polls narrative/reflection obligations.")
+     (:episode-refs p5-substantially-complete vestige-host-contract mind-duty-check)
+     (:date-label . "2026-09-11")
      (:reality-status . observed))))
 
 (setq *narrative-arc*
@@ -29,7 +34,7 @@
     (:open-threads . (geometry-preservation multi-model-ensemble))
     (:tensions . (pure-dmn-vs-tpn-pressure user-drive-vs-mind-drive))
     (:status . active)
-    (:last-closed . "P12-dmn-mind-native")))
+    (:last-closed . "P5 substantially complete")))
 
 (setq *narrative-candidates* nil)
 
