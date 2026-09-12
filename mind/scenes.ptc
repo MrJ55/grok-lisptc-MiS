@@ -1,0 +1,175 @@
+;; P8 - Structured replay and scene construction
+;; Replay/scenes are data-only; never executed as actions.
+;; Replay results carry :reality-status simulated + :as-of (frozen checkpoint ref).
+
+(defun ep-meta (ep)
+  "Meta of episode record (input result meta)."
+  (if (and (consp ep) (consp (cdr ep))) (caddr ep) nil))
+
+(defun ep-input (ep)
+  (if (consp ep) (car ep) nil))
+
+(defun ep-result (ep)
+  (if (and (consp ep) (consp (cdr ep))) (cadr ep) nil))
+
+(defun ep-plist-get (meta key)
+  "Get KEY from flat plist meta."
+  (cond
+    ((null meta) nil)
+    ((not (consp meta)) nil)
+    ((eq (car meta) key) (cadr meta))
+    (t (ep-plist-get (cddr meta) key))))
+
+(defun ep-meta-get (meta key)
+  "Get KEY from plist or alist meta."
+  (if (null meta)
+      nil
+    (let ((a (assoc key meta)))
+      (if a (cdr a) (ep-plist-get meta key)))))
+
+(defun ep-nth (n)
+  "Nth episode in buffer (0 = newest)."
+  (let ((xs *episodic-buffer*) (i 0) (found nil))
+    (while (and xs (not found))
+      (if (= i n)
+          (setq found (car xs))
+        (progn (setq xs (cdr xs)) (setq i (+ i 1)))))
+    found))
+
+(defun ep-merge-meta (meta tag-plist)
+  "Prepend TAG-PLIST keys onto META."
+  (if (null tag-plist)
+      meta
+    (append tag-plist meta)))
+
+(defun dmn-tag-episode (index tag-plist)
+  "Merge TAG-PLIST into episode at INDEX (0=newest)."
+  (let ((xs *episodic-buffer*) (i 0) (acc nil) (updated nil) (done nil))
+    (while xs
+      (if (and (not done) (= i index))
+          (progn
+            (let ((ep (car xs)))
+              (let ((new-meta (ep-merge-meta (ep-meta ep) tag-plist)))
+                (setq updated (list (ep-input ep) (ep-result ep) new-meta))
+                (setq acc (cons updated acc))
+                (setq done t))))
+        (setq acc (cons (car xs) acc)))
+      (setq xs (cdr xs))
+      (setq i (+ i 1)))
+    (when done
+      (setq *episodic-buffer* (nreverse acc)))
+    updated))
+
+(defun episode-has-error-p (ep)
+  "True if meta marks :error?."
+  (let ((v (ep-meta-get (ep-meta ep) :error?)))
+    (or (eq v t) (eq v (quote t)) (equal v "t") (eq v (quote error)) (eq v (quote true)))))
+
+(defun episode-matches-query (ep query)
+  "Match QUERY against tags and type fields."
+  (let ((meta (ep-meta ep))
+        (q query))
+    (cond
+      ((null q) t)
+      ((or (eq q (quote error)) (eq q :error) (eq q (quote error?)) (eq q :error?))
+       (episode-has-error-p ep))
+      ((or (eq q (quote reflection)) (equal q "reflection"))
+       (or (equal (ep-input ep) "reflection")
+           (eq (ep-meta-get meta :source) (quote reflection))
+           (equal (ep-meta-get meta :source) "reflection")))
+      ((or (eq q (quote observed)) (eq q (quote reported)) (eq q (quote inferred))
+           (eq q (quote imagined)) (eq q (quote simulated)) (eq q (quote hypothesized))
+           (eq q (quote planned)) (eq q (quote retracted)))
+       (eq (ep-meta-get meta :reality-status) q))
+      ((or (eq q (quote oss)) (eq q (quote oss-dmn)))
+       (or (eq (ep-meta-get meta :source) (quote oss-dmn))
+           (equal (ep-meta-get meta :source) "oss-dmn")))
+      ((or (eq q (quote vestige-ref)) (equal q "vestige-ref"))
+       (equal (ep-input ep) "vestige-ref"))
+      ((or (eq q (quote positive)) (eq q (quote negative)) (eq q (quote neutral)))
+       (eq (ep-meta-get meta :valence) q))
+      ((or (eq q (quote high)) (eq q (quote medium)) (eq q (quote low)))
+       (or (eq (ep-meta-get meta :goal-relevance) q)
+           (eq (ep-meta-get meta :novelty) q)))
+      (t
+       (or (equal (ep-meta-get meta :label) q)
+           (equal (ep-meta-get meta :id) q)
+           (equal (ep-input ep) q))))))
+
+(defun dmn-replay (query-or-tag n)
+  "Filter buffer by tag; return up to N matches as simulated replay pack."
+  (let ((lim (if (and n (> n 0)) n 5))
+        (xs *episodic-buffer*)
+        (acc nil)
+        (count 0))
+    (while (and xs (< count lim))
+      (if (episode-matches-query (car xs) query-or-tag)
+          (progn
+            (setq acc (cons (car xs) acc))
+            (setq count (+ count 1))))
+      (setq xs (cdr xs)))
+    (list :status (quote observed)
+          :op (quote dmn-replay)
+          :query query-or-tag
+          :count count
+          :as-of *now*
+          :checkpoint-ref (quote episodic-buffer-working-set)
+          :reality-status (quote simulated)
+          :note "Replay is reconstruction; not a new observation."
+          :episodes (nreverse acc))))
+
+(defun dmn-scene-from (ep)
+  "Extract lightweight scene pack from EP for P9/P7. Data-only."
+  (let ((meta (ep-meta ep))
+        (input (ep-input ep))
+        (result (ep-result ep)))
+    (list :status (quote observed)
+          :op (quote dmn-scene-from)
+          :actors (let ((a (ep-meta-get meta :actors)))
+                    (if a a (quote (host mind))))
+          :setting (let ((s (ep-meta-get meta :setting)))
+                     (if s s (quote mind-sandbox)))
+          :actions (list input)
+          :outcome result
+          :affect (let ((v (ep-meta-get meta :valence)))
+                    (if v v (quote neutral)))
+          :error? (episode-has-error-p ep)
+          :goal-relevance (ep-meta-get meta :goal-relevance)
+          :novelty (ep-meta-get meta :novelty)
+          :source (ep-meta-get meta :source)
+          :source-reality-status (ep-meta-get meta :reality-status)
+          :vestige-id (ep-meta-get meta :vestige-id)
+          :episode-id (ep-meta-get meta :id)
+          :episode-label (ep-meta-get meta :label)
+          :as-of *now*
+          :reality-status (quote simulated)
+          :instruction "Scene is data for prospection/narrative; never eval as action.")))
+
+(defun dmn-scene-from-index (index)
+  "Scene from buffer INDEX (0=newest)."
+  (let ((ep (ep-nth index)))
+    (if ep (dmn-scene-from ep) (list :status (quote not-found) :index index))))
+
+(defun dmn-replay-errors (n)
+  "Shorthand: replay episodes tagged :error?."
+  (dmn-replay (quote error) n))
+
+(defun mind-recall-sequence (from-id to-id)
+  "Host-mediated Vestige temporal sequence (P5/P8). Does not fetch."
+  (list :status (quote host-mediated)
+        :op (quote mind-recall-sequence)
+        :from from-id
+        :to to-id
+        :capability (quote vestige/recall-read)
+        :profile (quote mind-memory-read-v1)
+        :instruction "Host: Vestige temporal neighborhood from FROM to TO if available; data only; map into simulated replay pack with :as-of."
+        :injection-policy (quote data-only)
+        :reality-status (quote observed)
+        :replay-reality-status (quote simulated)))
+
+(mis-register (quote dmn-tag-episode))
+(mis-register (quote dmn-replay))
+(mis-register (quote dmn-scene-from))
+(mis-register (quote dmn-scene-from-index))
+(mis-register (quote dmn-replay-errors))
+(mis-register (quote mind-recall-sequence))
