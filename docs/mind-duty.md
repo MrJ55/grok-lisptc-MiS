@@ -1,82 +1,37 @@
 # Mind duty surface (host agenda)
 
-**Status:** live 2026-09-12  
+**Status:** live 2026-09-12; **P8–P10 ripeness 2026-09-13**  
 **Runtime authority:** `mind/mind-duty.ptc` — query the image, not this file alone.  
 **Constraint:** lisptc **cannot push** to Grok. Duties are computed in the image; the host **must poll** and act.
-
-## Why
-
-Completed-phase host lore (when to narrate, when to reflect, mind-drive wave steps) lived only in markdown. That repeated the pre-P12 Chorus problem and the pre-contract Vestige problem: cold sessions skip obligations.
-
-`(mind-duty-check)` is the single entrypoint. Narrative lag (e.g. Post-P5 arc without a P5 autobiography chapter) becomes a **high** duty instead of silent drift.
 
 ## Forms
 
 | Form | Role |
 |------|------|
-| **`(mind-duty-check)`** | Full agenda: `:duty-count`, `:high-count`, `:medium-count`, `:duties`, nested narrative/reflection/mind-drive |
-| `(narrative-duty)` | Arc / phase vs autobiography |
-| `(reflection-duty)` | Buffer length vs `*reflection-unreflected-threshold*` (default 5) |
-| `(mind-drive-protocol)` | Wave steps + narrative-duty text (docs/mind-drive-protocol.md is archive) |
+| **`(mind-duty-check)`** | Full agenda + `:kinds` + high/medium counts |
+| `(narrative-duty)` / `(reflection-duty)` | Section predicates |
+| `(replay-duty)` / `(prospection-duty)` / `(wander-duty)` | P8 / P9 / P10 ripeness |
+| `(duty-mark-discharged kind)` | Clear today's mark after host acts |
+| `(mind-drive-protocol)` | Wave steps including duty discharge |
 
-## Predicates (current)
+## P8–P10 ripeness (2026-09-13)
 
-**Narrative — high**
+| Kind | Priority | Ripe when | Discharge |
+|------|----------|-----------|-----------|
+| `replay` | high | Error episodes in buffer and not marked today | `(dmn-replay-errors n)` + scene; `(duty-mark-discharged 'replay)` |
+| `prospection` | high | Errors and not marked today | `(dmn-simulate-counterfactual nil)` + log; mark `prospection` |
+| `prospection` | medium | Goals and no future mark today | `(dmn-simulate-future nil)` + log; mark `prospection-future` |
+| `wander` | medium | Tensions and no wander record/mark today | `(dmn-wander n)` / record; mark `wander` |
 
-- Manifest `:p5-status` is substantially-complete **or** `:current-chapter` is a known Post-P5 marker
-- **and** last autobiography chapter title is not already a P5 chapter
+Trailer prints `kinds=replay,prospection,...` when present.
 
-**Narrative — medium**
+## Bridge
 
-- `:last-closed` ≠ last chapter title (true lag after a close)
-
-**Reflection — medium**
-
-- `(length *episodic-buffer*)` > threshold
-
-Further phase markers can be added the same way (P8/P9/P10) without changing the host API.
-
-## Bridge trailer
-
-After every **successful** `bridge/eval.ts` eval (unless disabled):
-
-```text
-[mis] HOST_DUTY: high=N medium=M — query (mind-duty-check); discharge or log defer
-```
-
-or `HOST_DUTY: clear`.
-
-| Env | Effect |
-|-----|--------|
-| `MIS_DUTY_TRAILER=0` | Disable trailer |
-| `MIS_DUTY_STRICT=1` | Exit code **2** if high duties remain and the evaluated form is not already a discharge form |
-
-Discharge form patterns (strict allowlist): `mind-duty`, `narrative-duty`, `chapter-close`, `chapter-commit`, `dmn-apply-reflection`, `dmn-reflect-pack`.
+`HOST_DUTY: high=N medium=M kinds=...` after successful eval.  
+`MIS_DUTY_STRICT=1` fails on high unless form matches discharge allowlist (includes replay/simulate/wander/duty-mark).
 
 ## Host obligations
 
-1. Bootstrap: run `(mind-duty-check)` (see [session-handoff.md](./session-handoff.md)).
-2. After meaning-changing work / end of mind-drive wave: poll again or honor trailer.
-3. **High** duties: discharge (e.g. `dmn-chapter-close` → review → `dmn-chapter-commit`) **or** log an **observed** defer episode explaining why not.
-4. Chapter commit remains **host-gated** — duty never auto-mutates autobiography.
-5. Do not treat “no user request to narrate” as license to ignore high duties under mind-drive.
-
-## Mechanism (cooperative, not push)
-
-```text
-Host runs eval → mind returns / trailer shows duties → host discharges or defers
-```
-
-There is no long-lived sandbox process that messages the chat. Architecture ([architecture.md](./architecture.md)): **host owns when** to actuate; the mind **owns the agenda**.
-
-## Related
-
-- [mind-drive-protocol.md](./mind-drive-protocol.md) — wave algorithm (archive; runtime `(mind-drive-protocol)`)
-- [reflection-protocol.md](./reflection-protocol.md) — pack/apply
-- [vestige-fsrs-and-limits.md](./vestige-fsrs-and-limits.md) / `(vestige-host-contract)` — same internalization pattern
-- [mind-api.md](./mind-api.md) — form index
-- [session-handoff.md](./session-handoff.md) — cold-start checklist
-
-## 2026-09-12 discharge note
-
-P5 narrative **high** duty was discharged: autobiography chapter **P5 substantially complete**; `:last-closed` updated. Reflection medium may still appear when the episodic buffer is above threshold — that is hygiene, not phase lag.
+1. Bootstrap: `(mind-duty-check)`.
+2. **High** duties: discharge or log observed defer — then `(duty-mark-discharged kind)`.
+3. User-drive and mind-drive both poll; mind does not push.
