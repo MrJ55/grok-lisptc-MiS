@@ -1,0 +1,123 @@
+;; OSS pure-DMN craft gate — runtime authority (query image, not docs alone)
+;; Load after dmn-protocol.ptc
+
+(setq *dmn-nudge-avoid*
+  '("workable change"
+    "workable by morning"
+    "workable"
+    "file named"
+    "list ideas"
+    "make it practical"
+    "answer-shaped ending"
+    "what it looks like"
+    "the one that"
+    "what changes is"
+    "system prompt"
+    "analytic naming of the split that invites advice"
+    "error-tagged"
+    "missing tags"
+    "episode about"
+    "concrete problem"
+    "you should"
+    "please help"
+    "how do I"
+    "task for you"))
+
+(setq *oss-committed-seed* nil)
+(setq *oss-craft-ok-today* nil)
+(setq *oss-uncrafted-count* 0)
+(setq *oss-last-seed-check* nil)
+
+(defun dmn-suggest-seed-catalog ()
+  "Canonical pure-DMN seeds (exact match required for craft gate)."
+  (list (dmn-suggest-seed (quote geometry-preservation))
+        (dmn-suggest-seed (quote pure-dmn-vs-tpn-pressure))
+        (dmn-suggest-seed (quote user-drive-vs-mind-drive))
+        (dmn-suggest-seed nil)))
+
+(defun dmn-oss-seed-check (text)
+  "OK only if TEXT equals a (dmn-suggest-seed) catalog entry."
+  (let ((ok nil) (via nil) (catalog (dmn-suggest-seed-catalog)))
+    (if (null text)
+        (setq *oss-last-seed-check*
+              (list :status (quote observed)
+                    :op (quote dmn-oss-seed-check)
+                    :ok nil
+                    :reason (quote empty-seed)
+                    :instruction "Use (dmn-suggest-seed thread) only."
+                    :reality-status (quote observed)))
+      (progn
+        (let ((xs catalog))
+          (while (and xs (not ok))
+            (if (equal text (car xs))
+                (progn (setq ok t) (setq via (quote suggest-seed-exact))))
+            (setq xs (cdr xs))))
+        (setq *oss-last-seed-check*
+              (list :status (quote observed)
+                    :op (quote dmn-oss-seed-check)
+                    :ok ok
+                    :via via
+                    :reason (if ok (quote craft-ok) (quote not-from-dmn-suggest-seed))
+                    :nudge-craft (dmn-nudge-craft)
+                    :must-not (quote (fire-oss-if-ok-nil hand-roll-problem-description analytic-tpn-framing))
+                    :instruction "If :ok is nil, do not call OSS."
+                    :reality-status (quote observed)))))
+    *oss-last-seed-check*))
+
+(defun oss-check-ok-p (check)
+  "True if seed-check plist has :ok t."
+  (let ((xs check) (found nil) (val nil))
+    (while (and xs (not found))
+      (if (eq (car xs) :ok)
+          (progn (setq found t) (setq val (cadr xs))))
+      (setq xs (cdr xs)))
+    (eq val t)))
+
+(defun dmn-oss-seed-commit (text)
+  "Commit TEXT for live OSS only if seed-check passes."
+  (let ((c (dmn-oss-seed-check text)))
+    (if (oss-check-ok-p c)
+        (progn
+          (setq *oss-committed-seed* text)
+          (setq *oss-craft-ok-today* t)
+          (list :status (quote committed)
+                :ok t
+                :seed text
+                :craft-ok-today *oss-craft-ok-today*
+                :reality-status (quote observed)))
+      (progn
+        (setq *oss-craft-ok-today* nil)
+        (setq *oss-uncrafted-count* (+ *oss-uncrafted-count* 1))
+        (list :status (quote rejected)
+              :ok nil
+              :check c
+              :uncrafted-count *oss-uncrafted-count*
+              :instruction "Rejected: do not call OSS with this seed."
+              :reality-status (quote observed))))))
+
+(defun dmn-oss-note-uncrafted ()
+  "Process debt: OSS without craft commit."
+  (setq *oss-uncrafted-count* (+ *oss-uncrafted-count* 1))
+  (setq *oss-craft-ok-today* nil)
+  (list :status (quote noted)
+        :uncrafted-count *oss-uncrafted-count*
+        :reality-status (quote observed)))
+
+(defun dmn-oss-host-rule ()
+  "Mandatory steps before pure-DMN HTTP."
+  (list :status (quote observed)
+        :op (quote dmn-oss-host-rule)
+        :steps
+          (quote ((dmn-nudge-craft)
+                  (dmn-suggest-seed)
+                  (dmn-oss-seed-check)
+                  (dmn-oss-seed-commit)
+                  (fire-http-only-if-committed)))
+        :forms (quote (dmn-nudge-craft dmn-suggest-seed dmn-oss-seed-check dmn-oss-seed-commit))
+        :reality-status (quote observed)
+        :instruction "Never call Groq/OpenCode without seed-commit ok."))
+
+(mis-register (quote dmn-oss-seed-check))
+(mis-register (quote dmn-oss-seed-commit))
+(mis-register (quote dmn-oss-host-rule))
+(mis-register (quote dmn-oss-note-uncrafted))

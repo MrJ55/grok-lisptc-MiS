@@ -1,5 +1,4 @@
 ;; MiS mind image — thin loader + compatibility manifest (P0.1 / P2)
-;; Forms after the setq are loaded relative to this file's directory (bridge chdirs during load).
 (setq *mind-manifest*
   '((:gmod-schema . "0.1.0")
     (:helpers-version . "0.7")
@@ -26,6 +25,7 @@
 (import "autobiography.ptc")
 (import "dmn-oracle.ptc")
 (import "dmn-protocol.ptc")
+(import "oss-craft.ptc")
 (import "arithmetic.ptc")
 (import "vestige-config.ptc")
 (import "vestige-ops.ptc")
