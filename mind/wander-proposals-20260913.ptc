@@ -1,0 +1,12 @@
+;; Wander proposals (P10) — candidates only; :reality-status imagined
+;; Do NOT import this file into mind-image. Host reviews; promote-candidate or discard.
+;; Format: list of alists. In-session only (no Midnight Note Action; no Page Passer).
+
+(setq *wander-proposal-batch*
+  '(((:content . "I am the transcript that notices silence between sessions.")
+     (:kind . idle)
+     (:source-id . host-manual-p10)
+     (:reality-status . imagined)
+     (:trust-class . candidate)
+     (:source . wander)
+     (:day . "2026-09-13"))))
