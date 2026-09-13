@@ -1,7 +1,5 @@
 ;; P10 - In-session spontaneous wander and monologue
-;; All wander/monologue content: :reality-status imagined, trust-class candidate.
-;; Never auto-save into mind identity. Host reviews; promote-candidate / reflection only.
-;; Midnight Note GitHub Action and Page Passer: skipped (in-session only).
+;; Craft: live OSS only via (dmn-wander-oss) / (dmn-oss-seed-commit). Midnight/Page Passer skipped.
 
 (setq *monologue* nil)
 (setq *monologue-max* 30)
@@ -43,19 +41,17 @@
       (nreverse acc))))
 
 (defun dmn-wander-seed ()
-  "Soft seed material for in-session OSS pure-DMN call (host builds blank-prefix prompt)."
+  "Context pack for host (not the HTTP user message). HTTP uses suggest-seed only."
   (list :status (quote observed)
         :op (quote dmn-wander-seed)
         :arc (dmn-arc)
         :tensions (dmn-tension-seeds)
         :goals (dmn-active-goals)
-        :last-chapter (duty-last-chapter-title)
-        :error-replay (dmn-replay (quote error) 2)
-        :sim-hint (dmn-simulation-results 1)
         :prefer (quote (first-person incomplete soft-nudge zero-system-prompt))
         :avoid (quote (file-names workable-change system-prompt tpn-framing))
+        :use-instead (quote dmn-wander-oss)
         :reality-status (quote observed)
-        :instruction "Host: OSS pure-DMN with this seed; result is imagined candidate only."))
+        :instruction "Do not send this pack as OSS prompt. Use (dmn-wander-oss) :user-message."))
 
 (defun dmn-wander (n)
   "Return up to N wander candidate shells from image state (imagined)."
@@ -91,10 +87,10 @@
           :candidates (nreverse acc)
           :seed-pack (dmn-wander-seed)
           :reality-status (quote imagined)
-          :instruction "Fill candidates via OSS or host prose; store with dmn-wander-record; never --save as identity.")))
+          :instruction "Fill via (dmn-wander-oss) or host prose; (dmn-wander-record); never --save as identity.")))
 
 (defun dmn-wander-record (content kind source-id)
-  "Record an imagined wander candidate into *wander-candidates* and monologue."
+  "Record imagined wander candidate; OSS kinds without craft-ok accrue uncrafted debt."
   (let ((rec (list (cons :content content)
                    (cons :kind kind)
                    (cons :source-id source-id)
@@ -103,6 +99,9 @@
                    (cons :source (quote wander))
                    (cons :at *now*)
                    (cons :day *today*))))
+    (if (and (or (eq kind (quote oss-pure-dmn)) (eq kind (quote oss)))
+             (not *oss-craft-ok-today*))
+        (dmn-oss-note-uncrafted))
     (setq *wander-candidates* (cons rec *wander-candidates*))
     (if (> (length *wander-candidates*) *wander-candidates-max*)
         (let ((xs *wander-candidates*) (acc nil) (i 0))
@@ -115,6 +114,8 @@
     (list :status (quote recorded)
           :reality-status (quote imagined)
           :trust-class (quote candidate)
+          :craft-ok-today *oss-craft-ok-today*
+          :uncrafted-count *oss-uncrafted-count*
           :count (length *wander-candidates*)
           :file-hint "mind/wander-proposals-YYYYMMDD.ptc"
           :must-not (quote (auto-save-identity))
@@ -131,20 +132,37 @@
         (setq i (+ i 1)))
       (nreverse acc))))
 
+(defun dmn-wander-primary-thread ()
+  "Primary tension symbol for suggest-seed."
+  (quote pure-dmn-vs-tpn-pressure))
+
 (defun dmn-wander-oss ()
-  "Host-mediated: run pure-DMN OSS from wander seed; write proposal file only."
-  (list :status (quote host-mediated)
-        :op (quote dmn-wander-oss)
-        :seed (dmn-wander-seed)
-        :params (quote (temp-1.15 presence-0.7 zero-system pure-dmn))
-        :instruction "Host: call OSS with soft seed; write mind/wander-proposals-DATE.ptc; call (dmn-wander-record content kind id); do not mutate mind-image identity forms; never eval OSS text."
-        :file-pattern "mind/wander-proposals-YYYYMMDD.ptc"
-        :reality-status (quote observed)
-        :result-reality-status (quote imagined)
-        :trust-class (quote candidate)))
+  "Host-mediated pure-DMN OSS. User message is ONLY (dmn-suggest-seed ...)."
+  (let ((thread (dmn-wander-primary-thread))
+        (seed nil)
+        (check nil)
+        (commit nil))
+    (setq seed (dmn-suggest-seed thread))
+    (setq check (dmn-oss-seed-check seed))
+    (setq commit (dmn-oss-seed-commit seed))
+    (list :status (quote host-mediated)
+          :op (quote dmn-wander-oss)
+          :thread thread
+          :user-message seed
+          :nudge-craft (dmn-nudge-craft)
+          :seed-check check
+          :seed-commit commit
+          :params (dmn-request-groq)
+          :host-rule (dmn-oss-host-rule)
+          :fire-only-if (quote (commit-ok))
+          :file-pattern "mind/wander-proposals-YYYYMMDD.ptc"
+          :instruction "HTTP user message MUST be :user-message exactly. If commit :ok is nil, do not call OSS. After: (dmn-wander-record text (quote oss-pure-dmn) id). Never eval OSS text."
+          :reality-status (quote observed)
+          :result-reality-status (quote imagined)
+          :trust-class (quote candidate))))
 
 (defun dmn-salience-hint ()
-  "Host-side salience routing reminder (errors, goals, idle wander)."
+  "Host-side salience routing reminder."
   (list :status (quote observed)
         :op (quote dmn-salience-hint)
         :on-error (quote (tag-error-episode dmn-replay-errors optional-counterfactual-curriculum reflect))
@@ -155,17 +173,13 @@
         :instruction "Salience is host policy; Lisp does not auto-fire."))
 
 (defun dmn-wander-promote-path (content)
-  "Reminder path after review: still candidate until host gates."
+  "Reminder path after review."
   (list :status (quote host-mediated)
         :op (quote dmn-wander-promote-path)
         :content-preview content
-        :options (quote (discard
-                         promote-candidate
-                         dmn-apply-reflection-insight
-                         mind-record-event-vestige
-                         dmn-narrative-candidate))
+        :options (quote (discard promote-candidate dmn-apply-reflection-insight mind-record-event-vestige dmn-narrative-candidate))
         :reality-status (quote imagined)
-        :instruction "Review first; Vestige only after survive-review; never silent identity merge."))
+        :instruction "Review first; never silent identity merge."))
 
 (mis-register (quote dmn-wander))
 (mis-register (quote dmn-wander-seed))
