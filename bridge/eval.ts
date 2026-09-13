@@ -52,7 +52,6 @@ const STATE_MANIFEST = join(STATE_DIR, "manifest.json");
 const KNOWN_GMOD_SCHEMAS = new Set(["0.1.0"]);
 const EXPECTED_CAPABILITY_PROFILE = "mind-sandbox-v1";
 
-/** Common pure-DMN / nudge-craft openings that must never be eval'd as code. */
 const OSS_SHAPE_PREFIXES = [
   "i am the transcript",
   "i am the voice that writes",
@@ -83,17 +82,14 @@ function looksLikeOssProse(code: string): boolean {
 function prevalidate(code: string): { ok: true } | { ok: false; reason: string } {
   const s = stripFences(code);
   if (!s) return { ok: false, reason: "empty form" };
-
   if (!s.trimStart().startsWith("(") && !s.trimStart().startsWith("'") && !s.trimStart().startsWith("`")) {
     if (/\s/.test(s.trim())) {
       return { ok: false, reason: "multi-word prose (not a Lisp form)" };
     }
   }
-
   if (looksLikeOssProse(s)) {
     return { ok: false, reason: "OSS-shaped prose rejected (pure-DMN discipline)" };
   }
-
   let depth = 0;
   let inStr = false;
   let esc = false;
@@ -224,17 +220,14 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   }
   const src = readFileSync(path, "utf8");
   if (!src.trim()) return;
-
   const forms = extractTopLevelForms(src);
   if (forms.length === 0) {
     console.error(`[mis] no top-level forms in ${path}`);
     if (strict) process.exit(2);
     return;
   }
-
   let anyFail = false;
   let manifestChecked = false;
-
   const imageDir = dirname(path);
   const prevCwd = process.cwd();
   try {
@@ -242,7 +235,6 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
   } catch {
     /* keep prevCwd */
   }
-
   for (let idx = 0; idx < forms.length; idx++) {
     const form = forms[idx];
     const { ok, output } = repl.eval(form);
@@ -256,7 +248,6 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
       }
       continue;
     }
-
     if (idx === 0 || !manifestChecked) {
       const m = repl.eval("*mind-manifest*");
       if (m.ok && m.output.trim() && !m.output.includes("unbound") && !m.output.includes("Unbound")) {
@@ -270,16 +261,12 @@ function loadImage(repl: MemoryRepl, path: string, strict: boolean) {
       }
     }
   }
-
   try {
     process.chdir(prevCwd);
   } catch {
     /* ignore */
   }
-
-  console.error(
-    `[mis] loaded ${path} (${src.length} chars, ${forms.length} forms) anyFail=${anyFail}`,
-  );
+  console.error(`[mis] loaded ${path} (${src.length} chars, ${forms.length} forms) anyFail=${anyFail}`);
   if (anyFail && strict) process.exit(2);
 }
 
@@ -311,18 +298,10 @@ function writeLastKnownGood(path: string) {
   if (!existsSync(path)) return;
   ensureDirs();
   copyFileSync(path, LKG_IMAGE);
-  const coreModules = [
-    "helpers.ptc",
-    "schema.ptc",
-    "episodes.ptc",
-    "autobiography.ptc",
-    "arithmetic.ptc",
-  ];
+  const coreModules = ["helpers.ptc", "schema.ptc", "episodes.ptc", "autobiography.ptc", "arithmetic.ptc"];
   for (const name of coreModules) {
     const src = join(MIND_DIR, name);
-    if (existsSync(src)) {
-      copyFileSync(src, join(CHECKPOINTS_DIR, name));
-    }
+    if (existsSync(src)) copyFileSync(src, join(CHECKPOINTS_DIR, name));
   }
   console.error(`[mis] last-known-good ← ${path} (+ modules)`);
 }
@@ -365,7 +344,6 @@ async function main() {
   let doCheckpoint = false;
   let strictLoad = false;
   const forms: string[] = [];
-
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === "--save") doSave = true;
@@ -373,52 +351,31 @@ async function main() {
     else if (a === "--checkpoint") doCheckpoint = true;
     else if (a === "--strict-load") strictLoad = true;
     else if (a === "--scratch") imagePath = SCRATCH_IMAGE;
-    else if (a === "--image" || a === "--load") {
-      imagePath = resolve(args[++i]);
-    } else if (a.startsWith("-")) {
+    else if (a === "--image" || a === "--load") imagePath = resolve(args[++i]);
+    else if (a.startsWith("-")) {
       console.error(`unknown flag: ${a}`);
       process.exit(1);
-    } else {
-      forms.push(a);
-    }
+    } else forms.push(a);
   }
-
   const code = forms.join(" ").trim();
-  if (!code && !doReset) {
-    // Allow pure load / image inspection with no forms
-  }
-
   const pre = code ? prevalidate(code) : { ok: true as const };
   if (!pre.ok) {
     console.error(`[mis] prevalidate failed: ${pre.reason}`);
     logFailure(pre.reason || "prevalidate", code);
     process.exit(2);
   }
-
   const repl = new MemoryRepl();
-  if (!doReset) {
-    loadImage(repl, imagePath, strictLoad);
-  } else {
-    console.error(`[mis] --reset: skipping image load`);
-  }
-
-  if (!code) {
-    process.exit(0);
-  }
-
+  if (!doReset) loadImage(repl, imagePath, strictLoad);
+  else console.error(`[mis] --reset: skipping image load`);
+  if (!code) process.exit(0);
   const beforeHash = existsSync(imagePath) ? shortHash(readFileSync(imagePath)) : "none";
   const { ok, output } = repl.eval(code);
   process.stdout.write(output);
-
   if (!ok) {
     console.error(`[mis] eval failed — image NOT updated`);
     logFailure("eval", code);
     process.exit(2);
   }
-
-  // Host duty trailer: mind cannot push to Grok; surface obligations after every successful eval.
-  // MIS_DUTY_TRAILER=0 disables. MIS_DUTY_STRICT=1 exits 2 when high-priority duties remain
-  // (unless the form itself mentions duty/chapter-close/commit/reflect).
   if (process.env.MIS_DUTY_TRAILER !== "0") {
     try {
       const dutyRun = repl.eval("(mind-duty-check)");
@@ -428,33 +385,33 @@ async function main() {
         const med = /:medium-count\s+([1-9]\d*)/.exec(text);
         const highN = high ? Number(high[1]) : 0;
         const medN = med ? Number(med[1]) : 0;
+        const kindsMatch = /:kinds\s+\(([^)]*)\)/.exec(text);
+        const kinds = kindsMatch ? kindsMatch[1].trim().replace(/\s+/g, ",") : "";
         if (highN > 0 || medN > 0) {
           console.error(
-            `[mis] HOST_DUTY: high=${highN} medium=${medN} — query (mind-duty-check); discharge or log defer`,
+            `[mis] HOST_DUTY: high=${highN} medium=${medN}` +
+              (kinds ? ` kinds=${kinds}` : "") +
+              ` — query (mind-duty-check); discharge or log defer`,
           );
-          const snippet = text.slice(0, 280);
+          const snippet = text.slice(0, 320);
           if (snippet) console.error(`[mis] HOST_DUTY detail: ${snippet}`);
         } else {
           console.error(`[mis] HOST_DUTY: clear`);
         }
         const strict = process.env.MIS_DUTY_STRICT === "1";
-        const discharging = /mind-duty|narrative-duty|chapter-close|chapter-commit|dmn-apply-reflection|dmn-reflect-pack/i.test(
-          code,
-        );
-        if (strict && highN > 0 && !discharging) {
-          console.error(
-            `[mis] HOST_DUTY strict: high-priority duties remain — discharge before continuing`,
+        const discharging =
+          /mind-duty|narrative-duty|replay-duty|prospection-duty|wander-duty|duty-mark-discharged|chapter-close|chapter-commit|dmn-apply-reflection|dmn-reflect-pack|dmn-replay|dmn-scene-from|dmn-simulate|dmn-wander|dmn-log-simulation/i.test(
+            code,
           );
+        if (strict && highN > 0 && !discharging) {
+          console.error(`[mis] HOST_DUTY strict: high-priority duties remain — discharge before continuing`);
           process.exit(2);
         }
       }
     } catch (e) {
-      console.error(
-        `[mis] HOST_DUTY trailer skipped: ${e instanceof Error ? e.message : e}`,
-      );
+      console.error(`[mis] HOST_DUTY trailer skipped: ${e instanceof Error ? e.message : e}`);
     }
   }
-
   if (doSave) {
     if (doCheckpoint && existsSync(imagePath)) {
       const prev = imagePath.replace(/\.ptc$/, ".prev.ptc");
