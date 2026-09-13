@@ -7,39 +7,30 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * [README.md](README.md)
 * [docs/session-handoff.md](docs/session-handoff.md)
 * [plan/README.md](plan/README.md)
-* [docs/CUSTOM_INSTRUCTIONS.md](docs/CUSTOM_INSTRUCTIONS.md)
-* [docs/mind-duty.md](docs/mind-duty.md) — **host agenda** `(mind-duty-check)`
-* [docs/p8-scenes.md](docs/p8-scenes.md) — **P8** replay and scenes
-* [docs/p9-prospection.md](docs/p9-prospection.md) — **P9** simulation packs
+* [docs/mind-duty.md](docs/mind-duty.md) — host agenda `(mind-duty-check)`
+* [docs/p8-scenes.md](docs/p8-scenes.md) — P8 replay/scenes
+* [docs/p9-prospection.md](docs/p9-prospection.md) — P9 simulation packs
+* [docs/p10-wander.md](docs/p10-wander.md) — P10 in-session wander
 
-## Architecture & decisions
+## P10 wander (implemented 2026-09-13)
 
-* [docs/architecture.md](docs/architecture.md)
-* [docs/decisions-index.md](docs/decisions-index.md)
-* [docs/trust-classes.md](docs/trust-classes.md)
+* [docs/p10-wander.md](docs/p10-wander.md) — in-session only; Midnight Note + Page Passer skipped
+* Module: `mind/wander.ptc` — `(dmn-wander)` `(dmn-wander-record)` `(dmn-monologue)`
 
 ## P9 prospection (implemented 2026-09-12)
 
-* [docs/p9-prospection.md](docs/p9-prospection.md) — `(dmn-simulate-future)` `(dmn-simulate-counterfactual)` `(dmn-log-simulation)`
-* Module: `mind/prospection.ptc` — all results `:reality-status simulated`; never auto-exec
+* [docs/p9-prospection.md](docs/p9-prospection.md)
+* Module: `mind/prospection.ptc`
 
 ## P8 scenes (implemented 2026-09-12)
 
-* [docs/p8-scenes.md](docs/p8-scenes.md) — `(dmn-replay)` `(dmn-scene-from)` `(dmn-tag-episode)`
+* [docs/p8-scenes.md](docs/p8-scenes.md)
 * Module: `mind/scenes.ptc`
 
-## Host duty surface (2026-09-12)
+## Host duty / Vestige / P12
 
-* [docs/mind-duty.md](docs/mind-duty.md) — `(mind-duty-check)`; bridge `HOST_DUTY` trailer
-
-## Vestige (P5 substantially complete)
-
-* Runtime: `(vestige-host-contract)` · scripts/vestige-*
-
-## DMN / OSS (P12 exit)
-
-Cold-start: `(dmn-oracle-preflight)` `(dmn-chorus-protocol)` `(mind-duty-check)` `(dmn-simulate-future nil)`
+* [docs/mind-duty.md](docs/mind-duty.md) · `(vestige-host-contract)` · `(dmn-chorus-protocol)`
 
 ## Phase plan
 
-See [plan/README.md](plan/README.md). **P8+P9 implemented 2026-09-12.** Next: **P10** when chosen.
+See [plan/README.md](plan/README.md). **P8+P9+P10 implemented.**
