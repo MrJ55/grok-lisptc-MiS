@@ -1,0 +1,178 @@
+;; P10 - In-session spontaneous wander and monologue
+;; All wander/monologue content: :reality-status imagined, trust-class candidate.
+;; Never auto-save into mind identity. Host reviews; promote-candidate / reflection only.
+;; Midnight Note GitHub Action and Page Passer: skipped (in-session only).
+
+(setq *monologue* nil)
+(setq *monologue-max* 30)
+(setq *wander-candidates* nil)
+(setq *wander-candidates-max* 40)
+
+(defun wander-plist-get (pl key)
+  (cond
+    ((null pl) nil)
+    ((not (consp pl)) nil)
+    ((eq (car pl) key) (cadr pl))
+    (t (wander-plist-get (cddr pl) key))))
+
+(defun dmn-monologue-push (thought)
+  "Push THOUGHT onto *monologue* as imagined; trim to *monologue-max*."
+  (let ((rec (list (cons :content thought)
+                   (cons :reality-status (quote imagined))
+                   (cons :trust-class (quote candidate))
+                   (cons :at *now*))))
+    (setq *monologue* (cons rec *monologue*))
+    (if (> (length *monologue*) *monologue-max*)
+        (let ((xs *monologue*) (acc nil) (i 0))
+          (while (and xs (< i *monologue-max*))
+            (setq acc (cons (car xs) acc))
+            (setq xs (cdr xs))
+            (setq i (+ i 1)))
+          (setq *monologue* (nreverse acc))))
+    rec))
+
+(defun dmn-monologue (n)
+  "Return up to N newest monologue entries (newest first)."
+  (if (or (null n) (<= n 0))
+      *monologue*
+    (let ((xs *monologue*) (acc nil) (i 0))
+      (while (and xs (< i n))
+        (setq acc (cons (car xs) acc))
+        (setq xs (cdr xs))
+        (setq i (+ i 1)))
+      (nreverse acc))))
+
+(defun dmn-wander-seed ()
+  "Soft seed material for in-session OSS pure-DMN call (host builds blank-prefix prompt)."
+  (list :status (quote observed)
+        :op (quote dmn-wander-seed)
+        :arc (dmn-arc)
+        :tensions (dmn-tension-seeds)
+        :goals (dmn-active-goals)
+        :last-chapter (duty-last-chapter-title)
+        :error-replay (dmn-replay (quote error) 2)
+        :sim-hint (dmn-simulation-results 1)
+        :prefer (quote (first-person incomplete soft-nudge zero-system-prompt))
+        :avoid (quote (file-names workable-change system-prompt tpn-framing))
+        :reality-status (quote observed)
+        :instruction "Host: OSS pure-DMN with this seed; result is imagined candidate only."))
+
+(defun dmn-wander (n)
+  "Return up to N wander candidate shells from image state (imagined)."
+  (let ((lim (if (and n (> n 0)) n 3))
+        (seeds nil)
+        (acc nil)
+        (i 0)
+        (tens (dmn-tension-seeds))
+        (goals (dmn-active-goals)))
+    (setq seeds (list
+                 (list :kind (quote tension) :hint (car tens))
+                 (list :kind (quote tension) :hint (cadr tens))
+                 (list :kind (quote goal) :hint (car goals))
+                 (list :kind (quote arc) :hint (dmn-arc))
+                 (list :kind (quote error-scene) :hint (dmn-replay (quote error) 1))))
+    (while (and seeds (< i lim))
+      (setq acc
+            (cons (list (cons :id (list (quote wander) i *today*))
+                        (cons :kind (wander-plist-get (car seeds) :kind))
+                        (cons :seed-hint (wander-plist-get (car seeds) :hint))
+                        (cons :content (quote host-or-oss-fills-first-person-fragment))
+                        (cons :reality-status (quote imagined))
+                        (cons :trust-class (quote candidate))
+                        (cons :source (quote wander))
+                        (cons :as-of *now*)
+                        (cons :must-not (quote (auto-save-to-mind-image auto-promote-to-autobiography eval-as-lisp))))
+                  acc))
+      (setq seeds (cdr seeds))
+      (setq i (+ i 1)))
+    (list :status (quote observed)
+          :op (quote dmn-wander)
+          :count i
+          :candidates (nreverse acc)
+          :seed-pack (dmn-wander-seed)
+          :reality-status (quote imagined)
+          :instruction "Fill candidates via OSS or host prose; store with dmn-wander-record; never --save as identity.")))
+
+(defun dmn-wander-record (content kind source-id)
+  "Record an imagined wander candidate into *wander-candidates* and monologue."
+  (let ((rec (list (cons :content content)
+                   (cons :kind kind)
+                   (cons :source-id source-id)
+                   (cons :reality-status (quote imagined))
+                   (cons :trust-class (quote candidate))
+                   (cons :source (quote wander))
+                   (cons :at *now*)
+                   (cons :day *today*))))
+    (setq *wander-candidates* (cons rec *wander-candidates*))
+    (if (> (length *wander-candidates*) *wander-candidates-max*)
+        (let ((xs *wander-candidates*) (acc nil) (i 0))
+          (while (and xs (< i *wander-candidates-max*))
+            (setq acc (cons (car xs) acc))
+            (setq xs (cdr xs))
+            (setq i (+ i 1)))
+          (setq *wander-candidates* (nreverse acc))))
+    (dmn-monologue-push content)
+    (list :status (quote recorded)
+          :reality-status (quote imagined)
+          :trust-class (quote candidate)
+          :count (length *wander-candidates*)
+          :file-hint "mind/wander-proposals-YYYYMMDD.ptc"
+          :must-not (quote (auto-save-identity))
+          :next (quote (review-then-promote-candidate-or-reflect-or-discard)))))
+
+(defun dmn-wander-candidates (n)
+  "Return up to N newest wander candidates."
+  (if (or (null n) (<= n 0))
+      *wander-candidates*
+    (let ((xs *wander-candidates*) (acc nil) (i 0))
+      (while (and xs (< i n))
+        (setq acc (cons (car xs) acc))
+        (setq xs (cdr xs))
+        (setq i (+ i 1)))
+      (nreverse acc))))
+
+(defun dmn-wander-oss ()
+  "Host-mediated: run pure-DMN OSS from wander seed; write proposal file only."
+  (list :status (quote host-mediated)
+        :op (quote dmn-wander-oss)
+        :seed (dmn-wander-seed)
+        :params (quote (temp-1.15 presence-0.7 zero-system pure-dmn))
+        :instruction "Host: call OSS with soft seed; write mind/wander-proposals-DATE.ptc; call (dmn-wander-record content kind id); do not mutate mind-image identity forms; never eval OSS text."
+        :file-pattern "mind/wander-proposals-YYYYMMDD.ptc"
+        :reality-status (quote observed)
+        :result-reality-status (quote imagined)
+        :trust-class (quote candidate)))
+
+(defun dmn-salience-hint ()
+  "Host-side salience routing reminder (errors, goals, idle wander)."
+  (list :status (quote observed)
+        :op (quote dmn-salience-hint)
+        :on-error (quote (tag-error-episode dmn-replay-errors optional-counterfactual-curriculum reflect))
+        :on-goal-done (quote (narrative-duty chapter-close-or-defer))
+        :on-idle (quote (dmn-wander-or-dmn-wander-oss in-session-only))
+        :skipped (quote (midnight-note-github-action page-passer))
+        :reality-status (quote observed)
+        :instruction "Salience is host policy; Lisp does not auto-fire."))
+
+(defun dmn-wander-promote-path (content)
+  "Reminder path after review: still candidate until host gates."
+  (list :status (quote host-mediated)
+        :op (quote dmn-wander-promote-path)
+        :content-preview content
+        :options (quote (discard
+                         promote-candidate
+                         dmn-apply-reflection-insight
+                         mind-record-event-vestige
+                         dmn-narrative-candidate))
+        :reality-status (quote imagined)
+        :instruction "Review first; Vestige only after survive-review; never silent identity merge."))
+
+(mis-register (quote dmn-wander))
+(mis-register (quote dmn-wander-seed))
+(mis-register (quote dmn-wander-record))
+(mis-register (quote dmn-wander-candidates))
+(mis-register (quote dmn-wander-oss))
+(mis-register (quote dmn-monologue-push))
+(mis-register (quote dmn-monologue))
+(mis-register (quote dmn-salience-hint))
+(mis-register (quote dmn-wander-promote-path))
