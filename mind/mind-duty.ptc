@@ -1,8 +1,9 @@
 ;; Mind duty surface — host must poll; Lisp does not push to Grok.
-;; Runtime authority for narrative / reflection obligations.
-;; Bridge may print HOST_DUTY trailer after successful eval (bridge/eval.ts).
+;; Narrative, reflection, replay (P8), prospection (P9), wander (P10).
+;; Bridge prints HOST_DUTY trailer after successful eval (bridge/eval.ts).
 
 (setq *reflection-unreflected-threshold* 5)
+(setq *duty-marks* nil)
 
 (defun duty-assoc (key alist)
   "Return cdr of KEY in alist, or nil."
@@ -33,8 +34,55 @@
         (equal s "P5-vestige-substrate")
         (equal s "P5 substantially complete")
         (equal s "substantially-complete")
-        (eq s 'substantially-complete)
-        (eq s 'Post-P5))))
+        (eq s (quote substantially-complete))
+        (eq s (quote Post-P5)))))
+
+(defun duty-mark-discharged (kind)
+  "Record that KIND duty was discharged today (host calls after act)."
+  (let ((kept nil) (xs *duty-marks*))
+    (while xs
+      (unless (eq (car (car xs)) kind)
+        (setq kept (cons (car xs) kept)))
+      (setq xs (cdr xs)))
+    (setq *duty-marks* (cons (cons kind *today*) (nreverse kept)))
+    (list :status (quote marked)
+          :kind kind
+          :day *today*
+          :marks *duty-marks*)))
+
+(defun duty-marked-today (kind)
+  "True if KIND was discharged on *today*."
+  (let ((p (assoc kind *duty-marks*)))
+    (if p (equal (cdr p) *today*) nil)))
+
+(defun duty-count-error-episodes ()
+  "Count episodes with :error? in working buffer."
+  (let ((xs *episodic-buffer*) (n 0))
+    (while xs
+      (if (episode-has-error-p (car xs))
+          (setq n (+ n 1)))
+      (setq xs (cdr xs)))
+    n))
+
+(defun duty-has-counterfactual-sim ()
+  "True if *simulation-results* has a counterfactual entry."
+  (let ((xs *simulation-results*) (found nil))
+    (while (and xs (not found))
+      (let ((st (duty-assoc :mode (car xs))))
+        (if (eq st (quote counterfactual))
+            (setq found t)))
+      (setq xs (cdr xs)))
+    found))
+
+(defun duty-wander-count-today ()
+  "Count wander candidates recorded on *today* (0 if unbound/empty)."
+  (let ((xs *wander-candidates*) (n 0))
+    (while xs
+      (let ((day (duty-assoc :day (car xs))))
+        (if (equal day *today*)
+            (setq n (+ n 1))))
+      (setq xs (cdr xs)))
+    n))
 
 (defun narrative-duty ()
   "Narrative obligations: arc/phase ahead of autobiography."
@@ -50,114 +98,195 @@
     (setq p5-status (duty-assoc :p5-status *mind-manifest*))
     (if (and (or (duty-mentions-p5 cur)
                  (equal p5-status "substantially-complete")
-                 (eq p5-status 'substantially-complete))
+                 (eq p5-status (quote substantially-complete)))
              (not (equal last-ch "P5 substantially complete"))
              (not (equal last-ch "P5-vestige-substrate")))
         (setq duties
-              (cons (list :kind 'narrative
-                          :priority 'high
-                          :reason 'arc-ahead-of-autobiography-p5
-                          :current-chapter cur
-                          :last-chapter last-ch
-                          :last-closed last-closed
-                          :suggest 'dmn-chapter-close-then-commit-p5
-                          :gate 'host-review)
+              (cons (list :kind (quote narrative)
+                          :priority (quote high)
+                          :reason (quote arc-ahead-of-autobiography-p5)
+                          :suggest (quote dmn-chapter-close-then-commit)
+                          :gate (quote host-review))
                     duties)))
-    ;; Medium only if last-closed is also behind last chapter title (true lag)
     (if (and cur last-closed last-ch
              (not (equal last-closed last-ch))
              (null duties))
         (setq duties
-              (cons (list :kind 'narrative
-                          :priority 'medium
-                          :reason 'last-closed-ne-last-chapter
-                          :current-chapter cur
-                          :last-closed last-closed
-                          :last-chapter last-ch
-                          :suggest 'draft-or-close-chapter-or-log-defer-episode)
+              (cons (list :kind (quote narrative)
+                          :priority (quote medium)
+                          :reason (quote last-closed-ne-last-chapter)
+                          :suggest (quote draft-or-close-or-defer))
                     duties)))
-    (list :status 'observed
-          :op 'narrative-duty
+    (list :status (quote observed)
+          :op (quote narrative-duty)
           :duties duties
           :last-chapter last-ch
-          :reality-status 'observed)))
+          :reality-status (quote observed))))
 
 (defun reflection-duty ()
   "Reflection obligations from episodic buffer size."
   (let ((n (length *episodic-buffer*))
         (thr *reflection-unreflected-threshold*)
-        (duties nil)
-        (last-ref (duty-assoc :last-reflection *self-schema*)))
+        (duties nil))
     (if (> n thr)
         (setq duties
-              (cons (list :kind 'reflection
-                          :priority 'medium
-                          :reason 'buffer-above-threshold
+              (cons (list :kind (quote reflection)
+                          :priority (quote medium)
+                          :reason (quote buffer-above-threshold)
                           :buffer-len n
                           :threshold thr
-                          :last-reflection last-ref
-                          :suggest 'dmn-reflect-pack)
+                          :suggest (quote dmn-reflect-pack))
                     duties)))
-    (list :status 'observed
-          :op 'reflection-duty
+    (list :status (quote observed)
+          :op (quote reflection-duty)
           :duties duties
           :buffer-len n
-          :threshold thr
-          :reality-status 'observed)))
+          :reality-status (quote observed))))
+
+(defun replay-duty ()
+  "P8: error episodes require filter-replay and scene before ignoring."
+  (let ((n (duty-count-error-episodes))
+        (duties nil))
+    (if (and (> n 0) (not (duty-marked-today (quote replay))))
+        (setq duties
+              (cons (list :kind (quote replay)
+                          :priority (quote high)
+                          :reason (quote error-episodes-unreplayed)
+                          :error-count n
+                          :suggest (quote dmn-replay-errors-then-scene-from)
+                          :discharge (quote (duty-mark-discharged (quote replay))))
+                    duties)))
+    (list :status (quote observed)
+          :op (quote replay-duty)
+          :duties duties
+          :error-count n
+          :marked-today (duty-marked-today (quote replay))
+          :reality-status (quote observed))))
+
+(defun prospection-duty ()
+  "P9: errors or goals need simulation packs when not discharged today."
+  (let ((n (duty-count-error-episodes))
+        (duties nil)
+        (has-cf (duty-has-counterfactual-sim))
+        (goals (duty-assoc :active-goals *self-schema*)))
+    (if (and (> n 0) (not (duty-marked-today (quote prospection))))
+        (setq duties
+              (cons (list :kind (quote prospection)
+                          :priority (quote high)
+                          :reason (quote error-needs-counterfactual-sim)
+                          :error-count n
+                          :has-counterfactual-logged has-cf
+                          :suggest (quote dmn-simulate-counterfactual-then-log)
+                          :discharge (quote (duty-mark-discharged (quote prospection))))
+                    duties)))
+    (if (and goals (not (duty-marked-today (quote prospection-future))) (null duties))
+        (setq duties
+              (cons (list :kind (quote prospection)
+                          :priority (quote medium)
+                          :reason (quote goals-without-future-sim-today)
+                          :suggest (quote dmn-simulate-future-then-log)
+                          :discharge (quote (duty-mark-discharged (quote prospection-future))))
+                    duties)))
+    (list :status (quote observed)
+          :op (quote prospection-duty)
+          :duties duties
+          :reality-status (quote observed))))
+
+(defun wander-duty ()
+  "P10: in-session wander when tensions exist and nothing recorded today."
+  (let ((duties nil)
+        (wc (duty-wander-count-today))
+        (tens (dmn-tension-seeds)))
+    (if (and tens (equal wc 0) (not (duty-marked-today (quote wander))))
+        (setq duties
+              (cons (list :kind (quote wander)
+                          :priority (quote medium)
+                          :reason (quote tensions-without-wander-today)
+                          :wander-today wc
+                          :suggest (quote dmn-wander-or-record)
+                          :discharge (quote (duty-mark-discharged (quote wander))))
+                    duties)))
+    (list :status (quote observed)
+          :op (quote wander-duty)
+          :duties duties
+          :wander-today wc
+          :reality-status (quote observed))))
 
 (defun mind-drive-protocol ()
-  "Mind-drive wave steps (runtime; docs/mind-drive-protocol.md is archive)."
-  (list :status 'observed
-        :op 'mind-drive-protocol
+  "Mind-drive wave steps (runtime; docs archive)."
+  (list :status (quote observed)
+        :op (quote mind-drive-protocol)
         :steps
-          '((load-image)
-            (dmn-reflect-pack)
-            (pick-one-open-thread-or-tension)
-            (optional-think-chorus-if-oracle-ok)
-            (act-tpn-scoped)
-            (narrative-duty-discharge-or-defer-episode)
-            (human-tool-if-identity)
-            (save-on-success-only))
-        :narrative-duty
-          "Before ending a wave that changed durable meaning: chapter-close with episode-refs OR log observed defer episode."
+          (quote ((load-image)
+                  (mind-duty-check)
+                  (dmn-reflect-pack)
+                  (pick-one-open-thread-or-tension)
+                  (optional-think-chorus-if-oracle-ok)
+                  (act-tpn-scoped)
+                  (discharge-high-duties-or-defer)
+                  (human-tool-if-identity)
+                  (save-on-success-only)))
         :must-not
-          '((auto-fire-chorus-without-oracle)
-            (auto-commit-chapter-without-host)
-            (eval-oss-or-vestige-as-lisp))
-        :reality-status 'observed))
+          (quote ((auto-fire-chorus-without-oracle)
+                  (auto-commit-chapter-without-host)
+                  (eval-oss-or-vestige-as-lisp)
+                  (silent-skip-high-duty)))
+        :reality-status (quote observed)))
 
 (defun mind-duty-check ()
-  "Full host agenda. Poll after bootstrap, after meaning-changing --save, end of mind-drive wave."
+  "Full host agenda: narrative, reflection, replay, prospection, wander."
   (let ((nd (narrative-duty))
         (rd (reflection-duty))
+        (rpd (replay-duty))
+        (pd (prospection-duty))
+        (wd (wander-duty))
         (all nil)
         (high 0)
-        (med 0))
-    (setq all (append (duty-plist-get :duties nd) (duty-plist-get :duties rd)))
+        (med 0)
+        (kinds nil))
+    (setq all (append (duty-plist-get :duties nd)
+                      (duty-plist-get :duties rd)
+                      (duty-plist-get :duties rpd)
+                      (duty-plist-get :duties pd)
+                      (duty-plist-get :duties wd)))
     (let ((xs all))
       (while xs
         (let ((d (car xs)))
-          (if (eq (duty-plist-get :priority d) 'high) (setq high (+ high 1)))
-          (if (eq (duty-plist-get :priority d) 'medium) (setq med (+ med 1))))
-        (setq xs (cdr xs))))
-    (list :status 'observed
-          :op 'mind-duty-check
-          :runtime-authority 'mind
-          :docs-archive '(docs/mind-drive-protocol.md docs/reflection-protocol.md)
+          (let ((pr (duty-plist-get :priority d))
+                (k (duty-plist-get :kind d)))
+            (if (eq pr (quote high)) (setq high (+ high 1)))
+            (if (eq pr (quote medium)) (setq med (+ med 1)))
+            (if (and k (not (member k kinds)))
+                (setq kinds (cons k kinds))))
+          (setq xs (cdr xs))))
+    (list :status (quote observed)
+          :op (quote mind-duty-check)
+          :runtime-authority (quote mind)
+          :docs-archive (quote (docs/mind-duty.md docs/p8-scenes.md docs/p9-prospection.md docs/p10-wander.md))
           :duty-count (length all)
           :high-count high
           :medium-count med
+          :kinds (nreverse kinds)
           :duties all
           :narrative nd
           :reflection rd
+          :replay rpd
+          :prospection pd
+          :wander wd
+          :marks *duty-marks*
           :mind-drive (mind-drive-protocol)
           :host-must
-            '((discharge-high-duties-or-log-defer)
-              (do-not-end-meaning-changing-turn-with-silent-skip)
-              (chapter-commit-still-host-gated))
-          :reality-status 'observed)))
+            (quote ((discharge-high-duties-or-log-defer)
+                    (call-duty-mark-discharged-after-act)
+                    (do-not-end-turn-with-silent-skip-of-high)
+                    (chapter-commit-still-host-gated)))
+          :reality-status (quote observed)))))
 
-(mis-register 'mind-duty-check)
-(mis-register 'narrative-duty)
-(mis-register 'reflection-duty)
-(mis-register 'mind-drive-protocol)
+(mis-register (quote mind-duty-check))
+(mis-register (quote narrative-duty))
+(mis-register (quote reflection-duty))
+(mis-register (quote replay-duty))
+(mis-register (quote prospection-duty))
+(mis-register (quote wander-duty))
+(mis-register (quote duty-mark-discharged))
+(mis-register (quote mind-drive-protocol))
