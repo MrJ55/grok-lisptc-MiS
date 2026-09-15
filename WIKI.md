@@ -1,13 +1,15 @@
 # Wiki — grok-lisptc-MiS
 
-Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN OSS channel + Vestige long-term memory substrate (P5) + **multi-agent peer minds** (blackboard branch).
+Mind-in-Sandbox: deterministic lisptc transcript + Grok host + pure-DMN OSS/Chorus + Vestige long-term memory **substrate** (P5) + **multi-agent peer minds** (branch `blackboard`, ADR 0013).
 
 ## Start here
 
-* [README.md](README.md)
-* [docs/session-handoff.md](docs/session-handoff.md)
-* [plan/README.md](plan/README.md)
-* [docs/mind-duty.md](docs/mind-duty.md) — host agenda `(mind-duty-check)`
+* [README.md](README.md) — status 2026-09-15
+* [docs/session-handoff.md](docs/session-handoff.md) — host restore protocol
+* [plan/README.md](plan/README.md) — phase table (source of truth)
+* [docs/architecture.md](docs/architecture.md) — layers
+* [docs/mind-duty.md](docs/mind-duty.md) — `(mind-duty-check)`
+* [docs/decisions-index.md](docs/decisions-index.md) — ADRs 0001–0013
 
 ## Blackboard / peer minds (branch `blackboard`)
 
@@ -18,10 +20,11 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 * **Roles:** [docs/role-contracts.md](docs/role-contracts.md)
 * **Bridge:** [docs/bridge-contract.md](docs/bridge-contract.md)
 * **Workflow:** [plan/P17-async-workflow.md](plan/P17-async-workflow.md)
+* **Permanence:** [docs/permanence.md](docs/permanence.md) — canonical vs role vs Vestige vs blackboard
 * **Vestige extension:** [docs/vestige-as-extension.md](docs/vestige-as-extension.md) · [plan/P22-vestige-true-extension.md](plan/P22-vestige-true-extension.md)
 * Injector: https://github.com/MrJ55/comet-mcp
 
-**Invariant:** local mind authorizes → local bridge I/O; peers do not save canonical identity; Vestige is substrate (peers read-only by default).
+**Invariants:** local mind authorizes → local bridge I/O; peers do not save canonical identity; Vestige is substrate (peers read-only by default); if Vestige disconnected → degraded, mind still boots.
 
 ## P10 wander (implemented 2026-09-13)
 
@@ -40,8 +43,9 @@ Mind-in-Sandbox: deterministic lisptc transcript + Grok host + optional pure-DMN
 
 ## Host duty / Vestige / P12
 
-* [docs/mind-duty.md](docs/mind-duty.md) · `(vestige-host-contract)` · `(dmn-chorus-protocol)`
+* [docs/mind-duty.md](docs/mind-duty.md) · [docs/vestige-injection-policy.md](docs/vestige-injection-policy.md) · `(dmn-chorus-protocol)`
+* Ops: [docs/ops-playbook.md](docs/ops-playbook.md) · [docs/bootstrap.md](docs/bootstrap.md)
 
 ## Phase plan
 
-See [plan/README.md](plan/README.md). **P8+P9+P10 implemented.** Blackboard P13–P22 + peer minds planned on branch `blackboard`.
+See [plan/README.md](plan/README.md). **P8+P9+P10 implemented.** P11/P12 live/exit. Blackboard **P13–P22 + peer minds designed** on branch `blackboard` (implementation starts at P13.0).
