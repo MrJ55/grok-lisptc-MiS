@@ -9,8 +9,9 @@
 ## One-shot script
 
 ```bash
-# From a clone of this repo
-bash scripts/bootstrap.sh
+# Prefer design branch when working multi-agent / peer minds:
+git clone -b blackboard https://github.com/MrJ55/grok-lisptc-MiS.git /tmp/grok-lisptc-MiS
+bash /tmp/grok-lisptc-MiS/scripts/bootstrap.sh
 # Creates /tmp/mis with sources, bridge, mind image, and node_modules/zod
 ```
 
@@ -36,7 +37,15 @@ cp -a /tmp/mis-node/node_modules /tmp/mis/
 cd /tmp/mis
 node --experimental-transform-types --no-warnings bridge/eval.ts '(+ 1 2 3)'
 node --experimental-transform-types --no-warnings bridge/eval.ts '(list (mis-version) (mis-ping))'
+node --experimental-transform-types --no-warnings bridge/eval.ts '(mis-state-summary)'
+node --experimental-transform-types --no-warnings bridge/eval.ts '(mind-duty-check)'
 ```
+
+## Peer tab (Model B)
+
+When running as a non-Orchestrator role, load **role image** for writes and treat canonical as read-only. Bridge/session config must set `role`, `roleImagePath`, `canonicalImagePath`, `vestigeProfile` (`read` for peers), `queueName`. See [role-contracts.md](./role-contracts.md) · [session-handoff.md](./session-handoff.md).
+
+Blackboard layout (when implementing P13.0): create `artifacts/blackboard/{state,tasks,claims,results,receipts,queues,archive}`.
 
 ## Why /tmp/mis?
 
