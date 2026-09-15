@@ -1,57 +1,68 @@
 # Vestige as true extension (not a second cabinet)
 
-**Intent:** Vestige is the long-term memory **store**; the lisptc transcript **indexes** into it; the **mind is the only authoritative surface** the host talks to for identity, agenda, and permanent growth.
+**Intent:** Vestige is the long-term memory **store**; each lisptc transcript **indexes** into it; the **local mind is the only authoritative surface** that instance talks to for identity, agenda, and growth.
+
+Under [adr/0013-peer-minds.md](../adr/0013-peer-minds.md), every Grok tab is a MiS instance. Vestige rules must hold for **Orchestrator and peers**.
 
 ## Authority model
 
 ```
-human / host chat
+human / host chat (per tab)
       ↓
-  mind (lisptc image)     ← only durable “cabinet” the host maintains
+  local mind (canonical or role image)
       │
-      ├── schema, autobiography, duties, compact episodic refs
+      ├── schema / role bias, duties, compact episodic refs
       │
-      └── host-mediated ops → Vestige HTTP MCP
+      └── host-mediated ops → bridge → Vestige HTTP MCP
                 │
-                └── ranked full-text episodes, causal/contradiction tools
+                └── ranked full-text episodes, causal tools (substrate)
 ```
 
-| Surface | Holds | Host may treat as |
-|---------|--------|-------------------|
-| Mind image | Identity, agenda, compact refs, trust | **Authoritative** |
-| Vestige | Full episodic mass, FSRS rank, backfill | **Substrate only** |
-| Wiki / GitHub docs | Archive of decisions | Archive, not runtime identity |
+| Surface | Holds | Treat as |
+|---------|--------|----------|
+| Canonical mind | Team identity, autobiography, global duties | **Authoritative (Orchestrator writes)** |
+| Role mind | Peer competence, local episodes | **Authoritative for that role only** |
+| Vestige | Full episodic mass, FSRS, backfill | **Substrate only** |
+| Blackboard | Tasks/results candidates | Coordination, not identity |
+| Wiki / GitHub | Decision archive | Archive, not runtime identity |
 
-## What “extension” means in practice
+## Profiles
 
-1. **Ingest path** — After Vestige ingest, host records a compact ref in the image (`dmn-log-vestige-ref`), not a second prose copy ([vestige-buffer-compaction.md](vestige-buffer-compaction.md)).
-2. **Recall path** — Prefer mind-facing forms / documented host CLI that returns structured data into the turn, then optional compact update in-image. Do not maintain a parallel “Vestige notebook” the host reads instead of `(mind-duty-check)` / schema.
-3. **Promotion** — Nothing retrieved from Vestige auto-saves into permanent identity. Promote still uses P0 validate → eval → save-on-success and reality-status discipline.
-4. **Degraded** — If Vestige is down, mind still runs; compact refs remain; host discloses degraded search ([P5](../plan/P5-vector-cabinet.md)).
-5. **Blackboard** — Multi-agent coordination may reference Vestige ids in envelopes; the mind (Orchestrator) remains sole mutator of identity ([blackboard-architecture.md](blackboard-architecture.md)).
+| Actor | Default Vestige profile |
+|-------|-------------------------|
+| Orchestrator | `read+ingest` → compact ref in **canonical** image |
+| Peer | **`read` only** → optional compact ref in **role** image |
+| Peer ingest | Grant or blackboard propose → Orchestrator ingests |
 
-## Anti-patterns (second cabinet)
+## Practice
 
-- Filing goals, autobiography, or “who we are” primarily in Vestige.
-- Host answering from raw Vestige dumps without mind context/duties.
-- Parallel permanent docs that bypass the image and Vestige index.
-- Eval of recalled text as Lisp.
-- Claiming durable memory is “in Vestige” when the image has no index/ref for it.
+1. **Ingest** — Orchestrator: ingest then `(dmn-log-vestige-ref …)` in canonical image ([vestige-buffer-compaction.md](vestige-buffer-compaction.md)).  
+2. **Recall** — Always mind → bridge → adapter; data only; never eval bodies as Lisp.  
+3. **Promotion** — Never auto-save Vestige text into any image; P0 gates.  
+4. **Degraded** — Vestige down/disconnected: minds boot; disclose stale search; compact refs still useful.  
+5. **Blackboard** — Envelopes may list `vestige-ids`; Orchestrator sole canonical mutator.
 
-## Implementation surface (existing + P22)
+## Anti-patterns
+
+- Filing “who we are” in Vestige.  
+- Peer or host using raw Vestige as parallel notebook.  
+- Peer ingest without grant.  
+- Claiming durable memory is “in Vestige” with no mind-side ref.  
+- Eval of recall as Lisp.
+
+## Implementation surface
 
 | Piece | Role |
 |-------|------|
-| `bridge/vestige-adapter.ts` | Typed HTTP MCP; no link to AGPL server |
-| `mind/vestige-ops.ptc` / config | Host-mediated Lisp contract |
-| `dmn-log-vestige-ref` | Index row in episodic buffer |
-| Injection policy | Data-only recall |
-| P22 checklist | Close remaining dual-cabinet gaps |
+| `bridge/vestige-adapter.ts` | Typed HTTP MCP |
+| `mind/vestige-ops.ptc` | Host-mediated contract |
+| `dmn-log-vestige-ref` | Index row |
+| Bridge `vestigeProfile` | Enforce read vs ingest per role |
+| P22 checklist | Close dual-cabinet gaps |
 
 ## Related
 
-- [adr/0012-vestige-true-extension.md](../adr/0012-vestige-true-extension.md)
-- [plan/P22-vestige-true-extension.md](../plan/P22-vestige-true-extension.md)
-- [plan/P5-vector-cabinet.md](../plan/P5-vector-cabinet.md)
-- [vestige-injection-policy.md](vestige-injection-policy.md)
-- [session-handoff.md](session-handoff.md)
+- [adr/0012-vestige-true-extension.md](../adr/0012-vestige-true-extension.md)  
+- [plan/P22-vestige-true-extension.md](../plan/P22-vestige-true-extension.md)  
+- [role-contracts.md](role-contracts.md)  
+- [vestige-injection-policy.md](vestige-injection-policy.md)  
