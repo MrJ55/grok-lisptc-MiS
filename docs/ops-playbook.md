@@ -9,6 +9,12 @@ node --experimental-transform-types --no-warnings bridge/eval.ts [flags] '<forms
 # exit 0 ok | 1 usage | 2 validation/eval failure
 ```
 
+Branch tip (peer minds / blackboard design):
+
+```bash
+git clone -b blackboard https://github.com/MrJ55/grok-lisptc-MiS.git
+```
+
 ## Failure log (ephemeral)
 
 `mind/mind-failures.log` records validation and eval failures (timestamp + form).
@@ -25,6 +31,16 @@ It is **local/ephemeral**:
 - Form-by-form image load; `--strict-load` makes any form failure fatal.
 - `--save` always refreshes `state/checkpoints/last-known-good.ptc` first (and snapshots core mind modules beside it so modular imports resolve).
 - Prevalidate rejects multi-word prose and OSS-shaped openings; allows bare atoms (`:keyword`, `<=`, `string->symbol`).
+- **Peer tabs (Model B):** never `--save` to canonical `mind-image.ptc`; use role image path only ([role-contracts.md](./role-contracts.md)).
+
+## Vestige
+
+```bash
+# when connected — host-mediated only; see scripts/vestige-mind.ts / vestige-smoke
+# if disconnected: degraded — mind still runs; do not claim fresh durable search
+```
+
+Policy: [vestige-injection-policy.md](./vestige-injection-policy.md) · extension: [vestige-as-extension.md](./vestige-as-extension.md)
 
 ## Tests
 
@@ -34,11 +50,13 @@ bash scripts/test-crash-recovery.sh
 bash scripts/test-malicious-ptc.sh
 bash scripts/test-continuity.sh
 bash scripts/eval.sh
+# optional when Vestige up:
+bash scripts/test-vestige-degraded.sh
 ```
 
-See `docs/VERIFICATION.md` after behavioural changes. Push `mind/mind-image.ptc` only after meaningful permanent defs.
+See `docs/VERIFICATION.md` after behavioural changes. Push `mind/mind-image.ptc` only after meaningful permanent defs (Orchestrator).
 
-## OSS pure-DMN probe (P6/P11)
+## OSS pure-DMN probe (P11)
 
 ```bash
 export GROQ_API_KEY=...   # never commit
@@ -48,3 +66,9 @@ bash scripts/oss-dmn-probe.sh "I notice my own processing changing as I read the
 Locked params: `openai/gpt-oss-20b`, temperature `1.15`, presence_penalty `0.7`, **no system message**.
 Use `OSS_REASONING_EFFORT=low` (default in script) so `message.content` is non-empty on Groq.
 Full gate: `bash scripts/eval.sh`
+
+## Blackboard (planned)
+
+Layout and schema: [blackboard-architecture.md](./blackboard-architecture.md) · [blackboard-schema.md](./blackboard-schema.md).  
+Cold-start: [plan/P13.0-blackboard-cold-start.md](../plan/P13.0-blackboard-cold-start.md).  
+Do not treat blackboard files as identity; mind authorizes → bridge writes.
